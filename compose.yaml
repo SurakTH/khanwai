@@ -1,0 +1,21 @@
+services:
+  app:
+    image: ${KHANWAI_IMAGE:-khanwai:0.8.6}
+    environment:
+      DATA_DIR: "${DATA_DIR:-/data}"
+      APP_ORIGIN: "${APP_ORIGIN:-}"
+      GOOGLE_BOOKS_API_KEY: "${GOOGLE_BOOKS_API_KEY:-}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      ALLOW_REGISTRATION: "${ALLOW_REGISTRATION:-true}"
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-4173}:4173"
+    restart: unless-stopped
+    read_only: true
+    volumes:
+      - book-data:/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  book-data:

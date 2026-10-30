@@ -1,0 +1,20 @@
+import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+test('purchase check can add a book and a series when native randomUUID is unavailable',async({page,context,baseURL})=>{
+ const actualLan=!['localhost','127.0.0.1','[::1]'].includes(new URL(baseURL).hostname);
+ if(!actualLan)await context.addInitScript(()=>Object.defineProperty(crypto,'randomUUID',{value:undefined,configurable:true}));
+ const created=await context.request.post('/api/auth/register',{headers:{'X-Book-Request':'1'},data:{email:`lan-${randomUUID()}@example.test`,password:'lan-test-only-password',name:'ทดสอบ LAN'}});expect(created.status()).toBe(201);
+ await page.goto('/');expect(await page.evaluate(()=>typeof crypto.randomUUID)).toBe('undefined');
+ if(actualLan)expect(await page.evaluate(()=>isSecureContext)).toBe(false);
+ await page.locator('nav [data-page="check"]').click();
+ await expect(page.locator('.page-heading [data-add]')).toBeVisible();await page.locator('.page-heading [data-add]').click();
+ await page.locator('[name="title"]').fill('ชุดที่เพิ่มผ่าน LAN');await page.locator('[name="label"]').fill('1');
+ await page.getByRole('button',{name:'หลายเล่มในชุด',exact:true}).click();
+ await page.locator('[name="end"]').fill('3');await page.getByRole('button',{name:'ตรวจรายการก่อนเพิ่ม →'}).click();
+ await page.getByRole('button',{name:'ยืนยันเพิ่มเข้าชั้น'}).click();await expect(page.locator('.entry-row')).toHaveCount(3);
+ await page.getByRole('button',{name:'+ เพิ่มเล่มในฉบับนี้'}).click();await page.locator('[name="label"]').fill('4');
+ await page.getByRole('button',{name:'ตรวจแล้ว · เพิ่มเข้าชั้น'}).click();await expect(page.locator('#modal')).not.toBeVisible();
+ await expect(page.locator('#connection')).toContainText('บันทึกบนเซิร์ฟเวอร์แล้ว');
+ const snapshot=await (await context.request.get('/api/library')).json();expect(snapshot.state.series).toHaveLength(1);expect(snapshot.state.series[0].entries).toHaveLength(4);
+ expect(new Set(snapshot.state.series[0].entries.map(e=>e.id)).size).toBe(4);
+});

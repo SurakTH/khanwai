@@ -52,6 +52,8 @@ iPhone เป็นเป้าหมายหลักและรองรั�
 
 ## พัฒนาและตรวจรับ
 
+ภาพหน้าจอการพัฒนาเก็บไว้เฉพาะในเครื่อง ไม่รวมใน repository สร้างภาพใหม่ได้ด้วย `node tests/preview-shelf.mjs after` และ `node tests/preview-detail.mjs` หลังเตรียม Chromium แล้ว
+
 Node.js 24.22.2 ตาม Dockerfile:
 
 ```sh

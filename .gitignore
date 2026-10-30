@@ -1,0 +1,21 @@
+node_modules/
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+data/
+backups/
+.DS_Store
+
+# Editor files, logs and local databases
+*.swp
+*.swo
+*.log
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+
+# Keep development screenshots local; regenerate them from the preview scripts
+docs/screenshots/

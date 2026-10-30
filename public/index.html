@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ee">
+  <meta name="description" content="คั่นไว้ — ชั้นหนังสือส่วนตัว เช็กให้ชัวร์ก่อนซื้อเล่มถัดไป">
+  <title>คั่นไว้ — ชั้นหนังสือของเรา</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/workshop.css">
+  <link rel="stylesheet" href="/account.css">
+  <link rel="stylesheet" href="/shelf.css">
+  <link rel="stylesheet" href="/detail.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+  <aside class="sidebar">
+    <a class="brand" href="#shelf"><span class="brand-mark">ค</span><span>คั่นไว้<small>ที่ของหนังสือเล่มโปรด</small></span></a>
+    <p class="nav-label">มุมหนังสือของเรา</p>
+    <nav aria-label="เมนูหลัก">
+      <button data-page="shelf" class="nav-item active"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h18v16H3zM7 4v16M11 4v16M15 4v16M18 4v16"/></svg></span><span class="nav-text">ชั้นหนังสือ</span><span class="nav-count" id="series-count">0</span></button>
+      <button data-page="check" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></span><span class="nav-text">เช็กก่อนซื้อ</span></button>
+      <button data-page="drafts" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h18v16H3zM3 9h18M3 14h18M7 6.5h10M7 11.5h10M7 16.5h10"/></svg></span><span class="nav-text">ถาดรอตรวจ</span></button>
+      <button data-page="settings" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span><span class="nav-text">ข้อมูลและการตั้งค่า</span></button>
+    </nav>
+    <div class="sidebar-note"><span class="tiny-book" aria-hidden="true">▥</span><p>เรื่องเยอะก็จำไม่หมด<br><strong>ให้คั่นไว้ช่วยจำนะ</strong></p></div>
+    <div class="local-profile"><span class="avatar">☺</span><div><strong id="profile-name">บัญชีของเรา</strong><small id="profile-email"></small></div></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span>ห้องสมุดเล็ก ๆ ของเรา <span aria-hidden="true">/</span> <strong id="breadcrumb">ชั้นหนังสือ</strong></span><span class="local-indicator" id="connection">● เก็บในเครื่องนี้</span></header>
+    <main id="main" tabindex="-1"></main>
+    <footer>คั่นไว้ · เก็บเรื่องราวไว้ แล้วไปพบเล่มใหม่กัน <span id="footer-status">ชั้นหนังสือส่วนตัว</span></footer>
+  </div>
+  <dialog id="modal" aria-labelledby="modal-title"><div id="modal-content"></div></dialog>
+  <dialog id="auth-modal" aria-label="เข้าสู่ระบบอีกครั้ง"><div id="auth-modal-content"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input id="barcode-file" type="file" accept="image/*" hidden>
+  <input id="barcode-camera" type="file" accept="image/*" capture="environment" hidden>
+  <input id="import-file" type="file" accept="application/json,.json" hidden>
+</body>
+</html>
