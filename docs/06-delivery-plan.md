@@ -222,3 +222,8 @@ Docker build khanwai:0.10.1 ผ่าน สำรองข้อมูล insta
 ## 0.10.2 — ลดพื้นที่รูปปกในฟอร์มเพิ่ม
 
 ย้ายรูปปกไว้หลังข้อมูลหนังสือใน single/draft และพับช่องวางด้วยคีย์บอร์ด/แตะค้างไว้ก่อน คง direct paste button พร้อม fallback เปิดช่องให้โฟกัสเอง มี inline status ยืนยันหลังเลือก ISBN candidate ตรวจ browser 17 ผ่าน/1 skipped (native clipboard บน mobile emulation) รวมตำแหน่งหลัง form-grid, ค่าเริ่มต้นพับ, native clipboard, fallback/async/offline, file picker, สลับ single/batch และ metadata/default edition ภาพ scratch DB หลังเลือก ISBN ที่ 320/390/1440px ไม่ล้นและเห็นชื่อเรื่องต่อจากผลค้น ไม่มีข้อมูลผู้ใช้ในภาพ เก็บเฉพาะเครื่อง
+
+
+## 0.10.3 — หมวดหมู่ใต้ปกบนชั้น
+
+เปลี่ยนเฉพาะ card metadata เป็นรูปแบบ · หมวดหมู่ · ภาษา ตามผู้ใช้ ตรวจ browser ด้วย scratch DB ที่ 1440/390/320px ทั้ง gallery/list หมวดส่วนตัวแสดงตรง ไม่มีหน้าล้น รายละเอียดคง edition เดิมและ API state หลังใช้งานเท่ากับก่อนตรวจ ไม่มี mutation ภาพเก็บเฉพาะเครื่องใน screenshots/shelf-category-label-mobile.png Docker build 0.10.3 ผ่าน สำรอง pre-0103-shelf-category รวม 2 รูปก่อนอัปเดต ไม่มี schema/backend change

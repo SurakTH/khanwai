@@ -2,7 +2,7 @@
 
 ## บริบท
 
-ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.10.2 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/08-prototype.md` และ `docs/10-implementation.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
+ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.10.3 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/08-prototype.md` และ `docs/10-implementation.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
 
 0.7.1 มีรายการย่อ ตัวกรอง target/ที่เก็บ/แท็ก แก้หลาย entry และ CSV import พร้อม mapping/review แล้ว อ่าน docs/11-shelf-management.md กติกา target unknown/ordered/box และ CSV duplicate/edition matching ต้องรักษา แท็กเป็นระดับ series ไม่ใช่ per-volume ใช้ validateState ฝั่ง server และ mutation/outbox เดิม
 
@@ -23,6 +23,8 @@
 0.10.1 วางรูปปกผ่าน public/photos.js ได้ทุก flow อ่าน docs/17-cover-paste.md ใช้ processor/validation เดียวกับ file/camera ไม่ดัก paste ช่องข้อมูล ไม่โหลดภาพจาก URL clipboard ไม่อ่านคลิปบอร์ดอัตโนมัติ ใช้ native paste fallback เมื่อ async Clipboard API ไม่พร้อม และคง generation/editor lifecycle guard
 
 0.10.2 ผู้ใช้ขอรูปปกไม่กินพื้นที่ก่อนข้อมูล ISBN: single/draft วาง photo editor หลัง form-grid, ช่อง keyboard/native paste เริ่มพับ ปุ่มวางตรงยังใช้ได้ และมี inline lookup status หลังเลือก candidate ห้ามนำกล่องรูปปกใหญ่กลับไปคั่นผล ISBN กับชื่อเรื่อง
+
+0.10.3 บรรทัดใต้ปกบนชั้นทั้ง gallery/list แสดง รูปแบบ · หมวดหมู่ · ภาษา ตามคำขอผู้ใช้ ใช้ series.category แทน edition เฉพาะการ์ด ข้อมูลฉบับและรายละเอียดคงเดิม
 
 ## ก่อนทำงาน
 

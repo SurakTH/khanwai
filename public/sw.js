@@ -1,4 +1,4 @@
-const CACHE = 'khanwai-shell-v32';
+const CACHE = 'khanwai-shell-v33';
 const ASSETS = ['/', '/index.html', '/styles.css', '/mobile-inputs.css', '/categories.js', '/trash.js', '/trash-ui.js', '/trash.css', '/unread-picker.js', '/category-ui.js', '/category-ui.css', '/shelf.css', '/shelf-view.js', '/detail.css', '/detail-view.js', '/workshop.css', '/account.css', '/lookup-settings.js', '/provider-options.js', '/app.js', '/ids.js', '/shelf-sort.js', '/shelf-tools.js', '/bulk-edit.js', '/csv-import.js', '/csv-ui.js', '/lib.js', '/reading.js', '/photos.js', '/workshop.js', '/editing.js', '/barcode.js', '/account-store.js', '/account-ui.js', '/sync-core.js', '/vendor/barcode-decoder.js', '/icon.svg', '/icon-192.png', '/icon-512.png', '/manifest.webmanifest', '/fonts/NotoSansThai.ttf'];
 const OWNER_MAP = 'khanwai-client-owners-v1';
 const ownerKey = client => `/__book-client/${encodeURIComponent(client)}`;
