@@ -1,3 +1,4 @@
+import { categoryList, validateCategoryList } from './categories.js';
 import { validateState, normalizeIsbn } from './lib.js';
 
 export const emptyLibrary = () => ({ schemaVersion: 2, series: [], drafts: [] });
@@ -14,12 +15,14 @@ export function flattenLibrary(state) {
     for (const entry of entries) records.set(`entry:${entry.id}`, { ...entry, seriesId: series.id });
   }
   for (const draft of state.drafts) records.set(`draft:${draft.id}`, draft);
+  if(state.categories!==undefined)records.set('catalog:categories',{id:'categories',names:[...state.categories]});
   return records;
 }
 export function expandLibrary(records) {
-  const series = new Map(), drafts = [];
+  const series = new Map(), drafts = []; let categories;
   for (const [key, data] of records) {
-    if (key.startsWith('series:')) series.set(data.id, { ...data, entries: [] });
+    if(key==='catalog:categories'){categories=validateCategoryList(data.names);if(data.id!=='categories')throw Error('รายการหมวดหมู่ไม่ถูกต้อง');}
+    else if (key.startsWith('series:')) series.set(data.id, { ...data, entries: [] });
     else if (key.startsWith('draft:')) drafts.push(data);
   }
   for (const [key, data] of records) if (key.startsWith('entry:')) {
@@ -27,7 +30,7 @@ export function expandLibrary(records) {
     if (!series.has(seriesId)) throw Error('เล่มอ้างถึงฉบับที่ไม่มีอยู่ กรุณาตรวจข้อมูลก่อนซิงก์');
     series.get(seriesId).entries.push(entry);
   }
-  return validateState({ schemaVersion: 2, series: [...series.values()], drafts });
+  return validateState({ schemaVersion: 2, series: [...series.values()], drafts, ...(categories!==undefined?{categories}:{}) });
 }
 export function recordDiff(before, after) {
   const old = flattenLibrary(before), next = flattenLibrary(after), changes = [];
@@ -65,5 +68,6 @@ export function mergeImport(current, incoming) {
     if (used.has(draft.id) || draft.isbn && state.drafts.some(d => normalizeIsbn(d.isbn) === normalizeIsbn(draft.isbn))) { skipped++; continue; }
     state.drafts.push(structuredClone(draft)); used.add(draft.id); added++;
   }
+  if(incoming.categories!==undefined){const seen=new Set();state.categories=[...categoryList(current),...incoming.categories].filter(name=>{const key=name.normalize('NFKC').toLocaleLowerCase('th');if(seen.has(key))return false;seen.add(key);return true;});}
   return { state: validateState(state), skipped, added };
 }

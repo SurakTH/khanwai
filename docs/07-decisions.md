@@ -245,3 +245,21 @@ Box รองรับรายเล่มโดยไม่สร้างเ�
 ผู้ใช้พบว่า clone repository แล้วไม่มี .env.example จึงเพิ่มไฟล์ตัวอย่างที่มีครบทุกตัวแปร interpolation ของ Compose: image, bind address, port, container data directory, origin, registration, secure cookies และ Google Books key แบบว่างทั้งหมดที่เป็นความลับ ค่าเริ่มต้นตรง Compose เดิม โดย bind 127.0.0.1 พร้อมคำอธิบายการเปลี่ยนเป็น 0.0.0.0 เมื่อต้องการเข้าจากเครื่องอื่น ไม่คัดค่าจาก .env จริง
 
 README และคู่มือ Docker เริ่มด้วย `test -e .env || cp .env.example .env` เพื่อสร้างไฟล์เมื่อยังไม่มีและเก็บค่าเดิมเมื่อมีอยู่แล้ว .env.example เข้า Git ได้ตาม exception เดิม ส่วน .env จริงยัง ignored ตรวจเอกสาร [Compose interpolation และ env-file](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) แล้ว validate ด้วย compose config ทั้งค่าเริ่มต้นและตัวอย่าง server/HTTPS จากไฟล์ชั่วคราว ไม่เปิด/recreate container และไม่ต้องเปลี่ยน version image เพราะไม่มี runtime change
+
+
+## ช่องกรอกบนมือถือและการซูม Safari (31 ตุลาคม 2026)
+
+ผู้ใช้พบว่า iPhone ซูมเมื่อแตะพิมพ์ จึงเพิ่ม mobile-inputs.css เป็น stylesheet สุดท้าย ให้ช่องพิมพ์ select และ textarea ใช้ 16px เมื่อ viewport ไม่เกิน 800px หรือเป็นอุปกรณ์สัมผัสหลักแบบ pointer coarse/hover none รวมมือถือแนวนอน ไม่เปลี่ยนกรอบปกหรือแถวเครื่องมือ ไม่ปรับ checkbox/radio/file และปุ่มส่งฟอร์ม
+
+ใช้ baseline !important เฉพาะ font-size เพื่อครอบคลุมกฎ compact form เดิมที่เฉพาะเจาะจงกว่า คง viewport เดิมและ pinch zoom ตาม [คำแนะนำ MDN เรื่อง viewport และ accessibility](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport) ไม่ใช้ user-scalable=no หรือ maximum-scale จำกัดผู้ใช้ เปลี่ยน shell cache เป็น v27 เพื่อโหลด stylesheet ออฟไลน์ได้ผ่าน flow อัปเดตเดิม
+
+ตรวจ Chromium mobile emulation ผ่าน mobile-inputs.spec.js: ขนาด computed font หน้าล็อกอิน ค้นหา และเพิ่มหนังสืออย่างน้อย 16px ที่ 390px/320px ไม่มีหน้าล้น และ viewport ไม่ปิดซูม การตรวจนี้ยืนยัน CSS/geometry ยังต้องลองพฤติกรรมคีย์บอร์ดและ auto zoom บน Safari/iPhone จริงหลังอัปเดตเซิร์ฟเวอร์
+
+
+## 0.9.0 — หมวดหมู่ต่อบัญชี (31 ตุลาคม 2026)
+
+ผู้ใช้ขอคงหมวดเริ่มต้นแต่เพิ่ม/ลดได้ เช่น การ์ตูนวาย จึงเพิ่มการจัดการในตั้งค่า รวมการเปลี่ยนชื่อและย้ายหนังสือ/รอตรวจก่อนลบหมวดที่ใช้อยู่ ใช้ optional state.categories และ catalog:categories ผ่าน mutation/outbox/conflict เดิม ไม่สร้าง API หรือบริการแยก หมวดระดับเรื่อง/ฉบับคงแยกจากรูปแบบและสถานะ
+
+ตรวจ [SQLite user_version](https://www.sqlite.org/pragma.html#pragma_user_version) และ [service worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers) แล้ว ใช้ migration เพิ่ม catalogs owner-scoped ที่ DB v3 (JSON ยังคง v2), รับ restore DB v1/v2/v3, guard รุ่นใหม่กว่าเดิม และ shell-v27 รวม asset ใหม่ คง flow อัปเดต PWA เดิมไม่บังคับ reload กลางฟอร์ม
+
+ชื่อหมวดบน series/draft ยังเป็น string เพื่อคงข้อมูลเดิม รายการแสดงรวม configured + referenced names จึงไม่ซ่อนหนังสือจาก late offline write/การเลือก conflict ที่นำชื่อเก่ากลับมา การเปลี่ยนชื่อ/ลบปกติย้ายทั้ง series/draft ใน operation เดียว ไม่เปลี่ยน entry/photo/reading/ownership ชื่อเก่าที่กลับมาจะแสดงให้จัดการอีกครั้ง รายละเอียดและเกณฑ์อยู่ใน 15-categories.md

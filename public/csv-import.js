@@ -1,5 +1,6 @@
+import { categoryList, categoryOptions, categoryKey } from './categories.js';
 import { READING_STATUSES } from './reading.js';
-import { CATEGORIES, FORMATS, STATUSES, normalizeIsbn, matchingEntries, validateState } from './lib.js';
+import { FORMATS, STATUSES, normalizeIsbn, matchingEntries, validateState } from './lib.js';
 import { parseTags, targetLabels, tagKey } from './shelf-tools.js';
 import { newId } from './ids.js';
 export const CSV_FIELDS = { readingStatus:'สถานะการอ่าน', title:'ชื่อเรื่อง', author:'ผู้เขียน', edition:'ฉบับ', language:'ภาษา', format:'รูปแบบหนังสือ', category:'ประเภท', label:'เลขเล่ม / ชื่อบ็อกซ์', isbn:'ISBN', status:'สถานะ', quantity:'จำนวนสำเนา', location:'ที่เก็บ / แพลตฟอร์ม', tags:'แท็ก', target:'เลขเป้าหมายของชุด', kind:'ชนิดรายการ', members:'สมาชิกบ็อกซ์' };
@@ -41,12 +42,13 @@ function enumValue(raw, values) {
   return Object.hasOwn(values, normalized) ? normalized : Object.keys(values).find(k => values[k] === normalized) ?? '';
 }
 const identity = s => [s.title,s.author,s.edition,s.language,s.format].map(v => String(v).trim().normalize('NFC').toLocaleLowerCase('th')).join('\u0000');
-function rowData(row) {
+function rowData(row, state) {
   const format = enumValue(row.format, FORMATS), status = enumValue(row.status, STATUSES);
   if (!format) throw Error('เลือกรูปแบบหนังสือเล่มหรือ ebook');
   if (!status) throw Error('เลือกสถานะมีแล้ว รอส่ง หรืออยากซื้อ');
   if (!row.title.trim() || !row.edition.trim() || !row.language.trim() || !row.label.trim()) throw Error('กรอกชื่อเรื่อง ฉบับ ภาษา และเลขเล่มให้ครบ');
-  if (!CATEGORIES.includes(row.category)) throw Error('เลือกประเภทหนังสือให้ถูกต้อง');
+  const category = categoryList(state).find(name => categoryKey(name) === categoryKey(row.category));
+  if (!category) throw Error('เลือกหมวดหมู่ที่มีอยู่ หรือเพิ่มหมวดหมู่ในตั้งค่าก่อน');
   const isbn = row.isbn.trim() ? normalizeIsbn(row.isbn) : '';
   if (row.isbn.trim() && !isbn) throw Error('ISBN ไม่ถูกต้อง (ถ้า Excel เปลี่ยนเป็นเลขวิทยาศาสตร์ ให้แก้เป็นข้อความ)');
   const kind = ['','volume','เล่ม'].includes(row.kind) ? 'volume' : ['box','บ็อกซ์'].includes(row.kind) ? 'box' : '';
@@ -56,7 +58,7 @@ function rowData(row) {
   const readingStatus = readingRaw === 'ตั้งใจจะอ่าน' ? 'planned' : readingRaw ? enumValue(readingRaw,READING_STATUSES) : 'unread';
   if(readingRaw && !readingStatus) throw Error('สถานะการอ่านไม่ถูกต้อง');
   const quantity = row.quantity.trim() ? Number(row.quantity) : 1;
-  const series = { id:'candidate-series', title:row.title.trim(),author:row.author.trim(),alias:'',edition:row.edition.trim(),language:row.language.trim(),format,category:row.category,tags:parseTags(row.tags),entries:[],target:targetLabels(row.target) };
+  const series = { id:'candidate-series', title:row.title.trim(),author:row.author.trim(),alias:'',edition:row.edition.trim(),language:row.language.trim(),format,category,tags:parseTags(row.tags),entries:[],target:targetLabels(row.target) };
   const entry = { id:'candidate-entry',kind,label:row.label.trim(),isbn,quantity,status,readingStatus,location:row.location.trim(),source:'CSV · ตรวจแล้ว',...(kind === 'box' ? { members:targetLabels(row.members) } : {}) };
   if (kind === 'box' && !entry.members.length) throw Error('ระบุเล่มในบ็อกซ์ก่อนนำเข้า เพื่อเช็กซ้ำได้ถูกต้อง');
   validateState({schemaVersion:2,series:[{...series,entries:[entry]}],drafts:[]});
@@ -68,7 +70,7 @@ export function planCsv(state, candidates, idFactory = newId) {
   for (const row of candidates) {
     try {
       if (!row.selected) { results.push({index:row.index,status:'excluded',message:'เว้นไว้'}); continue; }
-      const {series,entry} = rowData(row);
+      const {series,entry} = rowData(row, next);
       const matches = next.series.filter(s => identity(s) === identity(series));
       if (matches.length > 1) throw Error('พบฉบับเดิมหลายรายการที่ข้อมูลตรงกัน โปรดแยกฉบับให้ชัดก่อน');
       let target = matches[0];

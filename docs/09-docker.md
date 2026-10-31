@@ -4,7 +4,7 @@
 
 ```sh
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.8.6 .
+docker build -t khanwai:0.9.0 .
 docker compose up -d --wait
 ```
 
@@ -19,10 +19,10 @@ docker compose up -d --wait
 ยังไม่มี registry ที่เผยแพร่จริง ผู้สร้างส่ง image กับ compose.yaml ได้:
 
 ```sh
-docker image save -o khanwai-0.8.6.tar khanwai:0.8.6
+docker image save -o khanwai-0.9.0.tar khanwai:0.9.0
 ```
 
-ผู้รับใช้ `docker image load -i khanwai-0.8.6.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
+ผู้รับใช้ `docker image load -i khanwai-0.9.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
 
 ## ตั้งค่า
 
@@ -32,7 +32,7 @@ docker image save -o khanwai-0.8.6.tar khanwai:0.8.6
 | --- | --- | --- |
 | PORT | 4173 | พอร์ต host |
 | BIND_ADDRESS | 127.0.0.1 | interface host |
-| KHANWAI_IMAGE | khanwai:0.8.6 | image/tag |
+| KHANWAI_IMAGE | khanwai:0.9.0 | image/tag |
 | DATA_DIR | /data | โฟลเดอร์ฐานข้อมูลใน volume ใช้เปลี่ยนหลัง restore |
 | ALLOW_REGISTRATION | true | ตั้ง false หลังสมัครบัญชีที่ต้องการแล้ว |
 | APP_ORIGIN | ว่าง | URL เว็บภายนอก เช่น https://books.example.com สำหรับ origin check |
@@ -84,6 +84,32 @@ docker compose exec app node src/cli.mjs reset-password reader@example.com
 สำรอง -> build/load image tag ใหม่ -> ตั้ง KHANWAI_IMAGE -> `docker compose up -d --wait` -> ตรวจ login/ชั้น/รูป เก็บ image เก่าไว้จนตรวจเสร็จ ถ้า schema ใหม่กว่า image เก่า แอพจะปฏิเสธการเปิด ต้องใช้ backup ที่เข้ากันกับ image เก่าลงโฟลเดอร์ใหม่ก่อนย้อนกลับ
 
 การลบบัญชีลบข้อมูลและรูปของบัญชีนั้นในระบบปัจจุบัน ไม่ลบ backup ที่ผู้ดูแลคัดลอกไว้ ต้องจัดการ retention ของ backup แยกกัน
+
+## อัปเกรดเป็น 0.9.0: หมวดหมู่ส่วนตัว
+
+สำรองด้วย container เดิมก่อนอัปเกรด:
+
+```sh
+docker compose exec -T app node src/cli.mjs backup /data/backups/pre-090-categories
+git pull
+```
+
+แก้เฉพาะ `KHANWAI_IMAGE=khanwai:0.9.0` ใน `.env` ของเครื่อง เก็บ APP_ORIGIN, bind และค่าอื่นเดิมไว้ จากนั้น:
+
+```sh
+docker build -t khanwai:0.9.0 .
+docker compose up -d
+```
+
+จะเพิ่มตารางหมวดเป็น SQLite v3 อัตโนมัติ หนังสือ/บัญชี/รูปเดิมคงอยู่ หมวดรวมใน JSON export และ server backup แล้ว ไม่เพิ่ม container หรือ reverse proxy หลังเข้าเว็บให้รับอัปเดต PWA เมื่อพร้อม ดูวิธีใช้ที่ [หมวดหมู่](15-categories.md)
+
+หากต้องย้อนกลับ 0.8.6 ให้ใช้ image เก่ากู้ **backup ก่อนอัปเกรด** ลง directory ว่าง ไม่เปิด DB v3 ด้วย image เก่า:
+
+```sh
+KHANWAI_IMAGE=khanwai:0.8.6 docker compose run --rm --no-deps app node src/cli.mjs restore /data/backups/pre-090-categories /data/rollback-086
+```
+
+จากนั้นตั้ง `.env` เป็น `KHANWAI_IMAGE=khanwai:0.8.6` และ `DATA_DIR=/data/rollback-086` แล้ว `docker compose up -d` การย้อนผ่าน backup จะได้ข้อมูล ณ เวลาสำรอง จึงควรเก็บ export ล่าสุดไว้ก่อนด้วย
 
 ## ISBN lookup ใน 0.4.0
 

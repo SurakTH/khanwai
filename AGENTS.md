@@ -2,7 +2,7 @@
 
 ## บริบท
 
-ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.8.6 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/08-prototype.md` และ `docs/10-implementation.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
+ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.9.0 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/08-prototype.md` และ `docs/10-implementation.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
 
 0.7.1 มีรายการย่อ ตัวกรอง target/ที่เก็บ/แท็ก แก้หลาย entry และ CSV import พร้อม mapping/review แล้ว อ่าน docs/11-shelf-management.md กติกา target unknown/ordered/box และ CSV duplicate/edition matching ต้องรักษา แท็กเป็นระดับ series ไม่ใช่ per-volume ใช้ validateState ฝั่ง server และ mutation/outbox เดิม
 
@@ -15,6 +15,8 @@
 0.8.3 ผู้ใช้ยืนยันให้กรอบปก gallery กว้างเต็มคอลัมน์เท่าเดิมและตรงแนวข้อความ ขยายเฉพาะรูปในกรอบ ห้ามย่อกรอบเป็น max-width แคบแล้วจัดกลางเหมือน 0.8.2
 
 0.8.6 ผู้ใช้ขอคืนหน้าชั้นแบบก่อนเพิ่มช่องการอ่าน: ใช้ shelf.css/shelf-view.js จาก 0.8.3 โดยตรง ตัวกรองการอ่านอยู่ในปุ่มกรอง ไม่เพิ่มแถว quick filter หรือคู่ช่องอ่าน/เรียงด้านนอกแบบ 0.8.4–0.8.5 สถานะการอ่านและข้อมูลเดิมคงครบ
+
+0.9.0 จัดการหมวดหมู่ต่อบัญชีในตั้งค่า ผ่าน public/categories.js และ catalog:categories ใน outbox เดิม SQLite v3/JSON v2 อ่าน docs/15-categories.md ก่อนแก้ หมวดเริ่มต้นเดิม ใช้ categoryList/categoryOptions ทุกช่อง ไม่ hardcode CATEGORIES สำหรับบัญชี เปลี่ยนชื่อ/ลบต้องย้าย series และ drafts ใน mutation เดียว ไม่เปลี่ยน entries; referenced names จากเครื่องเก่าต้องยังเห็นได้ mobile-inputs.css คงฟอนต์ช่องกรอกมือถือ 16px และ pinch zoom
 
 ## ก่อนทำงาน
 

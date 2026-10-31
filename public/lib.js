@@ -1,6 +1,7 @@
+import { DEFAULT_CATEGORIES, validateCategoryList, validateCategoryName } from './categories.js';
 import { validateReading } from './reading.js';
 export const STATUSES = { owned: 'มีแล้ว', ordered: 'รอส่ง', wishlist: 'อยากซื้อ' };
-export const CATEGORIES = ['การ์ตูน', 'นิยายวายไทย', 'นิยายแปลจีน', 'อื่น ๆ'];
+export const CATEGORIES = DEFAULT_CATEGORIES;
 export const FORMATS = { physical: 'หนังสือเล่ม', ebook: 'ebook' };
 export const normalizeText = text => String(text ?? '').normalize('NFKC').trim().toLocaleLowerCase('th');
 
@@ -33,7 +34,7 @@ export function searchLibrary(series, query = '', filter = 'all', format = 'all'
   const text = normalizeText(query);
   const isbn = normalizeIsbn(query);
   return series.filter(s => {
-    const statusMatches = filter === 'all' || CATEGORIES.includes(filter) && s.category === filter ||
+    const statusMatches = filter === 'all' || !Object.hasOwn(STATUSES,filter) && normalizeText(s.category) === normalizeText(filter) ||
       s.entries.some(e => e.status === filter);
     const haystack = normalizeText([s.title, s.author, s.alias, s.edition, s.language, ...(s.tags ?? []),
       ...s.entries.flatMap(e => [e.label, e.isbn, e.location])].join(' '));
@@ -60,6 +61,7 @@ function validateOptionalMedia(item) {
 export function validateState(data) {
   if (!data || data.schemaVersion !== 2 || !Array.isArray(data.series) || !Array.isArray(data.drafts) ||
       data.series.length > 5000 || data.drafts.length > 1000) throw new Error('รูปแบบข้อมูลหรือเวอร์ชันไม่รองรับ');
+  if(data.categories!==undefined) validateCategoryList(data.categories);
   const ids = new Set();
   function id(value) {
     requireText(value, 100);
@@ -77,7 +79,8 @@ export function validateState(data) {
     requireText(s.title); requireText(s.author, 300, true); requireText(s.alias, 300, true);
     requireText(s.edition); requireText(s.language); requireText(s.category);
     if (!Object.hasOwn(FORMATS, s.format)) throw new Error('รูปแบบหนังสือไม่ถูกต้อง');
-    if (!CATEGORIES.includes(s.category) || !Array.isArray(s.entries) || s.entries.length > 5000) throw new Error('ข้อมูลชุดไม่ถูกต้อง');
+    validateCategoryName(s.category);
+    if (!Array.isArray(s.entries) || s.entries.length > 5000) throw new Error('ข้อมูลชุดไม่ถูกต้อง');
     if (s.target !== undefined && (!Array.isArray(s.target) || s.target.length > 1000)) throw new Error('ข้อมูลเล่มเป้าหมายไม่ถูกต้อง');
     for (const label of s.target ?? []) requireText(label, 80);
     for (const e of s.entries) {

@@ -206,10 +206,10 @@ test('schema v1 migrates to provider preferences without changing existing accou
  const directory=await mkdtemp(path.join(os.tmpdir(),'book-migration-'));t.after(()=>rm(directory,{recursive:true,force:true}));
  const storage=new LibraryStorage(directory),owner=storage.createUser('migration@example.test','M','unused-hash').id;
  const state=seedState();storage.apply(owner,{id:randomUUID(),changes:recordDiff(emptyLibrary(),state).map(c=>({...c,baseRevision:0}))});
- storage.db.exec('DROP TABLE preferences; PRAGMA user_version=1;');
+ storage.db.exec('DROP TABLE preferences; DROP TABLE catalogs; PRAGMA user_version=1;');
  const oldBackup=path.join(directory,'v1-backup');await storage.backupTo(oldBackup);storage.close();
  const migrated=new LibraryStorage(directory);
- try{assert.ok(migrated.user(owner));assert.equal(migrated.db.prepare('PRAGMA user_version').get().user_version,2);assert.deepEqual(migrated.settings(owner).isbnProviders,['google','openlibrary']);assert.deepEqual(migrated.snapshot(owner).state,state);}finally{migrated.close();}
+ try{assert.ok(migrated.user(owner));assert.equal(migrated.db.prepare('PRAGMA user_version').get().user_version,3);assert.deepEqual(migrated.settings(owner).isbnProviders,['google','openlibrary']);assert.deepEqual(migrated.snapshot(owner).state,state);}finally{migrated.close();}
  const restoredPath=path.join(directory,'restored-v1');restoreBackup(oldBackup,restoredPath);const restored=new LibraryStorage(restoredPath);try{assert.deepEqual(restored.snapshot(owner).state,state);assert.deepEqual(restored.settings(owner).isbnProviders,['google','openlibrary']);}finally{restored.close();}
 });
 

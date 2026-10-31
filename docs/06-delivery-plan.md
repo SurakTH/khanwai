@@ -157,3 +157,23 @@ Patch 0.3.1: แก้พึ่ง Google Books แห่งเดียว เ�
 ## งานแรกที่หยิบทำต่อได้
 
 ลอง Safari/iPhone และ Android จริงด้วยหนังสือที่ผู้ใช้เลือก ตรวจกล้อง/install PWA และความครอบคลุม ISBN; งาน AI/CSV export/แบบฟอร์มสร้างบ็อกซ์เฉพาะอยู่ในแผนอนาคต ไม่เพิ่ม provider ค่าใช้จ่ายหรือ public hosting เอง
+
+
+## การแก้ช่องกรอกบนมือถือ (31 ตุลาคม 2026)
+
+เสร็จในซอร์ส: baseline ตัวอักษรช่องกรอก 16px บนมือถือ พร้อม shell-v27; mobile-inputs.spec.js ผ่านหน้าล็อกอิน/ค้นหา/เพิ่มหนังสือ ความกว้าง 390/320px และตรวจว่าไม่ปิด pinch zoom ไม่มีการเปลี่ยนข้อมูลหรือหน้าตาชั้น ต้องอัปเดต image บนเซิร์ฟเวอร์และตรวจ Safari/iPhone จริงก่อนยืนยันผล auto zoom บนอุปกรณ์จริง
+
+
+## ตรวจรับ 0.9.0 — หมวดหมู่ส่วนตัว
+
+| เกณฑ์ | หลักฐาน |
+| --- | --- |
+| เริ่มด้วยหมวดเดิมโดยไม่เขียนย้อนหลัง เพิ่ม/เปลี่ยนชื่อ/ลบได้และห้ามลบหมวดสุดท้าย | categories.test.js และ categories.spec.js |
+| ลบหมวดที่ใช้อยู่ต้องย้าย series/drafts คง entry/box/ownership/reading | unit + browser ตรวจ entries ก่อน/หลังและ draft review |
+| ใช้หมวดเดียวกันใน single/batch/edit/filter/CSV | categories.spec.js, categories.test.js, ชุด shelf/CSV เดิม |
+| แยกบัญชี ซิงก์ข้ามเครื่อง ออฟไลน์ reload และไม่ทับเมื่อชน | categories.test.js + categories.spec.js รวมเลือก catalog conflict |
+| export/import หมวดว่าง รวม/แทนที่ SQLite migration/backup/restore/rollback | categories.spec.js, backend.test.js, categories.test.js และ Docker smoke จาก khanwai:0.8.6 |
+
+ผลรอบนี้: npm test 61 ผ่าน, browser เต็ม 149 ผ่าน/1 skipped (mobile-only input test บน desktop), browser หมวดหลังตรวจ UI เพิ่มอีก 8 ผ่าน ภาพตัวอย่างที่สร้างจากบัญชีและฐานแยกตรวจไม่ล้น 320/390/1440px ภาพเก็บเฉพาะเครื่องใน docs/screenshots/categories-*.png ไม่ส่งขึ้น Git
+
+Docker migration + rollback ผ่านด้วย scratch volume: เริ่ม image 0.8.6/DB v2 → 0.9.0/DB v3 เพิ่ม/เปลี่ยนหมวด สำรอง/กู้หมวดว่างพร้อมบัญชี/หนังสือ/รูป และย้อน image ผ่าน backup ก่อนอัปเกรด ไม่มีการใช้ข้อมูลจริงในการทดสอบ

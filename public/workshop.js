@@ -1,6 +1,7 @@
+import { categoryList, categoryOptions, categoryKey } from './categories.js';
 import { readingOptions, readingLabel } from './reading.js';
 import { parseTags } from './shelf-tools.js';
-import { CATEGORIES, FORMATS, STATUSES, matchingEntries, normalizeIsbn } from './lib.js';
+import { FORMATS, STATUSES, matchingEntries, normalizeIsbn } from './lib.js';
 import { photoEditorMarkup, mountPhotoEditor } from './photos.js';
 
 export function batchLabels(start, end, excluded = '') {
@@ -36,7 +37,7 @@ export function openBatchForm({ state, initial={}, intro='', lookupMarkup='', op
     <label class="field full">เพิ่มเข้าฉบับ<select name="seriesId" id="batch-series"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${state.series.map(s=>`<option value="${esc(s.id)}" ${initial.seriesId===s.id?'selected':''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select></label>
     <label class="field full">ชื่อเรื่อง *<input name="title" required maxlength="300" placeholder="ชื่อชุด ไม่รวมเลขเล่ม"></label>
     <label class="field">ผู้เขียน<input name="author" maxlength="300"></label>
-    <label class="field">ประเภท<select name="category">${options(Object.fromEntries(CATEGORIES.map(c=>[c,c])),initial.category??'การ์ตูน')}</select></label>
+    <label class="field">ประเภท<select name="category">${categoryOptions(state,initial.category??categoryList(state)[0],esc)}</select></label>
     <label class="field">รูปแบบ<select name="format">${options(FORMATS,initial.format??'physical')}</select></label>
     <label class="field">ฉบับ *<input name="edition" required maxlength="300"></label>
     <label class="field">ภาษา *<input name="language" required maxlength="100"></label>

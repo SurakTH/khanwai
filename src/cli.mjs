@@ -18,7 +18,7 @@ export function restoreBackup(source, destination) {
   }
   const verify = new DatabaseSync(path.join(origin, 'library.sqlite'), { readOnly: true });
   try {
-    if (verify.prepare('PRAGMA integrity_check').get().integrity_check !== 'ok' || verify.prepare('PRAGMA foreign_key_check').all().length || ![1,2].includes(verify.prepare('PRAGMA user_version').get().user_version)) throw Error('ฐานข้อมูล backup ไม่ผ่านการตรวจสอบ');
+    if (verify.prepare('PRAGMA integrity_check').get().integrity_check !== 'ok' || verify.prepare('PRAGMA foreign_key_check').all().length || ![1,2,3].includes(verify.prepare('PRAGMA user_version').get().user_version)) throw Error('ฐานข้อมูล backup ไม่ผ่านการตรวจสอบ');
   } finally { verify.close(); }
   mkdirSync(target, { recursive: true, mode: 0o700 });
   for (const file of files) { const output = path.join(target, file.path); mkdirSync(path.dirname(output), { recursive: true, mode: 0o700 }); copyFileSync(path.join(origin, file.path), output); }

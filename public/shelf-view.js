@@ -1,4 +1,5 @@
-import { CATEGORIES, FORMATS, STATUSES, coverage } from './lib.js';
+import { categoryList, categoryOptions, categoryKey } from './categories.js';
+import { FORMATS, STATUSES, coverage } from './lib.js';
 import { READING_STATUSES } from './reading.js';
 import { SHELF_ORDERS } from './shelf-sort.js';
 const icons = { grid:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>', list:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></svg>', filter:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="var(--white)"/><circle cx="16" cy="12" r="2" fill="var(--white)"/><circle cx="8" cy="18" r="2" fill="var(--white)"/></svg>' };
@@ -21,7 +22,7 @@ export function shelfPageMarkup(p, esc) {
     <div class="shelf-search"><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" aria-label="ค้นหาหนังสือ" placeholder="ค้นชื่อเรื่อง ผู้เขียน หรือ ISBN" value="${esc(query)}" autocomplete="off"><button type="button" id="clear-search" aria-label="ล้างคำค้น" ${query?'':'hidden'}>×</button></div></div>
     <details class="shelf-filters" id="shelf-filters" ${filtersOpen?'open':''}><summary><span class="shelf-filter-icon" aria-hidden="true">${icons.filter}</span> กรอง<span id="shelf-filter-count" ${active.length?'':'hidden'}>${active.length}</span></summary>
       <div class="shelf-filter-panel"><div class="shelf-filter-heading"><div><h2>เลือกหนังสือที่อยากดู</h2><p>เลือกใช้ร่วมกันได้ แล้วกดดูผลลัพธ์</p></div><button type="button" class="button" id="close-shelf-filters" aria-label="ปิดตัวกรอง">×</button></div><div class="form-grid">
-        <label class="field">ประเภทหนังสือ<select id="category">${options(Object.fromEntries(CATEGORIES.map(c=>[c,c])),category,'ทุกประเภท')}</select></label>
+        <label class="field">ประเภทหนังสือ<select id="category">${options(Object.fromEntries(categoryList(state).map(c=>[c,c])),category,'ทุกประเภท')}</select></label>
         <label class="field">รูปแบบหนังสือ<select id="format-filter" aria-label="กรองรูปแบบหนังสือ">${options(FORMATS,bookFormat,'ทุกรูปแบบ')}</select></label>
         <label class="field">สถานะการอ่าน<select id="shelf-reading" aria-label="กรองสถานะการอ่าน"><option value="">ทุกสถานะการอ่าน</option>${Object.entries(READING_STATUSES).map(([k,v])=>`<option value="${k}" ${readingFilter===k?'selected':''}>${v}</option>`).join('')}</select></label>
         <label class="field">แสดงเฉพาะ<select id="shelf-smart">${options(SMART,smartFilter,'ทั้งหมด')}</select></label>

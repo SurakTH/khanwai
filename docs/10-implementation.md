@@ -1,5 +1,12 @@
 # โครงสร้างที่ implementation แล้วใน 0.4.0
 
+## เพิ่มใน 0.9.0
+
+หมวดหมู่ส่วนตัวอยู่ใน optional state.categories / sync catalog:categories พร้อม SQLite catalogs แยก owner และ schema DB v3 อัปเกรดจาก v1/v2 โดยเพิ่มตาราง ไม่เขียนข้อมูลหนังสือเดิม ตั้งค่าจัดการเพิ่ม/เปลี่ยนชื่อ/ลบพร้อมย้าย ใช้หมวดเดียวกันทุกแบบฟอร์ม ตัวกรอง และ CSV รวมใน outbox/export/import/backup เดิม ดู [15-categories.md](15-categories.md)
+
+mobile-inputs.css โหลดท้ายเพื่อให้ช่องกรอกมือถืออย่างน้อย 16px โดยคง pinch zoom และ shelf layout เดิม shell-v27 รวม asset ใหม่ทั้งหมด
+
+
 เอกสารนี้ระบุระบบปัจจุบัน ต่างจากแบบเป้าหมายใน 03/04 ที่ยังมีส่วนอนาคต
 
 ## ข้อมูลและบัญชี

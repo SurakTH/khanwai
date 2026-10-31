@@ -9,12 +9,12 @@ import { expandLibrary, flattenLibrary, stableJSON } from '../public/sync-core.j
 export class AppError extends Error {
   constructor(status, code, message, details) { super(message); Object.assign(this, { status, code, details }); }
 }
-const tables = { series: 'series', entry: 'entries', draft: 'drafts' };
+const tables = { series: 'series', entry: 'entries', draft: 'drafts', catalog: 'catalogs' };
 export const sha256 = value => createHash('sha256').update(value).digest('hex');
 export function parseKey(key) {
   if (typeof key !== 'string' || key.length > 110) throw new AppError(400, 'invalid_operation', 'รายการซิงก์ไม่ถูกต้อง');
   const split = key.indexOf(':'), kind = key.slice(0, split), id = key.slice(split + 1);
-  if (!tables[kind] || !id || id.length > 100) throw new AppError(400, 'invalid_operation', 'ชนิดรายการซิงก์ไม่ถูกต้อง');
+  if (!tables[kind] || kind==='catalog' && id!=='categories' || !id || id.length > 100) throw new AppError(400, 'invalid_operation', 'ชนิดรายการซิงก์ไม่ถูกต้อง');
   return { kind, id, table: tables[kind] };
 }
 
@@ -25,7 +25,7 @@ export class LibraryStorage {
     this.db = new DatabaseSync(path.join(this.directory, 'library.sqlite'), { timeout: 5000 });
     this.db.exec('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;');
     const version = this.db.prepare('PRAGMA user_version').get().user_version;
-    if (version > 2) throw Error('ฐานข้อมูลเป็นเวอร์ชันใหม่กว่าแอพ ห้ามเปิดด้วย image เก่า');
+    if (version > 3) throw Error('ฐานข้อมูลเป็นเวอร์ชันใหม่กว่าแอพ ห้ามเปิดด้วย image เก่า');
     if (version === 0) this.db.exec(`BEGIN IMMEDIATE;
       CREATE TABLE users(id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL, created_at INTEGER NOT NULL, cursor INTEGER NOT NULL DEFAULT 0) STRICT;
       CREATE TABLE sessions(token_hash TEXT PRIMARY KEY, owner TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL) STRICT;
@@ -44,6 +44,7 @@ export class LibraryStorage {
       CREATE TABLE preferences(owner TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, data TEXT NOT NULL CHECK(json_valid(data)), revision INTEGER NOT NULL) STRICT;
       PRAGMA user_version=2; COMMIT;`);
 
+    if(version<3)this.db.exec(`BEGIN IMMEDIATE; CREATE TABLE catalogs(owner TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, id TEXT NOT NULL, data TEXT NOT NULL CHECK(json_valid(data)), revision INTEGER NOT NULL, deleted INTEGER NOT NULL CHECK(deleted IN(0,1)), PRIMARY KEY(owner,id)) STRICT; PRAGMA user_version=3; COMMIT;`);
   }
   close() { this.db.close(); }
   writable() {
@@ -161,6 +162,7 @@ export class LibraryStorage {
         if (!conflicts.some(c => c.key === key)) conflicts.push({ key, current: null, mine: null, reason: 'parent_deleted' });
       }
       if (conflicts.length) throw new AppError(409, 'conflict', 'รายการนี้ถูกแก้จากอีกเครื่อง กรุณาเลือกข้อมูลที่จะเก็บ', { conflicts, snapshot });
+      for(const change of operation.changes)if(change.key==='catalog:categories'&&change.value!==null&&Object.keys(change.value).some(key=>!['id','names'].includes(key)))throw new AppError(400,'invalid_library','ข้อมูลหมวดหมู่ไม่ถูกต้อง');
       try { expandLibrary(records); } catch (error) { throw new AppError(400, 'invalid_library', error.message); }
       const result = { versions: {}, cursor: snapshot.cursor };
       // Keep the same immutable image URL after normalization, and don't log image data in changes.

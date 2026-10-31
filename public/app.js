@@ -1,3 +1,6 @@
+import { openCategoryManager, categorySettingsMarkup } from './category-ui.js';
+import { changeCategory } from './categories.js';
+import { categoryList, categoryOptions, categoryKey } from './categories.js';
 import { detailMarkup } from './detail-view.js';
 import { shelfPageMarkup, shelfFilterItems } from './shelf-view.js';
 import { readingOptions, readingItems, readingSummaryText, setReading, setSeriesReading } from './reading.js';
@@ -8,7 +11,7 @@ import { planCsv, csvFingerprint } from './csv-import.js';
 import { SHELF_ORDERS, sortShelf, stampShelfChanges } from './shelf-sort.js';
 import { newId } from './ids.js';
 import { lookupSettingsMarkup, mountLookupSettings } from './lookup-settings.js';
-import { STATUSES, CATEGORIES, FORMATS, coverage, matchingEntries, normalizeIsbn, searchLibrary, seedState, validateState, migrateState } from './lib.js';
+import { STATUSES, FORMATS, coverage, matchingEntries, normalizeIsbn, searchLibrary, seedState, validateState, migrateState } from './lib.js';
 import { photoEditorMarkup, mountPhotoEditor } from './photos.js';
 import { openBatchForm, seriesTitleFromCandidate } from './workshop.js';
 import { editSeries, editEntry } from './editing.js';
@@ -34,7 +37,7 @@ export const account = new AccountStore(content => {
 });
 async function persist(next) {
   validateState(next);
-  return mutate(current => { current.series = next.series; current.drafts = next.drafts; });
+  return mutate(current => { current.series = next.series; current.drafts = next.drafts; if(next.categories !== undefined) current.categories = next.categories; });
 }
 async function mutate(fn) {
   try { const result = await account.mutate(current => { const before = structuredClone(current); fn(current); stampShelfChanges(before, current); }, $('#modal').open ? modalBases : undefined); state = account.state; return result; }
@@ -69,7 +72,7 @@ function renderAuth() {
   });
 }
 function settingsView() {
-  return accountSettings(account, esc) + lookupSettingsMarkup() + `<section class="panel"><h2>สำรองและนำเข้าข้อมูล</h2><p>ส่งออกหนังสือ สถานะ ถาดรอตรวจ และรูปปกเป็นไฟล์ JSON เก็บไว้นอกเครื่องเซิร์ฟเวอร์ได้ การส่งออกรวมงานที่ยังรอซิงก์ด้วย</p><div class="actions"><button class="button primary" id="export">ส่งออกข้อมูล JSON</button><button class="button" id="import">นำเข้าข้อมูลสำรอง</button><button class="button" id="import-csv">นำเข้าจาก CSV</button></div></section>${localStorage.getItem(KEY) ? '<section class="panel"><h2>ข้อมูลจากต้นแบบในเครื่องนี้</h2><p>ข้อมูลเดิมยังอยู่และยังไม่ถูกนำเข้าบัญชีอัตโนมัติ ตรวจรายการก่อนนำเข้าได้</p><div class="actions"><button class="button" id="import-legacy">ตรวจและนำเข้าข้อมูลเดิม</button><button class="button" id="export-legacy">ดาวน์โหลดไฟล์เดิม</button></div></section>' : ''}<section class="panel"><h2>ติดตั้งและใช้ออฟไลน์</h2><p>หลังโหลดชั้นและรูปแล้ว เปิดดูและเพิ่มรายการได้ตอนออฟไลน์ งานรอส่งอยู่ในเครื่องจนกว่าเซิร์ฟเวอร์จะยืนยัน</p><button class="button" id="install">วิธีติดตั้ง PWA</button><p id="install-help" class="install-help"></p></section><section class="panel"><h2>ข้อมูลตัวอย่าง</h2><p>ชื่อและปกตัวอย่างเป็นเรื่องสมมติ เลือกโหลดมาลองได้ และลบตัวอย่างออกภายหลังได้</p><div class="actions">${state.series.length ? '<button class="button danger" id="clear-samples">ลบข้อมูลตัวอย่าง</button>' : '<button class="button" id="load-samples">โหลดหนังสือตัวอย่าง</button>'}</div></section><section class="panel"><h2>จัดการบัญชี</h2><p>ลบบัญชีจะลบชั้นและรูปบนเซิร์ฟเวอร์ของบัญชีนี้ กรุณาส่งออกข้อมูลก่อนหากต้องการเก็บไว้</p><button class="button danger" id="delete-account">ลบบัญชีและข้อมูล</button></section>`;
+  return accountSettings(account, esc) + categorySettingsMarkup(state, esc) + lookupSettingsMarkup() + `<section class="panel"><h2>สำรองและนำเข้าข้อมูล</h2><p>ส่งออกหนังสือ สถานะ ถาดรอตรวจ และรูปปกเป็นไฟล์ JSON เก็บไว้นอกเครื่องเซิร์ฟเวอร์ได้ การส่งออกรวมงานที่ยังรอซิงก์ด้วย</p><div class="actions"><button class="button primary" id="export">ส่งออกข้อมูล JSON</button><button class="button" id="import">นำเข้าข้อมูลสำรอง</button><button class="button" id="import-csv">นำเข้าจาก CSV</button></div></section>${localStorage.getItem(KEY) ? '<section class="panel"><h2>ข้อมูลจากต้นแบบในเครื่องนี้</h2><p>ข้อมูลเดิมยังอยู่และยังไม่ถูกนำเข้าบัญชีอัตโนมัติ ตรวจรายการก่อนนำเข้าได้</p><div class="actions"><button class="button" id="import-legacy">ตรวจและนำเข้าข้อมูลเดิม</button><button class="button" id="export-legacy">ดาวน์โหลดไฟล์เดิม</button></div></section>' : ''}<section class="panel"><h2>ติดตั้งและใช้ออฟไลน์</h2><p>หลังโหลดชั้นและรูปแล้ว เปิดดูและเพิ่มรายการได้ตอนออฟไลน์ งานรอส่งอยู่ในเครื่องจนกว่าเซิร์ฟเวอร์จะยืนยัน</p><button class="button" id="install">วิธีติดตั้ง PWA</button><p id="install-help" class="install-help"></p></section><section class="panel"><h2>ข้อมูลตัวอย่าง</h2><p>ชื่อและปกตัวอย่างเป็นเรื่องสมมติ เลือกโหลดมาลองได้ และลบตัวอย่างออกภายหลังได้</p><div class="actions">${state.series.length ? '<button class="button danger" id="clear-samples">ลบข้อมูลตัวอย่าง</button>' : '<button class="button" id="load-samples">โหลดหนังสือตัวอย่าง</button>'}</div></section><section class="panel"><h2>จัดการบัญชี</h2><p>ลบบัญชีจะลบชั้นและรูปบนเซิร์ฟเวอร์ของบัญชีนี้ กรุณาส่งออกข้อมูลก่อนหากต้องการเก็บไว้</p><button class="button danger" id="delete-account">ลบบัญชีและข้อมูล</button></section>`;
 }
 async function exportCurrent() {
   try { const state = await portableExport(account.state); download(JSON.stringify(state, null, 2), 'khanwai-backup.json'); }
@@ -80,7 +83,7 @@ function previewImport(imported) {
   openModal(`${modalHeading('ตรวจข้อมูลก่อนนำเข้า')}<p>พบ ${imported.series.length} เรื่อง / ฉบับ และ ${imported.drafts.length} รายการรอตรวจ</p><div class="notice">เพิ่มเฉพาะรายการใหม่ได้ ${merged.added} รายการ · ข้ามรายการซ้ำ/ขัดแย้ง ${merged.skipped} รายการ โดยเก็บข้อมูลปัจจุบันไว้</div><label class="checkbox-line"><input id="replace-import" type="checkbox">แทนที่ข้อมูลทั้งชั้น รวมรายการที่มีอยู่แล้ว</label><p class="subtitle">ถ้าเลือกแทนที่ ข้อมูลปัจจุบันจะถูกแทนที่ด้วยไฟล์นี้ โปรดส่งออกสำรองก่อน</p><div class="form-actions"><button class="button" data-close>ยกเลิก</button><button class="button primary" id="confirm-import">ยืนยันนำเข้าข้อมูล</button></div>`);
   $('#confirm-import').addEventListener('click', async () => {
     const replacing = $('#replace-import').checked;
-    if (await persist(replacing ? imported : merged.state)) { $('#modal').close(); render(); notify('นำเข้าข้อมูลแล้ว · รอเซิร์ฟเวอร์ยืนยันการซิงก์'); }
+    if (await persist(replacing ? {...imported, categories: categoryList(imported)} : merged.state)) { $('#modal').close(); render(); notify('นำเข้าข้อมูลแล้ว · รอเซิร์ฟเวอร์ยืนยันการซิงก์'); }
   });
 }
 function openDeleteAccount() {
@@ -122,6 +125,17 @@ function collectionContext() {
     openModal: html => { if(isCurrent()) { openModal(html); modalBases = bases; } },
     checkOwner: () => { if(!isCurrent()) throw Error('บัญชีเปลี่ยนแล้ว กรุณาเปิดรายการใหม่'); } };
 }
+function startCategoryManager() {
+  const context = collectionContext();
+  openCategoryManager({ ...context, onSave: async command => {
+    context.checkOwner();
+    if (await mutate(next => changeCategory(next, command))) {
+      render(); startCategoryManager(); notify('บันทึกหมวดหมู่ในเครื่องแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
+      return true;
+    }
+    return false;
+  } });
+}
 function startBulkEdit() {
   const context = collectionContext();
   openBulkEdit({ ...context, state, seriesIds: new Set(selectedSeries), statusFilter: filter, locationFilter, readingFilter,
@@ -145,7 +159,7 @@ function updateShelfFilters() {
 function clearShelfFilters() { filter='all';category='all';bookFormat='all';smartFilter='all';locationFilter='';tagFilter='';readingFilter='';selectedSeries.clear(); }
 function renderResults() {
   if (page === 'check') return renderCheckResults();
-  const result = sortShelf(filterShelf(searchLibrary(state.series, query, filter, bookFormat).filter(s => category === 'all' || s.category === category), { smart: smartFilter, location: locationFilter, tag: tagFilter, reading: readingFilter }), shelfOrder);
+  const result = sortShelf(filterShelf(searchLibrary(state.series, query, filter, bookFormat).filter(s => category === 'all' || categoryKey(s.category) === categoryKey(category)), { smart: smartFilter, location: locationFilter, tag: tagFilter, reading: readingFilter }), shelfOrder);
   for (const id of selectedSeries) if (!result.some(s => s.id === id)) selectedSeries.delete(id);
   updateSelectionBar();
   const container = $('#results');
@@ -315,7 +329,7 @@ function editEntryPhoto(seriesId, entryId = null) {
 function openAdd(draft = null, seriesId = '', options = {}) {
   draftId = draft?.id ?? options.draftId ?? null;
   seriesId = seriesId || draft?.seriesId || '';
-  const d = draft ?? options.prefill ?? { title: '', author: '', isbn: '', label: '', edition: 'ฉบับธรรมดา', language: 'ไทย', format: 'physical', category: 'การ์ตูน', source: 'กรอกเอง' };
+  const d = draft ?? options.prefill ?? { title: '', author: '', isbn: '', label: '', edition: 'ฉบับธรรมดา', language: 'ไทย', format: 'physical', category: categoryList(state)[0], source: 'กรอกเอง' };
   const selected = state.series.find(s => s.id === seriesId);
   openModal(`${modalHeading(draft ? 'ตรวจข้อมูลก่อนเข้าชั้น' : 'เพิ่มหนังสือ', 'บันทึกเมื่อเธอตรวจแล้วเท่านั้น')}${addModeMarkup('single')}
     ${lookupMarkup(d.lookupIsbn??d.isbn)}
@@ -323,7 +337,7 @@ function openAdd(draft = null, seriesId = '', options = {}) {
     <label class="field full">เพิ่มเข้าเรื่อง / ฉบับ<select id="series-link" name="seriesId"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${state.series.map(s => `<option value="${esc(s.id)}" ${s.id === seriesId ? 'selected' : ''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(s.language)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select><small>ชื่อคล้ายกันจะไม่ถูกรวมเอง เลือกเรื่องเดิมเมื่อเป็นฉบับเดียวกัน</small></label>
     <label class="field full">ชื่อเรื่อง *<input name="title" required maxlength="300" value="${esc(selected?.title ?? d.title)}"></label>
     <label class="field">ผู้เขียน<input name="author" maxlength="300" value="${esc(selected?.author ?? d.author)}"></label>
-    <label class="field">ประเภท<select name="category">${CATEGORIES.map(c => `<option ${c === (selected?.category ?? d.category) ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    <label class="field">ประเภท<select name="category">${categoryOptions(state, selected?.category ?? d.category ?? categoryList(state)[0], esc)}</select></label>
     <label class="field full">รูปแบบหนังสือ<select name="format" aria-label="รูปแบบหนังสือ" aria-describedby="format-help">${formatOptions(selected?.format ?? d.format)}</select><small id="format-help">เรื่องเดียวกันเก็บได้ทั้งหนังสือเล่มและ ebook โดยสร้างแยกฉบับ ไม่ต้องมี ISBN ก็เพิ่มได้</small></label>
     <label class="field">ฉบับ *<input name="edition" required maxlength="300" value="${esc(selected?.edition ?? d.edition)}"></label>
     <label class="field">ภาษา *<input name="language" required maxlength="100" value="${esc(selected?.language ?? d.language)}"></label>
@@ -523,6 +537,7 @@ document.addEventListener('click', async event => {
   if(button.dataset.removeShelfFilter){const key=button.dataset.removeShelfFilter;if(key==='category')category='all';if(key==='format')bookFormat='all';if(key==='smart')smartFilter='all';if(key==='location')locationFilter='';if(key==='tag')tagFilter='';if(key==='reading')readingFilter='';render();$('#shelf-filters summary').focus({preventScroll:true});}
 
   if (button.id === 'bulk-edit') startBulkEdit();
+  if (button.id === 'manage-categories') startCategoryManager();
   if (button.id === 'import-csv') startCsvImport();
   if (button.dataset.page) { page = button.dataset.page; selectedSeries.clear(); selectionMode = false; smartFilter = 'all'; locationFilter = ''; tagFilter = ''; readingFilter = ''; filter = 'all'; category = 'all'; bookFormat = 'all'; query = ''; checkLabel = ''; render(); window.scrollTo(0, 0); }
   if (button.hasAttribute('data-add')) openAdd();
