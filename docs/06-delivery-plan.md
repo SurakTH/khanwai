@@ -208,3 +208,12 @@ Docker scratch migration 0.9.0 → 0.10.0 ผ่าน พร้อม volume pe
 ## README พร้อมภาพ (31 ตุลาคม 2026)
 
 เสร็จ: ภาพ overview คอมคู่มือถือ 1600×1040, เช็กก่อนซื้อและรายละเอียดบ็อกซ์ 1180×1060, สุ่มอ่าน 660×450 รวม PNG 4 ภาพประมาณ 555 KiB ใน docs/images/readme/ สร้างจาก tests/preview-readme.mjs โดยใช้ scratch DB/account และปก CSS สมมติ ไม่มีข้อมูล/รูปผู้ใช้จริง ตรวจภาพสุดท้ายด้วยตาและอ้างอิง README 26 จุดแล้ว path/anchor ในไฟล์ที่ลิงก์มีอยู่จริง ภาพพัฒนา/ไฟล์แนบเดิมยังไม่ถูกเผยแพร่ ไม่มี runtime change จึงไม่รันชุดทดสอบแอพซ้ำ
+
+
+## 0.10.1 — วางรูปปก
+
+เสร็จ: ปุ่มวางและ textarea สำหรับ native paste ใน editor ร่วมของ single/draft/batch/series/entry คงการตรวจชนิด/ขนาดและย่อรูปเดิม รีวิวยืนยันก่อนส่ง owner photos ไม่มี schema หรือ API ใหม่
+
+ตรวจ npm test 66 ผ่าน; browser ที่กระทบ 20 ผ่าน/2 skipped (mobile-only input test บน desktop และ native OS clipboard test บน mobile emulation) รวม native Chromium clipboard write→Control+V→read button, draft/reload, แก้รูปชุด/รายเล่ม, capability/permission denied, ภาพเก่าไม่หายเมื่อวางไม่ได้, ไม่ดัก text paste นอก editor, async cancellation, file picker เดิม และการสลับโหมดเพิ่มหนังสือ ภาพจาก scratch DB ตรวจ 320/390/1440px ไม่ล้น เก็บเฉพาะเครื่อง ไม่อ้าง native Safari/iPhone หรือ Android hardware test
+
+Docker build khanwai:0.10.1 ผ่าน สำรองข้อมูล instance เดิมที่ /data/backups/pre-0101-cover-paste รวม 2 รูปก่อนอัปเดต ไม่สร้างบัญชีทดสอบบน volume จริง ไม่มีการเพิ่มบริการหรืออ่าน clipboard อัตโนมัติ

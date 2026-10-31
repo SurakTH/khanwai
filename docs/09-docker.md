@@ -4,7 +4,7 @@
 
 ```sh
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.10.0 .
+docker build -t khanwai:0.10.1 .
 docker compose up -d --wait
 ```
 
@@ -19,7 +19,7 @@ docker compose up -d --wait
 ยังไม่มี registry ที่เผยแพร่จริง ผู้สร้างส่ง image กับ compose.yaml ได้:
 
 ```sh
-docker image save -o khanwai-0.10.0.tar khanwai:0.10.0
+docker image save -o khanwai-0.10.0.tar khanwai:0.10.1
 ```
 
 ผู้รับใช้ `docker image load -i khanwai-0.10.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
@@ -32,7 +32,7 @@ docker image save -o khanwai-0.10.0.tar khanwai:0.10.0
 | --- | --- | --- |
 | PORT | 4173 | พอร์ต host |
 | BIND_ADDRESS | 127.0.0.1 | interface host |
-| KHANWAI_IMAGE | khanwai:0.10.0 | image/tag |
+| KHANWAI_IMAGE | khanwai:0.10.1 | image/tag |
 | DATA_DIR | /data | โฟลเดอร์ฐานข้อมูลใน volume ใช้เปลี่ยนหลัง restore |
 | ALLOW_REGISTRATION | true | ตั้ง false หลังสมัครบัญชีที่ต้องการแล้ว |
 | APP_ORIGIN | ว่าง | URL เว็บภายนอก เช่น https://books.example.com สำหรับ origin check |
@@ -80,6 +80,8 @@ docker compose exec app node src/cli.mjs reset-password reader@example.com
 พิมพ์รหัสใหม่อย่างน้อย 10 ตัวอักษรแล้วจบ stdin (Ctrl-D) คำสั่งนี้ไม่ใช่ช่องทางลับ: อย่าแชร์ terminal/session ที่ใช้กรอกรหัส ทุกอุปกรณ์ต้องล็อกอินใหม่หลัง reset เปลี่ยนรหัสเองได้จากหน้า settings เช่นกัน
 
 ## อัปเกรดและย้อนกลับ
+
+รุ่นปัจจุบัน **0.10.1** เพิ่ม [การวางรูปปก](17-cover-paste.md) ไม่เปลี่ยน DB schema ตั้ง `KHANWAI_IMAGE=khanwai:0.10.1` ใน `.env` หลังดึง source แล้ว `docker build -t khanwai:0.10.1 .` และ `docker compose up -d` ใช้ volume เดิมและรับอัปเดต PWA เมื่อพร้อม
 
 สำรอง -> build/load image tag ใหม่ -> ตั้ง KHANWAI_IMAGE -> `docker compose up -d --wait` -> ตรวจ login/ชั้น/รูป เก็บ image เก่าไว้จนตรวจเสร็จ ถ้า schema ใหม่กว่า image เก่า แอพจะปฏิเสธการเปิด ต้องใช้ backup ที่เข้ากันกับ image เก่าลงโฟลเดอร์ใหม่ก่อนย้อนกลับ
 

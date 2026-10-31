@@ -297,3 +297,12 @@ README และคู่มือ Docker เริ่มด้วย `test -e .
 ภาพสาธารณะที่ผู้ใช้ขออยู่ใน docs/images/readme/ พร้อม provenance และคำสั่งสร้างใหม่ กรอบภาพหลักประกอบด้วย HTML/CSS ไม่ใช้ภาพโฆษณาฟังก์ชันที่ยังไม่มี ภาพพัฒนาเดิม docs/screenshots/ และไฟล์แนบผู้ใช้ยังไม่เข้า Git ไม่มีการแก้ .gitignore ให้เปิดเผยภาพเก่า ไม่มี dependency หรือ runtime change
 
 README ใช้ภาพ relative path, alt text, ตารางฟังก์ชัน/คู่มือ และ details สำหรับข้อมูลเสริม คงขั้น Docker build จาก source, env/HTTPS, volume และการสำรอง รวมข้อจำกัด ISBN/กล้อง/AI ตามสถานะจริง ไม่อ้าง license หรือ registry image ที่ยังไม่มี
+
+
+## 0.10.1 — วางรูปปกจากคลิปบอร์ด (31 ตุลาคม 2026)
+
+ผู้ใช้ขอ copy/paste รูปขณะเลือกปก จึงเพิ่มปุ่มวางรูปและ textarea สำหรับ ⌘V/Ctrl+V หรือ native paste บนมือถือใน editor ร่วมทุก flow ไม่เพิ่มเมนูหลัก ไม่ดัก paste ของช่องข้อมูลหนังสือ การวางเป็นพรีวิวในเครื่องก่อนยืนยันตามเดิม
+
+ตรวจ [ClipboardEvent.clipboardData](https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData), [Clipboard.read](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read) และ [WebKit async clipboard](https://webkit.org/blog/10855/async-clipboard-api/) แล้ว ปุ่ม read เรียกจาก user gesture เท่านั้นบน secure context; Safari อาจต้องยืนยัน paste เลือกอ่าน MIME ภาพที่รองรับและคงทาง native paste/file picker เมื่อ capability หรือ permission ไม่พร้อม ไม่ขยาย CSP หรืออ่าน text/HTML จาก clipboard ไปโหลด URL ภายนอก
+
+Refactor ตัวเตรียมรูปเดิมให้ใช้ร่วมกันทั้งไฟล์/กล้อง/paste พร้อม generation/editor visibility guard: รูปเก่าคงอยู่หากแปลงไม่ได้ และผล async เก่าไม่กลับมาหลังลบหรือปิดฟอร์ม ตัวจำกัดขนาด/ชนิด การย่อ JPEG รีวิวยืนยัน owner photos และ outbox เดิมทั้งหมด ไม่มี backend/schema/dependency ใหม่ shell-v31 รายละเอียดและขอบเขตทดสอบใน 17-cover-paste.md
