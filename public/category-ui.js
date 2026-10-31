@@ -2,19 +2,19 @@ import { categoryList, categoryUsage, categoryKey, changeCategory } from './cate
 
 export function categorySettingsMarkup(state, esc) {
   const names = categoryList(state);
-  return `<section class="panel"><h2>หมวดหมู่หนังสือ</h2><p>เลือกหมวดให้ตรงกับชั้นของเธอ เพิ่ม เปลี่ยนชื่อ หรือลดหมวดได้</p><p class="subtitle category-summary">${names.map(esc).join(' · ')}</p><button class="button" id="manage-categories">จัดการหมวดหมู่</button></section>`;
+  return `<section class="panel"><h2>หมวดหมู่หนังสือ</h2><p>เลือกหมวดให้ตรงกับชั้นของเธอ เพิ่ม เปลี่ยนชื่อ หรือลดหมวดได้</p><p class="subtitle">หมวดหมู่เริ่มต้น: <strong>${esc(names[0])}</strong></p><p class="subtitle category-summary">${names.map(esc).join(' · ')}</p><button class="button" id="manage-categories">จัดการหมวดหมู่</button></section>`;
 }
 
 export function openCategoryManager({ getState, openModal, heading, escape: esc, onSave, checkOwner }) {
   const usageText = name => { const usage = categoryUsage(getState(), name); return `${usage.series} เรื่อง / ฉบับ · ${usage.drafts} รายการรอตรวจ`; };
   const actions = `<div class="form-actions"><button type="button" class="button" data-category-back>กลับ</button><button type="submit" class="button primary">บันทึกหมวดหมู่</button></div>`;
-  function bind(command) {
+  function bind(command, selector = '#category-form') {
     document.querySelector('[data-category-back]')?.addEventListener('click', list);
-    document.querySelector('#category-form').addEventListener('submit', async event => {
+    document.querySelector(selector).addEventListener('submit', async event => {
       event.preventDefault(); const form = event.target, button = form.querySelector('[type=submit]'); button.disabled = true;
       try {
         checkOwner();
-        const change = { ...command, value: form.elements.categoryName?.value, target: form.elements.categoryTarget?.value };
+        const change = { ...command, name: form.elements.defaultCategory?.value ?? command.name, value: form.elements.categoryName?.value, target: form.elements.categoryTarget?.value };
         changeCategory(structuredClone(getState()), change);
         const saved = await onSave(change);
         if (!saved && form.isConnected) form.querySelector('[role=alert]').textContent = 'ยังบันทึกไม่ได้ กรุณาตรวจข้อความแจ้งเตือนแล้วลองอีกครั้ง';
@@ -30,10 +30,11 @@ export function openCategoryManager({ getState, openModal, heading, escape: esc,
   }
   function list() {
     checkOwner(); const names = categoryList(getState());
-    openModal(`${heading('จัดการหมวดหมู่', 'หมวดหมู่ของบัญชีนี้ ใช้ร่วมกันบนมือถือและคอม')}<div class="category-list">${names.map((name, index) => `<div class="category-row"><div><strong>${esc(name)}</strong><small>${usageText(name)}</small></div><div class="category-actions"><button class="button" data-category-edit="${index}">เปลี่ยนชื่อ</button><button class="button danger" data-category-delete="${index}" ${names.length === 1 ? 'disabled title="ต้องเหลืออย่างน้อย 1 หมวด"' : ''}>ลบ</button></div></div>`).join('')}</div><form id="category-form"><label class="field">เพิ่มหมวดหมู่<input name="categoryName" placeholder="เช่น การ์ตูนวาย" required maxlength="300"></label><p role="alert" class="category-error"></p><div class="form-actions"><button class="button" type="button" data-close>ปิด</button><button class="button primary" type="submit">เพิ่มหมวดหมู่</button></div></form>`);
+    openModal(`${heading('จัดการหมวดหมู่', 'หมวดหมู่ของบัญชีนี้ ใช้ร่วมกันบนมือถือและคอม')}<form id="category-default-form"><div class="category-default-controls"><label class="field">หมวดหมู่เริ่มต้น<select name="defaultCategory">${names.map((name,index)=>`<option value="${esc(name)}" ${index===0?'selected':''}>${esc(name)}</option>`).join('')}</select></label><button class="button" type="submit">บันทึกค่าเริ่มต้น</button></div><p class="subtitle">ใช้เมื่อเริ่มเพิ่มหนังสือใหม่ ไม่เปลี่ยนหมวดของหนังสือเดิม</p><p class="category-error" role="alert"></p></form><div class="category-list">${names.map((name, index) => `<div class="category-row"><div><strong>${esc(name)}</strong><small>${usageText(name)}</small></div><div class="category-actions"><button class="button" data-category-edit="${index}">เปลี่ยนชื่อ</button><button class="button danger" data-category-delete="${index}" ${names.length === 1 ? 'disabled title="ต้องเหลืออย่างน้อย 1 หมวด"' : ''}>ลบ</button></div></div>`).join('')}</div><form id="category-form"><label class="field">เพิ่มหมวดหมู่<input name="categoryName" placeholder="เช่น การ์ตูนวาย" required maxlength="300"></label><p role="alert" class="category-error"></p><div class="form-actions"><button class="button" type="button" data-close>ปิด</button><button class="button primary" type="submit">เพิ่มหมวดหมู่</button></div></form>`);
     for (const button of document.querySelectorAll('[data-category-edit]')) button.addEventListener('click', () => edit(names[Number(button.dataset.categoryEdit)], false));
     for (const button of document.querySelectorAll('[data-category-delete]')) button.addEventListener('click', () => edit(names[Number(button.dataset.categoryDelete)], true));
     bind({ action: 'add' });
+    bind({ action: 'default' }, '#category-default-form');
   }
   list();
 }

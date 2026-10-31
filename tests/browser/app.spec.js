@@ -374,17 +374,34 @@ test('camera photo fills ISBN for review; non-book photos preserve manual input'
   await expect(page.locator('[name="title"]')).toHaveValue('ข้อมูลที่ยังไม่บันทึก');
 });
 
-test('fallback metadata shows its real source and leaves unknown edition and language for review', async ({ page }) => {
-  await page.route('**/api/isbn?*',route=>route.fulfill({json:{status:'found',candidates:[{title:'หนังสือจากแหล่งสำรอง',author:'ผู้เขียน',publisher:'สำนักพิมพ์',language:'',isbn:'9780306406157',source:'Open Library'}]}}));
-  await page.locator('.page-heading [data-add]').click();
-  await page.locator('#lookup-isbn').fill('0306406152');
-  await page.getByRole('button',{name:'ดึงข้อมูล',exact:true}).click();
-  await page.getByRole('button',{name:/หนังสือจากแหล่งสำรอง.*Open Library/}).click();
-  await expect(page.locator('#source-label')).toContainText('Open Library');
-  await expect(page.locator('[name="language"]')).toHaveValue('');
-  await expect(page.locator('[name="edition"]')).toHaveValue('');
-  await expect(page.locator('[name="isbn"]')).toHaveValue('9780306406157');
-  await expect(page.locator('.book-card')).toHaveCount(6);
+test('fallback metadata keeps the default or entered edition in single and batch forms; explicit metadata still applies', async ({ page }) => {
+  await page.route('**/api/isbn?*',route=>route.fulfill({json:{status:'found',candidates:[
+    {title:'หนังสือจากแหล่งสำรอง',author:'ผู้เขียน',publisher:'สำนักพิมพ์',language:'',isbn:'9780306406157',source:'Open Library'},
+    {title:'ข้อมูลฉบับพิเศษ',author:'ผู้เขียน',language:'ไทย',edition:'ฉบับพิเศษ',isbn:'9780306406157',source:'Open Library'},
+    {title:'ข้อมูลฉบับว่าง',edition:'   ',language:'',isbn:'9780306406157',source:'Open Library'}
+  ]}}));
+  for (const batch of [false, true]) {
+    await page.locator('.page-heading [data-add]').click();
+    if (batch) await page.getByRole('button',{name:'หลายเล่มในชุด',exact:true}).click();
+    await page.locator('#lookup-isbn').fill('0306406152');
+    await page.getByRole('button',{name:'ดึงข้อมูล',exact:true}).click();
+    const missing = page.getByRole('button',{name:/หนังสือจากแหล่งสำรอง.*Open Library/});
+    await missing.click();
+    await expect(page.locator('#source-label')).toContainText('Open Library');
+    await expect(page.locator('[name="language"]')).toHaveValue('');
+    await expect(page.locator('[name="edition"]')).toHaveValue('ฉบับธรรมดา');
+    await expect(page.locator(batch?'[name="seedIsbn"]':'[name="isbn"]')).toHaveValue('9780306406157');
+    await page.locator('[name="edition"]').fill('ฉบับที่กรอกเอง');
+    await missing.click();
+    await expect(page.locator('[name="edition"]')).toHaveValue('ฉบับที่กรอกเอง');
+    await page.getByRole('button',{name:/ข้อมูลฉบับพิเศษ.*Open Library/}).click();
+    await expect(page.locator('[name="edition"]')).toHaveValue('ฉบับพิเศษ');
+    await page.locator('[name="edition"]').fill('');
+    await page.getByRole('button',{name:/ข้อมูลฉบับว่าง.*Open Library/}).click();
+    await expect(page.locator('[name="edition"]')).toHaveValue('ฉบับธรรมดา');
+    await expect(page.locator('.book-card')).toHaveCount(6);
+    await page.getByRole('button',{name:'ปิดหน้าต่าง'}).click();
+  }
 });
 
 test('partial provider failure distinguishes exhausted quota from an empty fallback and preserves review input',async({page})=>{

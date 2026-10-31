@@ -436,7 +436,8 @@ async function lookup(event) {
         if(!form.isConnected)return;
         if(!form.elements.seriesId.value){
           form.elements.title.value=seriesTitleFromCandidate(candidate); form.elements.author.value=candidate.author||'';
-          form.elements.language.value=candidate.language==='th'?'ไทย':candidate.language||'';form.elements.edition.value=candidate.edition||'';
+          form.elements.language.value=candidate.language==='th'?'ไทย':candidate.language||'';
+          form.elements.edition.value=String(candidate.edition??'').trim()||form.elements.edition.value.trim()||'ฉบับธรรมดา';
         }
         form.elements[isBatch?'seedIsbn':'isbn'].value=candidate.isbn;form.elements[isBatch?'seedLabel':'label'].value=candidate.label||'';
         form.dataset.source = candidate.source || 'ข้อมูลภายนอก'; $('#source-label').textContent = `แหล่งข้อมูล: ${form.dataset.source} · โปรดตรวจภาษา ฉบับ และเลขเล่มก่อนบันทึก`;

@@ -11,6 +11,22 @@ import { LibraryStorage } from '../src/storage.mjs';
 import { restoreBackup } from '../src/cli.mjs';
 import { planCsv } from '../public/csv-import.js';
 
+test('choosing a default changes only the catalog and follows rename or deletion', () => {
+  const state = seedState(), before = structuredClone(state);
+  changeCategory(state, { action: 'default', name: 'นิยายแปลจีน' });
+  assert.equal(categoryList(state)[0], 'นิยายแปลจีน');
+  assert.deepEqual(state.series, before.series); assert.deepEqual(state.drafts, before.drafts);
+  assert.deepEqual(recordDiff(before, state).map(change => change.key), ['catalog:categories']);
+  assert.deepEqual(expandLibrary(flattenLibrary(state)), state);
+  changeCategory(state, { action: 'rename', name: 'นิยายแปลจีน', value: 'นิยายวายแปลจีน' });
+  assert.equal(categoryList(state)[0], 'นิยายวายแปลจีน');
+  changeCategory(state, { action: 'delete', name: 'นิยายวายแปลจีน', target: 'การ์ตูน' });
+  assert.equal(categoryList(state)[0], 'การ์ตูน');
+  const snapshot = structuredClone(state);
+  assert.throws(() => changeCategory(state, { action: 'default', name: 'ไม่มีหมวดนี้' }), /เปลี่ยนไปแล้ว/);
+  assert.deepEqual(state, snapshot);
+});
+
 test('defaults do not rewrite legacy data; add, rename and remove preserve book and box data', () => {
   const state = seedState(), before = structuredClone(state);
   assert.deepEqual(categoryList(state), DEFAULT_CATEGORIES); assert.deepEqual(state, before);

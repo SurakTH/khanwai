@@ -182,3 +182,8 @@ Docker migration + rollback ผ่านด้วย scratch volume: เริ�
 ## ช่องถึงเล่มตอนเพิ่มชุด (31 ตุลาคม 2026)
 
 แก้ default 6 เป็นค่าว่างแล้ว ตรวจด้วย app.spec.js ส่วน batch review และ switching add modes ทั้ง desktop/mobile รวม 4 กรณีผ่าน: เริ่มว่าง กรอกช่วงแล้วตรวจ/เพิ่มได้ตามเดิม และสลับโหมดยังจำช่วงที่พิมพ์ไว้ Docker image 0.9.0 rebuild พร้อม shell-v28 ไม่มีการเปลี่ยนข้อมูล
+
+
+## ค่าเริ่มต้นของฉบับและหมวดหมู่ (31 ตุลาคม 2026)
+
+เสร็จในเครื่องและผู้ใช้อนุมัติให้ส่งขึ้น Git แล้ว: ISBN ไม่มีฉบับให้คงค่าที่กรอกไว้หรือฉบับธรรมดา ทั้ง single/batch และตั้งค่าเลือกหมวดเริ่มต้นผ่าน catalog เดิมโดยไม่เปลี่ยนหมวดหนังสือเก่า ตรวจ npm test 62 ผ่าน และ browser ที่กระทบ 16 ผ่าน ครอบคลุม missing/whitespace/explicit edition, default category reload/offline/sync, การเก็บค่าฟอร์มตอนสลับโหมด, category rename/delete/import/conflict ภาพ modal จาก scratch DB ตรวจ 320/390/1440px ไม่ล้น shell-v29 ไม่มี schema ใหม่

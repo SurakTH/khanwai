@@ -21,6 +21,35 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/'); await expect(page.locator('#series-count')).toHaveText('6');
 });
 
+test('chosen default survives reload and offline sync, starts new single and batch forms without changing existing books', async ({ page, context }) => {
+  const before = await library(page);
+  await manager(page); await addCategory(page, 'นิยายวายแปลจีน');
+  await page.locator('[name=defaultCategory]').selectOption('นิยายวายแปลจีน');
+  await page.getByRole('button', { name: 'บันทึกค่าเริ่มต้น', exact: true }).click();
+  await expect.poll(async () => (await library(page)).categories?.[0]).toBe('นิยายวายแปลจีน');
+  expect((await library(page)).series).toEqual(before.series);
+  await page.reload(); await page.locator('.page-heading [data-add]').click();
+  await expect(page.locator('[name=category]')).toHaveValue('นิยายวายแปลจีน');
+  await page.getByRole('button', { name: 'หลายเล่มในชุด', exact: true }).click();
+  await expect(page.locator('#batch-form [name=category]')).toHaveValue('นิยายวายแปลจีน');
+  await page.locator('#batch-form [name=category]').selectOption('การ์ตูน');
+  await page.getByRole('button', { name: 'ทีละเล่ม', exact: true }).click();
+  await expect(page.locator('[name=category]')).toHaveValue('การ์ตูน');
+  await page.getByRole('button', { name: 'ปิดหน้าต่าง' }).click();
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; }); await page.reload(); await manager(page);
+  await context.setOffline(true);
+  await page.locator('[name=defaultCategory]').selectOption('นิยายแปลจีน');
+  await page.getByRole('button', { name: 'บันทึกค่าเริ่มต้น', exact: true }).click();
+  await expect(page.locator('[name=defaultCategory]')).toHaveValue('นิยายแปลจีน');
+  await expect(page.locator('[name=defaultCategory] option').first()).toHaveValue('นิยายแปลจีน');
+  await page.reload(); await page.locator('.page-heading [data-add]').click();
+  await expect(page.locator('[name=category]')).toHaveValue('นิยายแปลจีน');
+  await context.setOffline(false); await page.getByRole('button', { name: 'ปิดหน้าต่าง' }).click();
+  await page.locator('#connection').click();
+  await expect.poll(async () => (await library(page)).categories?.[0]).toBe('นิยายแปลจีน');
+  expect((await library(page)).series).toEqual(before.series);
+});
+
 test('manage categories, prevent duplicates and move books safely when deleting a used category', async ({ page }) => {
   const before = await library(page), original = before.series[0].category;
   await manager(page); await expect(page.locator('.category-row')).toHaveCount(4);

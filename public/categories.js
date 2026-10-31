@@ -25,7 +25,9 @@ export function changeCategory(state,{action,name,value,target}) {
     const next=validateCategoryName(value);if(names.some(n=>categoryKey(n)===categoryKey(next)))throw Error('มีหมวดหมู่ชื่อนี้แล้ว');names.push(next);
   } else {
     if(index<0)throw Error('หมวดหมู่นี้เปลี่ยนไปแล้ว กรุณาเปิดใหม่');
-    if(action==='rename') {
+    if(action==='default') {
+      names.unshift(...names.splice(index,1));
+    } else if(action==='rename') {
       replacement=validateCategoryName(value);if(names.some((n,i)=>i!==index&&categoryKey(n)===categoryKey(replacement)))throw Error('มีหมวดหมู่ชื่อนี้แล้ว');names[index]=replacement;
     } else if(action==='delete') {
       if(names.length===1)throw Error('ต้องเหลือหมวดหมู่อย่างน้อย 1 หมวด');
