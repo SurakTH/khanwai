@@ -318,3 +318,8 @@ Refactor ตัวเตรียมรูปเดิมให้ใช้ร�
 ## 0.10.3 — หมวดหมู่แทนฉบับใต้ปก (31 ตุลาคม 2026)
 
 ผู้ใช้ระบุบรรทัดใต้ปกบนชั้น จึงเปลี่ยนเฉพาะ card metadata จาก format/edition/language เป็น format/category/language ใช้หมวดจริงของ series และ esc เดิม รองรับหมวดส่วนตัว gallery/list ใช้ card ร่วมกัน ไม่มีการแก้ edition ในข้อมูลหรือรายละเอียด ไม่เปลี่ยนขนาดปก/toolbar/schema shell-v33
+
+
+## เอกสารโครงสร้างปัจจุบัน (31 ตุลาคม 2026)
+
+ผู้ใช้ขอแผนที่เว็บและข้อมูลที่อ่านต่อได้ จัด docs/README.md เป็นสารบัญ และแยก 18-system-overview, 19-data-and-storage, 20-api-and-sync โดยตรวจเทียบซอร์ส 0.10.3 แทนการนำแผน Work/Edition หรือ auth ทางอีเมลมาอ้างว่าใช้งานแล้ว ติดป้าย 03/04 ว่าเป็นข้อเสนอเก่า และให้ 10 เป็นทางเข้าเอกสารปัจจุบัน แยก SQLite v3 / JSON v2 / IndexedDB v1, bytes รูปใน filesystem, ถังขยะกับ SQL tombstone และ preferences กับ catalog outbox ชัดเจน ไม่เปลี่ยน runtime/schema/dependency หรือ deploy เพื่อแก้เอกสาร

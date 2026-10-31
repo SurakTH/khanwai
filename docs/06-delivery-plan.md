@@ -227,3 +227,8 @@ Docker build khanwai:0.10.1 ผ่าน สำรองข้อมูล insta
 ## 0.10.3 — หมวดหมู่ใต้ปกบนชั้น
 
 เปลี่ยนเฉพาะ card metadata เป็นรูปแบบ · หมวดหมู่ · ภาษา ตามผู้ใช้ ตรวจ browser ด้วย scratch DB ที่ 1440/390/320px ทั้ง gallery/list หมวดส่วนตัวแสดงตรง ไม่มีหน้าล้น รายละเอียดคง edition เดิมและ API state หลังใช้งานเท่ากับก่อนตรวจ ไม่มี mutation ภาพเก็บเฉพาะเครื่องใน screenshots/shelf-category-label-mobile.png Docker build 0.10.3 ผ่าน สำรอง pre-0103-shelf-category รวม 2 รูปก่อนอัปเดต ไม่มี schema/backend change
+
+
+## เอกสารโครงสร้างระบบ (31 ตุลาคม 2026)
+
+จัดสารบัญและเอกสารปัจจุบันแยกภาพรวม/ข้อมูล/API พร้อมแผนภาพ หน้าที่โมดูล ตาราง SQL ทั้ง 12 ตาราง และตัวอย่าง library/operation; แยกแผนเก่าใน 03/04 ออกจากสถานะจริงและแก้ทางเข้า 10 ตรวจลิงก์ local/anchor ในเอกสารที่แก้ 146 จุด ตรวจตัวอย่าง JSON ผ่าน validateState และ flatten/expand รวมทดลอง operation/replay/conflict ใน SQLite ชั่วคราวเทียบ revision/schema จริง งานเอกสารเท่านั้น ไม่รัน browser/Docker ใหม่หรือแตะข้อมูล instance ที่ใช้อยู่

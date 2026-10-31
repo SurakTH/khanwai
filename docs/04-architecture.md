@@ -1,6 +1,6 @@
 # สถาปัตยกรรม บัญชี PWA และซิงก์
 
-> สถานะ implementation 0.3.0 ดู [10-implementation.md](10-implementation.md) เอกสารนี้มีแบบเป้าหมายและข้อเสนออนาคตที่ยังไม่ทำ ไม่ใช้แทน schema ที่ทำงานจริง
+> **สถานะเอกสาร:** ข้อเสนอช่วงวางแผน ไม่ใช่สถานะเทคโนโลยีปัจจุบัน ระบบจริงใช้ vanilla JS + Node.js + SQLite และ email/password ดู [18 — ภาพรวมระบบ](18-system-overview.md) และ [20 — API/ซิงก์](20-api-and-sync.md) ส่วน auth ทางอีเมล/AI/background jobs ด้านล่างยังเป็นข้อเสนอ
 
 ## แนวทางเสนอ
 

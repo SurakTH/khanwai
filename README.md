@@ -9,7 +9,8 @@
   Self-hosted · Docker · SQLite · PWA<br>
   <a href="#เริ่มใช้ด้วย-docker">เริ่มใช้งาน</a> ·
   <a href="#ภาพหน้าจอ">ภาพหน้าจอ</a> ·
-  <a href="docs/09-docker.md">คู่มือติดตั้งเซิร์ฟเวอร์</a>
+  <a href="docs/09-docker.md">คู่มือติดตั้งเซิร์ฟเวอร์</a> ·
+  <a href="docs/README.md">สารบัญเอกสาร / โครงสร้างระบบ</a>
 </p>
 
 ![คั่นไว้ — หน้าชั้นหนังสือบนคอมและมือถือ แสดงปก ชื่อเรื่อง และสถานะจากข้อมูลตัวอย่าง](docs/images/readme/overview.png)
