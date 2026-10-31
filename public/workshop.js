@@ -50,7 +50,7 @@ export function openBatchForm({ state, initial={}, intro='', lookupMarkup='', op
     <details class="batch-photo"><summary>แนบรูปปกสำหรับแสดงชุดนี้ (ไม่บังคับ)</summary>${photoEditorMarkup(esc)}<p class="subtitle">รูปนี้เป็นภาพแทนชุด ไม่ใช้แทนปกแต่ละเล่ม</p></details>
     <div class="batch-range"><h3>ช่วงที่ต้องการสะสม</h3><div class="form-grid"><label class="field">ตั้งแต่เล่ม<input name="start" type="number" min="0" max="999" required></label><label class="field">ถึงเล่ม<input name="end" type="number" min="0" max="999" required></label><label class="field full">เล่มที่ยังไม่มี / เว้นไว้<input name="excluded" placeholder="เช่น 3, 5, 8-10" maxlength="500"><small>เล่มที่เว้นไว้จะไม่ถูกบันทึกว่ามีแล้ว</small></label></div></div><div id="batch-error" class="subtitle" role="alert"></div><div class="form-actions"><button class="button primary" type="submit">ตรวจรายการก่อนเพิ่ม →</button></div></form><section id="batch-review" hidden></section>`);
   const form=document.querySelector('#batch-form');
-  const defaults={tags:'',title:'',author:'',edition:'ฉบับธรรมดา',language:'ไทย',location:'',seedIsbn:'',seedLabel:'',start:'1',end:'6',excluded:''};
+  const defaults={tags:'',title:'',author:'',edition:'ฉบับธรรมดา',language:'ไทย',location:'',seedIsbn:'',seedLabel:'',start:'1',end:'',excluded:''};
   for(const [key,value] of Object.entries(defaults))form.elements[key].value=initial[key]??value;
   form.dataset.source=initial.source??'กรอกเอง';
   const getPhoto=mountPhotoEditor(document.querySelector('#modal-content'),initial.coverData??'');

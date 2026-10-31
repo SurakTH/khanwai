@@ -263,3 +263,8 @@ README และคู่มือ Docker เริ่มด้วย `test -e .
 ตรวจ [SQLite user_version](https://www.sqlite.org/pragma.html#pragma_user_version) และ [service worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers) แล้ว ใช้ migration เพิ่ม catalogs owner-scoped ที่ DB v3 (JSON ยังคง v2), รับ restore DB v1/v2/v3, guard รุ่นใหม่กว่าเดิม และ shell-v27 รวม asset ใหม่ คง flow อัปเดต PWA เดิมไม่บังคับ reload กลางฟอร์ม
 
 ชื่อหมวดบน series/draft ยังเป็น string เพื่อคงข้อมูลเดิม รายการแสดงรวม configured + referenced names จึงไม่ซ่อนหนังสือจาก late offline write/การเลือก conflict ที่นำชื่อเก่ากลับมา การเปลี่ยนชื่อ/ลบปกติย้ายทั้ง series/draft ใน operation เดียว ไม่เปลี่ยน entry/photo/reading/ownership ชื่อเก่าที่กลับมาจะแสดงให้จัดการอีกครั้ง รายละเอียดและเกณฑ์อยู่ใน 15-categories.md
+
+
+## ช่องถึงเล่มเริ่มว่าง (31 ตุลาคม 2026)
+
+ผู้ใช้ไม่ต้องการเลข 6 ที่กรอกล่วงหน้าตอนเพิ่มหลายเล่ม จึงเปลี่ยนเฉพาะ default end ใน workshop.js เป็นสตริงว่าง คง start 1 และ required/range validation เดิม ค่าที่ผู้ใช้พิมพ์หรือส่งมาใน initial ยังมีลำดับเหนือค่าเริ่มต้น จึงสลับโหมดแล้วไม่ล้างช่วงที่กำหนดแล้ว ไม่มี schema/dependency ใหม่ shell-v28 เพื่อให้ PWA รับ asset ที่แก้ผ่าน flow อัปเดตเดิม

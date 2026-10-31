@@ -230,6 +230,7 @@ test('purchase check distinguishes formats and drafts; ISBN verdict uses the mat
 test('batch review skips owned/boxed volumes and saves excluded gaps only after confirmation', async ({ page }) => {
   await page.locator('.page-heading [data-add]').click();
   await page.getByRole('button',{name:'หลายเล่มในชุด',exact:true}).click();
+  await expect(page.locator('[name="end"]')).toHaveValue('');
   await page.locator('#batch-series').selectOption('sample-2');
   await page.locator('[name="end"]').fill('6');
   await page.locator('[name="excluded"]').fill('5');

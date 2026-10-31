@@ -177,3 +177,8 @@ Patch 0.3.1: แก้พึ่ง Google Books แห่งเดียว เ�
 ผลรอบนี้: npm test 61 ผ่าน, browser เต็ม 149 ผ่าน/1 skipped (mobile-only input test บน desktop), browser หมวดหลังตรวจ UI เพิ่มอีก 8 ผ่าน ภาพตัวอย่างที่สร้างจากบัญชีและฐานแยกตรวจไม่ล้น 320/390/1440px ภาพเก็บเฉพาะเครื่องใน docs/screenshots/categories-*.png ไม่ส่งขึ้น Git
 
 Docker migration + rollback ผ่านด้วย scratch volume: เริ่ม image 0.8.6/DB v2 → 0.9.0/DB v3 เพิ่ม/เปลี่ยนหมวด สำรอง/กู้หมวดว่างพร้อมบัญชี/หนังสือ/รูป และย้อน image ผ่าน backup ก่อนอัปเกรด ไม่มีการใช้ข้อมูลจริงในการทดสอบ
+
+
+## ช่องถึงเล่มตอนเพิ่มชุด (31 ตุลาคม 2026)
+
+แก้ default 6 เป็นค่าว่างแล้ว ตรวจด้วย app.spec.js ส่วน batch review และ switching add modes ทั้ง desktop/mobile รวม 4 กรณีผ่าน: เริ่มว่าง กรอกช่วงแล้วตรวจ/เพิ่มได้ตามเดิม และสลับโหมดยังจำช่วงที่พิมพ์ไว้ Docker image 0.9.0 rebuild พร้อม shell-v28 ไม่มีการเปลี่ยนข้อมูล
