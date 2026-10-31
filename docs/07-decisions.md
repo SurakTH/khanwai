@@ -238,3 +238,10 @@ Box รองรับรายเล่มโดยไม่สร้างเ�
 ผู้ใช้ส่งภาพ Safari/iPhone เปรียบเทียบและระบุชัดว่าชอบหน้าตาก่อนเพิ่มการอ่าน จึงคืน shelf.css/shelf-view.js จาก image khanwai:0.8.3 โดยตรง ไม่ออกแบบแถวเครื่องมือใหม่อีก เอา quick filter ของ 0.8.4 และ paired toolbar ของ 0.8.5 ออกทั้งมือถือ/คอม สถานะการอ่านทั้ง 4 และทั้งหมดกลับไปเลือกในปุ่มกรองโดยใช้ native select/listener เดิมตามเอกสาร select ที่ตรวจไว้ ไม่มีเทคโนโลยีหรือ dependency ใหม่
 
 เป็นการคืน presentation เท่านั้น ใช้ app.js ล่าสุดโดยถอดเฉพาะ update ของ quick select ที่ยกเลิก คง close-focus fix/รายละเอียดรายเล่ม/box/offline/ownership/ข้อมูลบัญชี ไม่มีการ restore DB หรือลบสถานะอ่าน เปลี่ยน cache เป็น shell-v26 ผ่าน flow แจ้งอัปเดตเดิม ปรับ regression ให้ตรวจ toolbar แบบเดิมและการอ่านในแผงกรองแทนดีไซน์ที่ผู้ใช้ปฏิเสธ
+
+
+## ตัวอย่างค่าติดตั้งสำหรับเซิร์ฟเวอร์ (31 ตุลาคม 2026)
+
+ผู้ใช้พบว่า clone repository แล้วไม่มี .env.example จึงเพิ่มไฟล์ตัวอย่างที่มีครบทุกตัวแปร interpolation ของ Compose: image, bind address, port, container data directory, origin, registration, secure cookies และ Google Books key แบบว่างทั้งหมดที่เป็นความลับ ค่าเริ่มต้นตรง Compose เดิม โดย bind 127.0.0.1 พร้อมคำอธิบายการเปลี่ยนเป็น 0.0.0.0 เมื่อต้องการเข้าจากเครื่องอื่น ไม่คัดค่าจาก .env จริง
+
+README และคู่มือ Docker เริ่มด้วย `test -e .env || cp .env.example .env` เพื่อสร้างไฟล์เมื่อยังไม่มีและเก็บค่าเดิมเมื่อมีอยู่แล้ว .env.example เข้า Git ได้ตาม exception เดิม ส่วน .env จริงยัง ignored ตรวจเอกสาร [Compose interpolation และ env-file](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) แล้ว validate ด้วย compose config ทั้งค่าเริ่มต้นและตัวอย่าง server/HTTPS จากไฟล์ชั่วคราว ไม่เปิด/recreate container และไม่ต้องเปลี่ยน version image เพราะไม่มี runtime change

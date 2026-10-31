@@ -3,9 +3,12 @@
 ## เริ่มใช้
 
 ```sh
+test -e .env || cp .env.example .env
 docker build -t khanwai:0.8.6 .
 docker compose up -d --wait
 ```
+
+ไฟล์ `.env.example` มีค่าเริ่มต้นและคำอธิบายครบตาม Compose ให้แก้ `.env` ตามเครื่องที่ติดตั้ง คำสั่งคัดลอกจะไม่เขียนทับ `.env` เดิม ถ้าต้องการเข้าผ่าน IP จากเครื่องอื่น ตั้ง `BIND_ADDRESS=0.0.0.0` ก่อนเริ่ม สำหรับ HTTP ผ่าน IP เว้น `APP_ORIGIN` ว่างได้; เมื่อใช้โดเมน HTTPS ให้ตั้ง URL จริงตามตัวอย่างในไฟล์
 
 เปิด `http://localhost:4173` สมัครบัญชีเอง ไม่มีบัญชี/รหัสผ่านตั้งต้น แอพหนึ่ง service เสิร์ฟเว็บและ API พร้อม SQLite ใน process เดียว รัน non-root, root filesystem read-only และเขียนเฉพาะ data volume `/data` Healthcheck `/healthz` อ่านสถานะฐานข้อมูลที่เปิดตอนเริ่มแอพ
 
@@ -34,6 +37,7 @@ docker image save -o khanwai-0.8.6.tar khanwai:0.8.6
 | ALLOW_REGISTRATION | true | ตั้ง false หลังสมัครบัญชีที่ต้องการแล้ว |
 | APP_ORIGIN | ว่าง | URL เว็บภายนอก เช่น https://books.example.com สำหรับ origin check |
 | COOKIE_SECURE | false | true เมื่อต้องการบังคับ secure cookie; ใช้ https APP_ORIGIN แล้วเปิดอัตโนมัติด้วย |
+| GOOGLE_BOOKS_API_KEY | ว่าง | คีย์ Google Books ฝั่งเซิร์ฟเวอร์ เป็นตัวเลือกเสริม ไม่จำเป็นสำหรับเริ่มใช้แอพ |
 
 หากต้องเปิดจากมือถือใน LAN ใช้ `BIND_ADDRESS=0.0.0.0` แล้วเข้า IP เครื่อง Docker ใช้ HTTPS ที่ระบบ host มีอยู่เมื่อใช้งานบัญชีจริงผ่านเครือข่าย PWA/service worker ต้อง secure context (localhost หรือ HTTPS) ไม่เพิ่ม reverse proxy ใน Compose โดยอัตโนมัติ ไม่เชื่อ X-Forwarded-Host/Proto จากผู้เรียก ให้ตั้ง APP_ORIGIN เป็น URL ที่เปิดจริง
 
