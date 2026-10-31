@@ -203,3 +203,8 @@ Docker migration + rollback ผ่านด้วย scratch volume: เริ�
 ผลรอบสุดท้าย: npm test 66 ผ่าน; browser เต็ม 169 ผ่าน/1 skipped (mobile-only input test บน desktop) และตรวจชื่อเรื่องยาว 320px เพิ่ม 2 กรณีผ่าน ภาพสุ่ม/ถังขยะ/ตรวจคืนจาก scratch DB ที่ 320/390/1440px ไม่ล้น เก็บเฉพาะเครื่อง สร้างซ้ำด้วย node tests/preview-trash.mjs ยังไม่อ้างว่าเป็น Safari hardware test
 
 Docker scratch migration 0.9.0 → 0.10.0 ผ่าน พร้อม volume persistence, catalog, trashed box/member reading, รูป, portable export, SQLite backup/restore และย้อนกลับผ่าน backup เดิม DB v3 คงเดิม ไม่มีการสร้างบัญชีทดสอบใน volume จริง
+
+
+## README พร้อมภาพ (31 ตุลาคม 2026)
+
+เสร็จ: ภาพ overview คอมคู่มือถือ 1600×1040, เช็กก่อนซื้อและรายละเอียดบ็อกซ์ 1180×1060, สุ่มอ่าน 660×450 รวม PNG 4 ภาพประมาณ 555 KiB ใน docs/images/readme/ สร้างจาก tests/preview-readme.mjs โดยใช้ scratch DB/account และปก CSS สมมติ ไม่มีข้อมูล/รูปผู้ใช้จริง ตรวจภาพสุดท้ายด้วยตาและอ้างอิง README 26 จุดแล้ว path/anchor ในไฟล์ที่ลิงก์มีอยู่จริง ภาพพัฒนา/ไฟล์แนบเดิมยังไม่ถูกเผยแพร่ ไม่มี runtime change จึงไม่รันชุดทดสอบแอพซ้ำ

@@ -288,3 +288,12 @@ README และคู่มือ Docker เริ่มด้วย `test -e .
 ถังขยะใช้ optional trashedAt บน record เดิมแทนเก็บ snapshot ซ้ำ รักษา IDs/photo URLs/ข้อมูล box และ revisions เดิม หน้าชั้นใช้ activeLibrary แต่ AccountStore/export/backup ใช้ข้อมูลเต็ม การย้าย/คืนเป็น mutation ใน [SQLite transaction](https://www.sqlite.org/lang_transaction.html) เดิมต่อ owner จึงไม่เพิ่ม schema หรืองานล้างรูปที่เสี่ยงทำรูปในถังขยะหาย DB v3/JSON v2 คงเดิม shell-v30 รวม module ใหม่
 
 ไม่มีการลบอัตโนมัติหรือลบถาวรใน UI รุ่นนี้ ยืนยันก่อนย้ายและตรวจซ้ำก่อนคืน คืนทั้งฉบับไม่คืนเล่มที่เคยลบแยกก่อนหน้า การนำเข้าแทนที่และลบบัญชียังมีความหมายเดิม ต้องอัปเดต PWA ทุกเครื่องก่อนแก้ข้อมูล เพราะ client เก่าไม่รู้สถานะถังขยะ รายละเอียดใน 16-trash-and-picker.md
+
+
+## README พร้อมภาพแนะนำแอพ (31 ตุลาคม 2026)
+
+ผู้ใช้ขอ README ที่มีภาพและดูน่าใช้ จึงจัดหน้าแนะนำพร้อมภาพคอม/มือถือ ภาพเช็กก่อนซื้อ รายละเอียดบ็อกซ์ และการสุ่มอ่าน ใช้ screenshots ของแอพจริงจากบัญชีและฐานชั่วคราวใน tests/preview-readme.mjs เท่านั้น ชื่อ/ผู้เขียน/ปกเป็น seedState และบัญชี reader@example.test ไม่มีรูปหรือข้อมูลผู้ใช้จริง
+
+ภาพสาธารณะที่ผู้ใช้ขออยู่ใน docs/images/readme/ พร้อม provenance และคำสั่งสร้างใหม่ กรอบภาพหลักประกอบด้วย HTML/CSS ไม่ใช้ภาพโฆษณาฟังก์ชันที่ยังไม่มี ภาพพัฒนาเดิม docs/screenshots/ และไฟล์แนบผู้ใช้ยังไม่เข้า Git ไม่มีการแก้ .gitignore ให้เปิดเผยภาพเก่า ไม่มี dependency หรือ runtime change
+
+README ใช้ภาพ relative path, alt text, ตารางฟังก์ชัน/คู่มือ และ details สำหรับข้อมูลเสริม คงขั้น Docker build จาก source, env/HTTPS, volume และการสำรอง รวมข้อจำกัด ISBN/กล้อง/AI ตามสถานะจริง ไม่อ้าง license หรือ registry image ที่ยังไม่มี
