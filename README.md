@@ -50,13 +50,13 @@
 
 ## เริ่มใช้ด้วย Docker
 
-เวอร์ชันปัจจุบัน **0.10.1** ต้องมี Docker และ Docker Compose ไม่ต้องติดตั้ง Node หรือฐานข้อมูลแยกบนเซิร์ฟเวอร์
+เวอร์ชันปัจจุบัน **0.10.2** ต้องมี Docker และ Docker Compose ไม่ต้องติดตั้ง Node หรือฐานข้อมูลแยกบนเซิร์ฟเวอร์
 
 ```sh
 git clone https://github.com/SurakTH/khanwai.git
 cd khanwai
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.10.1 .
+docker build -t khanwai:0.10.2 .
 docker compose up -d
 ```
 

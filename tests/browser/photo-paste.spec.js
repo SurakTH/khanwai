@@ -5,6 +5,7 @@ const headers={'X-Book-Request':'1'};
 const library=async page=>(await(await page.request.get('/api/library')).json()).state;
 const png=async(size=192)=>(await readFile(`public/icon-${size}.png`)).toString('base64');
 async function paste(page,{data,type='image/png',text}={}) {
+  await page.locator('.photo-paste-options').evaluate(el=>el.open=true);
   await page.locator('#photo-paste').evaluate((area,{data,type,text})=>{
     const transfer=new DataTransfer();
     if(data)transfer.items.add(new File([Uint8Array.from(atob(data),char=>char.charCodeAt(0))],'clipboard-image',{type}));
@@ -21,7 +22,11 @@ test.beforeEach(async({page})=>{
 });
 
 test('pasted image previews without saving, survives draft review and reload, and keeps normal text paste outside the cover area',async({page})=>{
-  await add(page);await paste(page,{data:await png()});await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
+  await add(page);
+  expect(await page.locator('.photo-paste-options').evaluate(el=>el.open)).toBe(false);
+  const positions=await page.locator('#review-form').evaluate(form=>({photo:form.querySelector('.photo-editor').getBoundingClientRect().top,fields:form.querySelector('.form-grid').getBoundingClientRect().bottom}));
+  expect(positions.photo).toBeGreaterThanOrEqual(positions.fields);
+  await paste(page,{data:await png()});await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
   await expect(page.locator('#photo-preview img')).toHaveAttribute('src',/^data:image\/jpeg;base64,/);
   expect((await library(page)).series).toHaveLength(0);
   const source=await page.locator('#photo-preview img').getAttribute('src');
@@ -40,7 +45,7 @@ test('pasted image previews without saving, survives draft review and reload, an
 
 test('batch, series cover and entry cover use the same paste flow and retain photos after saving',async({page})=>{
   await add(page,'ชุดจากคลิปบอร์ด');await page.getByRole('button',{name:'หลายเล่มในชุด',exact:true}).click();
-  await page.locator('.batch-photo summary').click();await paste(page,{data:await png()});await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
+  await page.locator('.batch-photo > summary').click();await paste(page,{data:await png()});await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
   await page.locator('[name=end]').fill('2');await page.getByRole('button',{name:'ตรวจรายการก่อนเพิ่ม →'}).click();await page.getByRole('button',{name:'ยืนยันเพิ่มเข้าชั้น',exact:true}).click();
   await expect(page.getByRole('heading',{name:'รายละเอียดบนชั้น',exact:true})).toBeVisible();
   await expect.poll(async()=>Boolean((await library(page)).series[0]?.coverData)).toBe(true);
@@ -88,6 +93,7 @@ test('removing or leaving a cover editor cancels a pending clipboard result',asy
   await page.getByRole('button',{name:'วางรูปจากคลิปบอร์ด'}).click();await page.getByRole('button',{name:'ปิดหน้าต่าง'}).click();
   await add(page,'ฟอร์มใหม่');await resolve();await expect(page.locator('#photo-preview img')).toHaveCount(0);await expect(page.locator('#photo-status')).not.toContainText('เตรียมรูปแล้ว');
   await page.setViewportSize({width:320,height:800});expect(await page.locator('#modal').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
+  await page.locator('.photo-paste-options').evaluate(el=>el.open=true);
   expect(await page.locator('#photo-paste').evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
 });
 
@@ -98,7 +104,7 @@ test('native clipboard image paste works with the keyboard and the explicit past
     const blob=new Blob([Uint8Array.from(atob(data),char=>char.charCodeAt(0))],{type:'image/png'});
     await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
   },await png());
-  await page.locator('#photo-paste').focus();await page.keyboard.press('Control+V');await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
+  await page.locator('.photo-paste-options summary').click();await page.locator('#photo-paste').focus();await page.keyboard.press('Control+V');await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');
   await page.getByRole('button',{name:'ลบรูป',exact:true}).click();await page.getByRole('button',{name:'วางรูปจากคลิปบอร์ด'}).click();
   await expect(page.locator('#photo-status')).toContainText('เตรียมรูปแล้ว');await expect(page.locator('#photo-preview img')).toHaveCount(1);
 });

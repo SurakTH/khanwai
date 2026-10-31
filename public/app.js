@@ -357,7 +357,7 @@ function openAdd(draft = null, seriesId = '', options = {}) {
   const selected = state.series.find(s => s.id === seriesId);
   openModal(`${modalHeading(draft ? 'ตรวจข้อมูลก่อนเข้าชั้น' : 'เพิ่มหนังสือ', 'บันทึกเมื่อเธอตรวจแล้วเท่านั้น')}${addModeMarkup('single')}
     ${lookupMarkup(d.lookupIsbn??d.isbn)}
-    <form id="review-form">${photoEditorMarkup(esc)}<div class="form-grid">
+    <form id="review-form"><div class="form-grid">
     <label class="field full">เพิ่มเข้าเรื่อง / ฉบับ<select id="series-link" name="seriesId"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${state.series.map(s => `<option value="${esc(s.id)}" ${s.id === seriesId ? 'selected' : ''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(s.language)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select><small>ชื่อคล้ายกันจะไม่ถูกรวมเอง เลือกเรื่องเดิมเมื่อเป็นฉบับเดียวกัน</small></label>
     <label class="field full">ชื่อเรื่อง *<input name="title" required maxlength="300" value="${esc(selected?.title ?? d.title)}"></label>
     <label class="field">ผู้เขียน<input name="author" maxlength="300" value="${esc(selected?.author ?? d.author)}"></label>
@@ -370,7 +370,7 @@ function openAdd(draft = null, seriesId = '', options = {}) {
     <label class="field">ISBN ของเล่มนี้<input name="isbn" maxlength="30" value="${esc(d.isbn)}" placeholder="ไม่มีให้เว้นว่าง"></label>
     <label class="field">สถานะ<select name="status">${Object.entries(STATUSES).map(([k, v]) => `<option value="${k}" ${k===(d.status??'owned')?'selected':''}>${v}</option>`).join('')}</select></label>
     <label class="field">สถานะการอ่าน<select name="readingStatus">${readingOptions(d.readingStatus ?? (draft ? '' : 'unread'))}</select><small>แยกจากการมีแล้ว รอส่ง และอยากซื้อ</small></label><label class="field">จำนวนสำเนา / สิทธิ์<input name="quantity" type="number" value="${esc(d.quantity??1)}" min="1" max="999" required></label>
-    </div><label class="checkbox-line"><input id="continue-adding" type="checkbox" ${options.continueAdding?'checked':''}>เพิ่มเล่มถัดไปต่อหลังบันทึก</label><p class="subtitle" id="source-label">แหล่งข้อมูล: ${esc(d.source||'กรอกเอง')} · ตรวจเลขเล่ม ภาษา และฉบับก่อนบันทึก</p><div id="duplicate-warning" aria-live="polite"></div>
+    </div>${photoEditorMarkup(esc)}<label class="checkbox-line"><input id="continue-adding" type="checkbox" ${options.continueAdding?'checked':''}>เพิ่มเล่มถัดไปต่อหลังบันทึก</label><p class="subtitle" id="source-label">แหล่งข้อมูล: ${esc(d.source||'กรอกเอง')} · ตรวจเลขเล่ม ภาษา และฉบับก่อนบันทึก</p><div id="duplicate-warning" aria-live="polite"></div>
     <div class="form-actions"><button class="button" id="save-draft" type="button">เก็บไว้ในถาดรอตรวจ</button><button class="button primary" type="submit">ตรวจแล้ว · เพิ่มเข้าชั้น</button></div></form>`);
   $('#review-form').dataset.source = d.source||'กรอกเอง';
   getReviewPhoto = mountPhotoEditor($('#modal-content'), d.coverData ?? '');
@@ -464,6 +464,8 @@ async function lookup(event) {
           form.elements.edition.value=String(candidate.edition??'').trim()||form.elements.edition.value.trim()||'ฉบับธรรมดา';
         }
         form.elements[isBatch?'seedIsbn':'isbn'].value=candidate.isbn;form.elements[isBatch?'seedLabel':'label'].value=candidate.label||'';
+        const applied = output.querySelector('p');
+        if(applied){applied.className='lookup-applied';applied.setAttribute('role','status');applied.textContent=form.elements.seriesId.value?'ใส่ ISBN ที่เลือกแล้ว · ข้อมูลฉบับเดิมยังอยู่':'กรอกข้อมูลที่เลือกแล้ว · ตรวจชื่อเรื่องและฉบับด้านล่าง';}
         form.dataset.source = candidate.source || 'ข้อมูลภายนอก'; $('#source-label').textContent = `แหล่งข้อมูล: ${form.dataset.source} · โปรดตรวจภาษา ฉบับ และเลขเล่มก่อนบันทึก`;
         notify('กรอกข้อมูลที่ค้นได้แล้ว ตรวจเลขเล่มและฉบับก่อนบันทึก');
       }); output.append(choice);

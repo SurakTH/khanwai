@@ -217,3 +217,8 @@ Docker scratch migration 0.9.0 → 0.10.0 ผ่าน พร้อม volume pe
 ตรวจ npm test 66 ผ่าน; browser ที่กระทบ 20 ผ่าน/2 skipped (mobile-only input test บน desktop และ native OS clipboard test บน mobile emulation) รวม native Chromium clipboard write→Control+V→read button, draft/reload, แก้รูปชุด/รายเล่ม, capability/permission denied, ภาพเก่าไม่หายเมื่อวางไม่ได้, ไม่ดัก text paste นอก editor, async cancellation, file picker เดิม และการสลับโหมดเพิ่มหนังสือ ภาพจาก scratch DB ตรวจ 320/390/1440px ไม่ล้น เก็บเฉพาะเครื่อง ไม่อ้าง native Safari/iPhone หรือ Android hardware test
 
 Docker build khanwai:0.10.1 ผ่าน สำรองข้อมูล instance เดิมที่ /data/backups/pre-0101-cover-paste รวม 2 รูปก่อนอัปเดต ไม่สร้างบัญชีทดสอบบน volume จริง ไม่มีการเพิ่มบริการหรืออ่าน clipboard อัตโนมัติ
+
+
+## 0.10.2 — ลดพื้นที่รูปปกในฟอร์มเพิ่ม
+
+ย้ายรูปปกไว้หลังข้อมูลหนังสือใน single/draft และพับช่องวางด้วยคีย์บอร์ด/แตะค้างไว้ก่อน คง direct paste button พร้อม fallback เปิดช่องให้โฟกัสเอง มี inline status ยืนยันหลังเลือก ISBN candidate ตรวจ browser 17 ผ่าน/1 skipped (native clipboard บน mobile emulation) รวมตำแหน่งหลัง form-grid, ค่าเริ่มต้นพับ, native clipboard, fallback/async/offline, file picker, สลับ single/batch และ metadata/default edition ภาพ scratch DB หลังเลือก ISBN ที่ 320/390/1440px ไม่ล้นและเห็นชื่อเรื่องต่อจากผลค้น ไม่มีข้อมูลผู้ใช้ในภาพ เก็บเฉพาะเครื่อง

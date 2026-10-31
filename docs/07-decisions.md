@@ -306,3 +306,10 @@ README ใช้ภาพ relative path, alt text, ตารางฟังก�
 ตรวจ [ClipboardEvent.clipboardData](https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData), [Clipboard.read](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read) และ [WebKit async clipboard](https://webkit.org/blog/10855/async-clipboard-api/) แล้ว ปุ่ม read เรียกจาก user gesture เท่านั้นบน secure context; Safari อาจต้องยืนยัน paste เลือกอ่าน MIME ภาพที่รองรับและคงทาง native paste/file picker เมื่อ capability หรือ permission ไม่พร้อม ไม่ขยาย CSP หรืออ่าน text/HTML จาก clipboard ไปโหลด URL ภายนอก
 
 Refactor ตัวเตรียมรูปเดิมให้ใช้ร่วมกันทั้งไฟล์/กล้อง/paste พร้อม generation/editor visibility guard: รูปเก่าคงอยู่หากแปลงไม่ได้ และผล async เก่าไม่กลับมาหลังลบหรือปิดฟอร์ม ตัวจำกัดขนาด/ชนิด การย่อ JPEG รีวิวยืนยัน owner photos และ outbox เดิมทั้งหมด ไม่มี backend/schema/dependency ใหม่ shell-v31 รายละเอียดและขอบเขตทดสอบใน 17-cover-paste.md
+
+
+## 0.10.2 — รูปปกกระชับ ไม่บังผล ISBN (31 ตุลาคม 2026)
+
+ผู้ใช้ส่งภาพ iPhone และระบุว่ากล่องรูปปกใหญ่จนไม่เห็นข้อมูลหลัง fetch ISBN จึงย้าย photo editor ของฟอร์ม single/draft ไปหลัง form-grid ก่อนปุ่มบันทึก ลดข้อความแนะนำ และพับเฉพาะช่อง native paste ด้วย details ที่เริ่มปิด ปุ่มเลือกรูป/ถ่ายรูป/วางรูปยังเห็นและใช้ได้ทันที เมื่อ API วางไม่พร้อม ปุ่มจะเปิดช่อง paste ก่อนโฟกัสให้เอง
+
+ผลเลือก candidate มีข้อความยืนยันสีเขียว role=status ใน lookup-result เดิม จึงรู้ว่าใส่ข้อมูลแล้วแม้ไม่เลื่อนลง ไม่อ้างว่าบันทึกเข้าบัญชีแล้ว ไม่เปลี่ยนข้อมูลที่เลือก ค่าเริ่มต้นฉบับ/หมวด การย่อรูป หรือ outbox คงตัวอักษรช่องกรอกมือถือ 16px และ touch target 44px ไม่ทำให้ UI เล็กด้วยการลดขนาดฟอนต์ใช้ยาก ไม่มี schema/dependency ใหม่ shell-v32

@@ -1,6 +1,6 @@
 services:
   app:
-    image: ${KHANWAI_IMAGE:-khanwai:0.10.1}
+    image: ${KHANWAI_IMAGE:-khanwai:0.10.2}
     environment:
       DATA_DIR: "${DATA_DIR:-/data}"
       APP_ORIGIN: "${APP_ORIGIN:-}"

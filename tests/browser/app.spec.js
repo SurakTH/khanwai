@@ -387,6 +387,7 @@ test('fallback metadata keeps the default or entered edition in single and batch
     await page.getByRole('button',{name:'ดึงข้อมูล',exact:true}).click();
     const missing = page.getByRole('button',{name:/หนังสือจากแหล่งสำรอง.*Open Library/});
     await missing.click();
+    await expect(page.locator('#lookup-result [role=status]')).toContainText('กรอกข้อมูลที่เลือกแล้ว');
     await expect(page.locator('#source-label')).toContainText('Open Library');
     await expect(page.locator('[name="language"]')).toHaveValue('');
     await expect(page.locator('[name="edition"]')).toHaveValue('ฉบับธรรมดา');
