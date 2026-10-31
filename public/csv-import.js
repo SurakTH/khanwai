@@ -71,11 +71,11 @@ export function planCsv(state, candidates, idFactory = newId) {
     try {
       if (!row.selected) { results.push({index:row.index,status:'excluded',message:'เว้นไว้'}); continue; }
       const {series,entry} = rowData(row, next);
-      const matches = next.series.filter(s => identity(s) === identity(series));
+      const matches = next.series.filter(s => !s.trashedAt && identity(s) === identity(series));
       if (matches.length > 1) throw Error('พบฉบับเดิมหลายรายการที่ข้อมูลตรงกัน โปรดแยกฉบับให้ชัดก่อน');
       let target = matches[0];
-      const sameIsbn = entry.isbn && next.series.some(s => s.format === series.format && s.entries.some(e => normalizeIsbn(e.isbn) === entry.isbn));
-      const overlap = target && (matchingEntries(target,entry).length || entry.kind === 'box' && target.entries.some(e => (e.kind === 'box'?e.members:[e.label]).some(l => entry.members.includes(l))));
+      const sameIsbn = entry.isbn && next.series.some(s => !s.trashedAt && s.format === series.format && s.entries.some(e => !e.trashedAt && normalizeIsbn(e.isbn) === entry.isbn));
+      const overlap = target && (matchingEntries(target,entry).length || entry.kind === 'box' && target.entries.some(e => !e.trashedAt && (e.kind === 'box'?e.members:[e.label]).some(l => entry.members.includes(l))));
       if (sameIsbn || overlap) { results.push({index:row.index,status:'duplicate',message:sameIsbn?'ISBN นี้มีในชั้นหรือไฟล์แล้ว':'เลขเล่มซ้ำหรืออยู่ในบ็อกซ์แล้ว'}); continue; }
       if (target && series.target.length && target.target?.length && JSON.stringify([...series.target].sort()) !== JSON.stringify([...target.target].sort())) throw Error('เป้าหมายของชุดไม่ตรงกับฉบับเดิม แก้เป้าหมายให้ตรงหรือเว้นว่าง');
       if (!target) { target = {...series,id:idFactory(),entries:[]}; next.series.push(target); }

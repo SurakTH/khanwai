@@ -187,3 +187,19 @@ Docker migration + rollback ผ่านด้วย scratch volume: เริ�
 ## ค่าเริ่มต้นของฉบับและหมวดหมู่ (31 ตุลาคม 2026)
 
 เสร็จในเครื่องและผู้ใช้อนุมัติให้ส่งขึ้น Git แล้ว: ISBN ไม่มีฉบับให้คงค่าที่กรอกไว้หรือฉบับธรรมดา ทั้ง single/batch และตั้งค่าเลือกหมวดเริ่มต้นผ่าน catalog เดิมโดยไม่เปลี่ยนหมวดหนังสือเก่า ตรวจ npm test 62 ผ่าน และ browser ที่กระทบ 16 ผ่าน ครอบคลุม missing/whitespace/explicit edition, default category reload/offline/sync, การเก็บค่าฟอร์มตอนสลับโหมด, category rename/delete/import/conflict ภาพ modal จาก scratch DB ตรวจ 320/390/1440px ไม่ล้น shell-v29 ไม่มี schema ใหม่
+
+
+## ตรวจรับ 0.10.0 — สุ่มอ่านและถังขยะ
+
+| เกณฑ์ | หลักฐาน |
+| --- | --- |
+| สุ่มจาก owned unread ต่อเรื่อง/ฉบับ ไม่ถ่วงด้วยจำนวนเล่ม รวม box/member และสำเนาอ่านแล้ว เคารพตัวกรอง ไม่เขียนสถานะ | trash-picker.test.js + trash-picker.spec.js |
+| รายเล่ม/ทั้งฉบับ/รอตรวจย้ายถังขยะหลังยืนยัน ไม่ถูกนับในชั้น/เช็กซ้ำ และคืนข้อมูลเดิมพร้อมภาพ | trash-picker.spec.js + backend.test.js |
+| คืนแล้วอาจซ้ำต้องตรวจยืนยัน ไม่คืนรายการที่ลบแยกก่อนย้ายทั้งฉบับ | trash-picker.test.js + duplicate browser flow |
+| ซิงก์ข้ามเครื่อง ออฟไลน์ reload การแก้ชน และฟอร์มเก่าที่รายการถูกย้ายไปถังขยะ | trash-picker.spec.js + backend revisions + account browser tests |
+| export/import/backup ยังเก็บถังขยะ รูป และ box reading แยก owner | backend.test.js + docker-smoke.mjs |
+| sample loading ไม่ล้างถังขยะ และหมวดที่อ้างเฉพาะในถังขยะยังย้ายหมวดได้ | trash-picker.spec.js |
+
+ผลรอบสุดท้าย: npm test 66 ผ่าน; browser เต็ม 169 ผ่าน/1 skipped (mobile-only input test บน desktop) และตรวจชื่อเรื่องยาว 320px เพิ่ม 2 กรณีผ่าน ภาพสุ่ม/ถังขยะ/ตรวจคืนจาก scratch DB ที่ 320/390/1440px ไม่ล้น เก็บเฉพาะเครื่อง สร้างซ้ำด้วย node tests/preview-trash.mjs ยังไม่อ้างว่าเป็น Safari hardware test
+
+Docker scratch migration 0.9.0 → 0.10.0 ผ่าน พร้อม volume persistence, catalog, trashed box/member reading, รูป, portable export, SQLite backup/restore และย้อนกลับผ่าน backup เดิม DB v3 คงเดิม ไม่มีการสร้างบัญชีทดสอบใน volume จริง

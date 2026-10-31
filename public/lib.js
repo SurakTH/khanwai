@@ -1,3 +1,4 @@
+import { validateTrash } from './trash.js';
 import { DEFAULT_CATEGORIES, validateCategoryList, validateCategoryName } from './categories.js';
 import { validateReading } from './reading.js';
 export const STATUSES = { owned: 'มีแล้ว', ordered: 'รอส่ง', wishlist: 'อยากซื้อ' };
@@ -20,14 +21,14 @@ export function normalizeIsbn(input) {
 }
 
 export function coverage(series, status = 'owned') {
-  return [...new Set(series.entries.filter(e => e.status === status).flatMap(e => e.kind === 'box' ? e.members : [e.label]))]
+  return [...new Set(series.entries.filter(e => !e.trashedAt && e.status === status).flatMap(e => e.kind === 'box' ? e.members : [e.label]))]
     .sort((a, b) => a.localeCompare(b, 'th', { numeric: true }));
 }
 
 export function matchingEntries(series, entry) {
   const isbn = normalizeIsbn(entry.isbn);
-  return series.entries.filter(e => (isbn && normalizeIsbn(e.isbn) === isbn) ||
-    (entry.kind !== 'box' && (e.kind === 'box' ? e.members.includes(entry.label) : e.label === entry.label)));
+  return series.entries.filter(e => !e.trashedAt && ((isbn && normalizeIsbn(e.isbn) === isbn) ||
+    (entry.kind !== 'box' && (e.kind === 'box' ? e.members.includes(entry.label) : e.label === entry.label))));
 }
 
 export function searchLibrary(series, query = '', filter = 'all', format = 'all') {
@@ -50,6 +51,7 @@ function requireText(value, max = 300, empty = false) {
 }
 
 function validateOptionalMedia(item) {
+  validateTrash(item);
   if (item.tags !== undefined) {
     if (!Array.isArray(item.tags) || item.tags.length > 30) throw Error('แท็กไม่ถูกต้อง');
     for (const tag of item.tags) requireText(tag, 50);

@@ -4,7 +4,7 @@
 
 ```sh
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.9.0 .
+docker build -t khanwai:0.10.0 .
 docker compose up -d --wait
 ```
 
@@ -19,10 +19,10 @@ docker compose up -d --wait
 ยังไม่มี registry ที่เผยแพร่จริง ผู้สร้างส่ง image กับ compose.yaml ได้:
 
 ```sh
-docker image save -o khanwai-0.9.0.tar khanwai:0.9.0
+docker image save -o khanwai-0.10.0.tar khanwai:0.10.0
 ```
 
-ผู้รับใช้ `docker image load -i khanwai-0.9.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
+ผู้รับใช้ `docker image load -i khanwai-0.10.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
 
 ## ตั้งค่า
 
@@ -32,7 +32,7 @@ docker image save -o khanwai-0.9.0.tar khanwai:0.9.0
 | --- | --- | --- |
 | PORT | 4173 | พอร์ต host |
 | BIND_ADDRESS | 127.0.0.1 | interface host |
-| KHANWAI_IMAGE | khanwai:0.9.0 | image/tag |
+| KHANWAI_IMAGE | khanwai:0.10.0 | image/tag |
 | DATA_DIR | /data | โฟลเดอร์ฐานข้อมูลใน volume ใช้เปลี่ยนหลัง restore |
 | ALLOW_REGISTRATION | true | ตั้ง false หลังสมัครบัญชีที่ต้องการแล้ว |
 | APP_ORIGIN | ว่าง | URL เว็บภายนอก เช่น https://books.example.com สำหรับ origin check |
@@ -84,6 +84,22 @@ docker compose exec app node src/cli.mjs reset-password reader@example.com
 สำรอง -> build/load image tag ใหม่ -> ตั้ง KHANWAI_IMAGE -> `docker compose up -d --wait` -> ตรวจ login/ชั้น/รูป เก็บ image เก่าไว้จนตรวจเสร็จ ถ้า schema ใหม่กว่า image เก่า แอพจะปฏิเสธการเปิด ต้องใช้ backup ที่เข้ากันกับ image เก่าลงโฟลเดอร์ใหม่ก่อนย้อนกลับ
 
 การลบบัญชีลบข้อมูลและรูปของบัญชีนั้นในระบบปัจจุบัน ไม่ลบ backup ที่ผู้ดูแลคัดลอกไว้ ต้องจัดการ retention ของ backup แยกกัน
+
+## อัปเกรดเป็น 0.10.0
+
+```sh
+docker compose exec -T app node src/cli.mjs backup /data/backups/pre-0100-trash
+git pull
+```
+
+ตั้ง `KHANWAI_IMAGE=khanwai:0.10.0` ใน `.env` โดยเก็บค่าอื่นเดิม แล้ว:
+
+```sh
+docker build -t khanwai:0.10.0 .
+docker compose up -d
+```
+
+รอบนี้ DB ยังเป็น v3 ไม่เพิ่มบริการ ถังขยะรวมใน JSON/SQLite backup พร้อมรูป อัปเดตเว็บหรือ PWA ทุกเครื่องก่อนแก้ต่อ เพราะรุ่นเก่าอาจยังแสดงรายการที่อยู่ในถังขยะ หากต้องย้อนกลับให้กู้ backup ก่อนอัปเดตลง directory ว่างตามวิธีในส่วนก่อนหน้า ดู [วิธีใช้สุ่มและถังขยะ](16-trash-and-picker.md)
 
 ## อัปเกรดเป็น 0.9.0: หมวดหมู่ส่วนตัว
 

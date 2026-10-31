@@ -38,5 +38,5 @@ export function entryReadingOptions(entry) {
 
 export function setSeriesReading(series, value) {
   if (!Object.hasOwn(READING_STATUSES,value)) throw Error('สถานะการอ่านไม่ถูกต้อง');
-  for (const entry of series.entries) setReading(entry,value);
+  for (const entry of series.entries) if(!entry.trashedAt) setReading(entry,value);
 }

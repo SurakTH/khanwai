@@ -9,6 +9,7 @@ import { createApp } from '../server.mjs';
 import { LibraryStorage } from '../src/storage.mjs';
 import { restoreBackup } from '../src/cli.mjs';
 import { seedState } from '../public/lib.js';
+import { activeLibrary } from '../public/trash.js';
 import { emptyLibrary, recordDiff, flattenLibrary } from '../public/sync-core.js';
 
 const PASSWORD = 'test-only-book-password-2026';
@@ -230,4 +231,22 @@ test('reading and box member progress validate server-side, stay private and sur
  assert.equal((await a.request('/api/sync','POST',operation(snapshot,[{key,value}]))).status,200);
  const exported=(await a.request('/api/export')).body;assert.deepEqual(exported.series[2].entries[0].readingByMember,{'1':'read','2':'planned'});assert.deepEqual((await b.request('/api/export')).body.series,[]);
  const backup=path.join(fixture.directory,'reading-backup'),restored=path.join(fixture.directory,'reading-restored');await fixture.app.storage.backupTo(backup);restoreBackup(backup,restored);const storage=new LibraryStorage(restored);try{assert.deepEqual(storage.snapshot(owner.id).state.series[2].entries[0].readingByMember,{'1':'read','2':'planned'});}finally{storage.close();}
+});
+
+test('trash remains private, validates timestamps, conflicts with stale edits and survives photo backup', async t => {
+  const fixture=await setup(t),c=fixture.client(),other=fixture.client(),owner=await signup(c);await signup(other);
+  const state=seedState();state.series[0].entries[0].coverData=`data:image/png;base64,${(await readFile('public/icon-192.png')).toString('base64')}`;
+  state.series[0].entries[0].trashedAt='2026-10-31T00:00:00.000Z';
+  assert.equal((await c.request('/api/sync','POST',{id:randomUUID(),changes:recordDiff(emptyLibrary(),state).map(change=>({...change,baseRevision:0}))})).status,200);
+  const snapshot=(await c.request('/api/library')).body,entry=snapshot.state.series[0].entries[0];
+  assert.equal(activeLibrary(snapshot.state).series[0].entries.length,state.series[0].entries.length-1);
+  assert.deepEqual((await other.request('/api/library')).body.state,emptyLibrary());
+  assert.equal((await other.request(entry.coverData)).status,404);
+  const key=`entry:${entry.id}`,value={...entry,seriesId:state.series[0].id,trashedAt:'invalid'};
+  assert.equal((await c.request('/api/sync','POST',{id:randomUUID(),changes:[{key,value,baseRevision:snapshot.versions[key]}]})).status,400);
+  assert.deepEqual((await c.request('/api/library')).body,snapshot);
+  assert.equal((await c.request('/api/sync','POST',{id:randomUUID(),changes:[{key,value:{...value,trashedAt:entry.trashedAt},baseRevision:0}]})).status,409);
+  const backup=path.join(fixture.directory,'trash-backup'),destination=path.join(fixture.directory,'trash-restored');
+  await fixture.app.storage.backupTo(backup);restoreBackup(backup,destination);
+  const restored=new LibraryStorage(destination);try{assert.deepEqual(restored.exportAccount(owner.id),(await c.request('/api/export')).body);assert.equal(restored.snapshot(owner.id).state.series[0].entries[0].trashedAt,entry.trashedAt);}finally{restored.close();}
 });

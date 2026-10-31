@@ -45,7 +45,8 @@ export function bulkPatch(state, entryIds, patch) {
   const tags = patch.tagMode ? parseTags(patch.tags) : [];
   const found = [];
   for (const series of state.series) {
-    const selected = series.entries.filter(e => ids.has(e.id)); if (!selected.length) continue;
+    if(series.trashedAt)continue;
+    const selected = series.entries.filter(e => !e.trashedAt && ids.has(e.id)); if (!selected.length) continue;
     found.push(...selected.map(e => e.id));
     if (patch.readingStatus !== undefined) for (const entry of selected) setReading(entry,patch.readingStatus);
     for (const entry of selected) for (const key of ['status','location']) if (patch[key] !== undefined) entry[key] = patch[key];

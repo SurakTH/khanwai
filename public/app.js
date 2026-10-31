@@ -1,3 +1,6 @@
+import { activeLibrary, moveToTrash, restoreFromTrash, trashItems } from './trash.js';
+import { unreadCandidates, pickUnread } from './unread-picker.js';
+import { openTrash, trashSettingsMarkup, restoreWarnings } from './trash-ui.js';
 import { openCategoryManager, categorySettingsMarkup } from './category-ui.js';
 import { changeCategory } from './categories.js';
 import { categoryList, categoryOptions, categoryKey } from './categories.js';
@@ -31,7 +34,7 @@ let pendingInstall, checkLabel = '', getReviewPhoto;
 let scanTarget = null, scanGeneration = 0;
 let modalBases, authMode = 'login', modalOwner, refreshAfterModal = false;
 export const account = new AccountStore(content => {
-  state = account.state; connection();
+  state = activeLibrary(account.state); connection();
   if (content && $('#modal').open) refreshAfterModal = true;
   if (account.needsLogin || !account.user || content && !$('#modal').open) renderPreservingFocus();
 });
@@ -40,7 +43,7 @@ async function persist(next) {
   return mutate(current => { current.series = next.series; current.drafts = next.drafts; if(next.categories !== undefined) current.categories = next.categories; });
 }
 async function mutate(fn) {
-  try { const result = await account.mutate(current => { const before = structuredClone(current); fn(current); stampShelfChanges(before, current); }, $('#modal').open ? modalBases : undefined); state = account.state; return result; }
+  try { const result = await account.mutate(current => { const before = structuredClone(current); fn(current); stampShelfChanges(before, current); }, $('#modal').open ? modalBases : undefined); state = activeLibrary(account.state); return result; }
   catch (error) { notify(error.message || 'บันทึกในเครื่องไม่สำเร็จ กรุณาตรวจพื้นที่เก็บข้อมูล'); return false; }
 }
 function renderPreservingFocus() {
@@ -72,15 +75,15 @@ function renderAuth() {
   });
 }
 function settingsView() {
-  return accountSettings(account, esc) + categorySettingsMarkup(state, esc) + lookupSettingsMarkup() + `<section class="panel"><h2>สำรองและนำเข้าข้อมูล</h2><p>ส่งออกหนังสือ สถานะ ถาดรอตรวจ และรูปปกเป็นไฟล์ JSON เก็บไว้นอกเครื่องเซิร์ฟเวอร์ได้ การส่งออกรวมงานที่ยังรอซิงก์ด้วย</p><div class="actions"><button class="button primary" id="export">ส่งออกข้อมูล JSON</button><button class="button" id="import">นำเข้าข้อมูลสำรอง</button><button class="button" id="import-csv">นำเข้าจาก CSV</button></div></section>${localStorage.getItem(KEY) ? '<section class="panel"><h2>ข้อมูลจากต้นแบบในเครื่องนี้</h2><p>ข้อมูลเดิมยังอยู่และยังไม่ถูกนำเข้าบัญชีอัตโนมัติ ตรวจรายการก่อนนำเข้าได้</p><div class="actions"><button class="button" id="import-legacy">ตรวจและนำเข้าข้อมูลเดิม</button><button class="button" id="export-legacy">ดาวน์โหลดไฟล์เดิม</button></div></section>' : ''}<section class="panel"><h2>ติดตั้งและใช้ออฟไลน์</h2><p>หลังโหลดชั้นและรูปแล้ว เปิดดูและเพิ่มรายการได้ตอนออฟไลน์ งานรอส่งอยู่ในเครื่องจนกว่าเซิร์ฟเวอร์จะยืนยัน</p><button class="button" id="install">วิธีติดตั้ง PWA</button><p id="install-help" class="install-help"></p></section><section class="panel"><h2>ข้อมูลตัวอย่าง</h2><p>ชื่อและปกตัวอย่างเป็นเรื่องสมมติ เลือกโหลดมาลองได้ และลบตัวอย่างออกภายหลังได้</p><div class="actions">${state.series.length ? '<button class="button danger" id="clear-samples">ลบข้อมูลตัวอย่าง</button>' : '<button class="button" id="load-samples">โหลดหนังสือตัวอย่าง</button>'}</div></section><section class="panel"><h2>จัดการบัญชี</h2><p>ลบบัญชีจะลบชั้นและรูปบนเซิร์ฟเวอร์ของบัญชีนี้ กรุณาส่งออกข้อมูลก่อนหากต้องการเก็บไว้</p><button class="button danger" id="delete-account">ลบบัญชีและข้อมูล</button></section>`;
+  return accountSettings(account, esc) + categorySettingsMarkup(state, esc) + trashSettingsMarkup(account.state, esc) + lookupSettingsMarkup() + `<section class="panel"><h2>สำรองและนำเข้าข้อมูล</h2><p>ส่งออกหนังสือ สถานะ ถาดรอตรวจ ถังขยะ และรูปปกเป็นไฟล์ JSON เก็บไว้นอกเครื่องเซิร์ฟเวอร์ได้ การส่งออกรวมงานที่ยังรอซิงก์ด้วย</p><div class="actions"><button class="button primary" id="export">ส่งออกข้อมูล JSON</button><button class="button" id="import">นำเข้าข้อมูลสำรอง</button><button class="button" id="import-csv">นำเข้าจาก CSV</button></div></section>${localStorage.getItem(KEY) ? '<section class="panel"><h2>ข้อมูลจากต้นแบบในเครื่องนี้</h2><p>ข้อมูลเดิมยังอยู่และยังไม่ถูกนำเข้าบัญชีอัตโนมัติ ตรวจรายการก่อนนำเข้าได้</p><div class="actions"><button class="button" id="import-legacy">ตรวจและนำเข้าข้อมูลเดิม</button><button class="button" id="export-legacy">ดาวน์โหลดไฟล์เดิม</button></div></section>' : ''}<section class="panel"><h2>ติดตั้งและใช้ออฟไลน์</h2><p>หลังโหลดชั้นและรูปแล้ว เปิดดูและเพิ่มรายการได้ตอนออฟไลน์ งานรอส่งอยู่ในเครื่องจนกว่าเซิร์ฟเวอร์จะยืนยัน</p><button class="button" id="install">วิธีติดตั้ง PWA</button><p id="install-help" class="install-help"></p></section><section class="panel"><h2>ข้อมูลตัวอย่าง</h2><p>ชื่อและปกตัวอย่างเป็นเรื่องสมมติ เลือกโหลดมาลองได้ และลบตัวอย่างออกภายหลังได้</p><div class="actions">${state.series.length ? '<button class="button danger" id="clear-samples">ลบข้อมูลตัวอย่าง</button>' : '<button class="button" id="load-samples">โหลดหนังสือตัวอย่าง</button>'}</div></section><section class="panel"><h2>จัดการบัญชี</h2><p>ลบบัญชีจะลบชั้นและรูปบนเซิร์ฟเวอร์ของบัญชีนี้ กรุณาส่งออกข้อมูลก่อนหากต้องการเก็บไว้</p><button class="button danger" id="delete-account">ลบบัญชีและข้อมูล</button></section>`;
 }
 async function exportCurrent() {
   try { const state = await portableExport(account.state); download(JSON.stringify(state, null, 2), 'khanwai-backup.json'); }
   catch (error) { notify(error.message); }
 }
 function previewImport(imported) {
-  const merged = mergeImport(state, imported);
-  openModal(`${modalHeading('ตรวจข้อมูลก่อนนำเข้า')}<p>พบ ${imported.series.length} เรื่อง / ฉบับ และ ${imported.drafts.length} รายการรอตรวจ</p><div class="notice">เพิ่มเฉพาะรายการใหม่ได้ ${merged.added} รายการ · ข้ามรายการซ้ำ/ขัดแย้ง ${merged.skipped} รายการ โดยเก็บข้อมูลปัจจุบันไว้</div><label class="checkbox-line"><input id="replace-import" type="checkbox">แทนที่ข้อมูลทั้งชั้น รวมรายการที่มีอยู่แล้ว</label><p class="subtitle">ถ้าเลือกแทนที่ ข้อมูลปัจจุบันจะถูกแทนที่ด้วยไฟล์นี้ โปรดส่งออกสำรองก่อน</p><div class="form-actions"><button class="button" data-close>ยกเลิก</button><button class="button primary" id="confirm-import">ยืนยันนำเข้าข้อมูล</button></div>`);
+  const merged = mergeImport(account.state, imported);
+  openModal(`${modalHeading('ตรวจข้อมูลก่อนนำเข้า')}<p>พบ ${imported.series.length} เรื่อง / ฉบับ และ ${imported.drafts.length} รายการรอตรวจ</p><div class="notice">เพิ่มเฉพาะรายการใหม่ได้ ${merged.added} รายการ · ข้ามรายการซ้ำ/ขัดแย้ง ${merged.skipped} รายการ โดยเก็บข้อมูลปัจจุบันไว้</div><label class="checkbox-line"><input id="replace-import" type="checkbox">แทนที่ข้อมูลทั้งชั้นและถังขยะ รวมรายการที่มีอยู่แล้ว</label><p class="subtitle">ถ้าเลือกแทนที่ ข้อมูลปัจจุบันรวมถังขยะจะถูกแทนที่ด้วยไฟล์นี้ โปรดส่งออกสำรองก่อน</p><div class="form-actions"><button class="button" data-close>ยกเลิก</button><button class="button primary" id="confirm-import">ยืนยันนำเข้าข้อมูล</button></div>`);
   $('#confirm-import').addEventListener('click', async () => {
     const replacing = $('#replace-import').checked;
     if (await persist(replacing ? {...imported, categories: categoryList(imported)} : merged.state)) { $('#modal').close(); render(); notify('นำเข้าข้อมูลแล้ว · รอเซิร์ฟเวอร์ยืนยันการซิงก์'); }
@@ -125,9 +128,28 @@ function collectionContext() {
     openModal: html => { if(isCurrent()) { openModal(html); modalBases = bases; } },
     checkOwner: () => { if(!isCurrent()) throw Error('บัญชีเปลี่ยนแล้ว กรุณาเปิดรายการใหม่'); } };
 }
+function startTrash() {
+  const context = collectionContext();
+  openTrash({ ...context, getState: () => account.state, onRestore: async (kind,id,confirmed) => {
+    context.checkOwner();
+    if (restoreWarnings(account.state,kind,id).length && !confirmed) throw Error('พบรายการที่อาจซ้ำ กรุณาตรวจและยืนยันก่อนกู้คืน');
+    if (await mutate(next => restoreFromTrash(next,kind,id))) { render(); startTrash(); notify('กู้คืนแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); return true; }
+    return false;
+  } });
+}
+function startUnreadPick(previous) {
+  filter = 'owned'; readingFilter = 'unread'; render();
+  const pool = filterShelf(searchLibrary(state.series,query,'owned',bookFormat).filter(s => category === 'all' || categoryKey(s.category) === categoryKey(category)), {smart:smartFilter,location:locationFilter,tag:tagFilter,reading:'unread'});
+  const candidates = unreadCandidates(pool,locationFilter);
+  const picked = pickUnread(candidates,previous);
+  if (!picked) { openModal(`${modalHeading('ยังไม่มีเรื่องให้สุ่ม')}<p>ไม่พบเล่มที่มีแล้วและยังไม่อ่านตรงคำค้นกับตัวกรองนี้</p><div class="form-actions"><button class="button" data-close>ปิด</button><button class="button" id="random-clear-filters">ล้างคำค้นและตัวกรอง</button></div>`); $('#random-clear-filters').onclick=()=>{$('#modal').close();query='';clearShelfFilters();render();}; return; }
+  const {series,labels}=picked;
+  openModal(`${modalHeading('สุ่มได้เรื่องนี้', 'เลือกจากหนังสือที่มีแล้วและยังไม่อ่าน ตามคำค้นและตัวกรองของเธอ')}<div class="detail-top unread-pick">${cover(series)}<div><h2>${esc(series.title)}</h2><p>${esc(series.author)}</p><p>${esc(series.edition)} · ${esc(FORMATS[series.format])}</p><p>เล่มที่ยังไม่อ่าน: ${labels.map(esc).join(', ')}</p></div></div><p class="subtitle">การสุ่มไม่เปลี่ยนสถานะการอ่าน</p><div class="form-actions"><button class="button" id="pick-again" ${candidates.length<2?'disabled':''}>สุ่มอีกเรื่อง</button><button class="button primary" data-detail="${esc(series.id)}">ดูรายละเอียด</button></div>`);
+  $('#pick-again').onclick=()=>startUnreadPick(series.id);
+}
 function startCategoryManager() {
   const context = collectionContext();
-  openCategoryManager({ ...context, onSave: async command => {
+  openCategoryManager({ ...context, getState: () => account.state, onSave: async command => {
     context.checkOwner();
     if (await mutate(next => changeCategory(next, command))) {
       render(); startCategoryManager(); notify('บันทึกหมวดหมู่ในเครื่องแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
@@ -260,7 +282,8 @@ function openEdit(seriesId, entryId = null) {
     if (patch === null) { openDetail(seriesId); return; }
     if (!await mutate(next => {
       const s = next.series.find(s => s.id === seriesId);
-      const item = entryId ? s.entries.find(e => e.id === entryId) : s;
+      const item = entryId ? s?.entries.find(e => e.id === entryId) : s;
+      if(!s || s.trashedAt || !item || item.trashedAt)throw Error('รายการนี้อยู่ในถังขยะหรือเปลี่ยนไปแล้ว กรุณาเปิดใหม่');
       Object.assign(item, patch, { updatedAt: new Date().toISOString() });
     })) return;
     if (!entryId && page === 'shelf') { query = ''; filter = 'all'; bookFormat = 'all'; category = 'all'; }
@@ -288,6 +311,7 @@ function openBatch(initial={}) {
     if(duplicates&&!data.confirmDuplicate)throw Error('ISBN ต้นทางมีในชั้นแล้ว โปรดกลับไปตรวจและยืนยันอีกสำเนา');
     const saved=await mutate(next=>{
       let series=next.series.find(s=>s.id===data.seriesId);
+      if(series?.trashedAt || next.drafts.some(d=>d.id===data.draftId&&d.trashedAt))throw Error('รายการนี้อยู่ในถังขยะ กรุณาเปิดใหม่');
       if(!series){series={id:newId(),title:data.title,author:data.author,alias:'',category:data.category,format:data.format,edition:data.edition,language:data.language,tags:parseTags(data.tags),entries:[]};next.series.push(series);}
       series.target=[...new Set([...(series.target??[]),...data.target])];
       if(data.seed)series.metadataSeed=data.seed;
@@ -322,7 +346,7 @@ function editEntryPhoto(seriesId, entryId = null) {
   $('#confirm-photo').addEventListener('click', async () => {
     try {
       const image = getPhoto();
-      if (await mutate(next => { const s = next.series.find(s => s.id === seriesId); const target = entryId ? s.entries.find(e => e.id === entryId) : s; target.coverData = image; })) { openDetail(seriesId); render(); notify('บันทึกรูปปกแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); }
+      if (await mutate(next => { const s = next.series.find(s => s.id === seriesId); const target = entryId ? s?.entries.find(e => e.id === entryId) : s; if(!s||s.trashedAt||!target||target.trashedAt)throw Error('รายการนี้อยู่ในถังขยะหรือเปลี่ยนไปแล้ว'); target.coverData = image; })) { openDetail(seriesId); render(); notify('บันทึกรูปปกแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); }
     } catch (error) { notify(error.message); }
   });
 }
@@ -468,7 +492,7 @@ async function saveDraft() {
     const d = draftFromForm();
     if (!d.title && !d.isbn) { notify('กรอกชื่อหรือ ISBN อย่างน้อยหนึ่งช่องก่อนเก็บในถาด'); return; }
     if (d.isbn && state.drafts.some(item => item.id !== d.id && normalizeIsbn(item.isbn) === d.isbn)) { notify('ISBN นี้มีในถาดแล้ว โปรดตรวจรายการเดิม'); return; }
-    if (await mutate(next => { next.drafts = next.drafts.filter(item => item.id !== d.id); next.drafts.push(d); })) {
+    if (await mutate(next => { if(next.drafts.some(item=>item.id===d.id&&item.trashedAt))throw Error('รายการนี้อยู่ในถังขยะ กรุณาเปิดใหม่'); next.drafts = next.drafts.filter(item => item.id !== d.id); next.drafts.push(d); })) {
       $('#modal').close(); render(); notify('เก็บในถาดรอตรวจแล้ว · รอซิงก์กับบัญชี');
     }
   } catch (error) { notify(error.message); } finally { finish(); }
@@ -492,6 +516,7 @@ async function commitReview(event) {
     const continueAdding=$('#continue-adding').checked; let savedSeriesId;
     if (await mutate(next => {
       let series = next.series.find(s => s.id === seriesId);
+      if(series?.trashedAt || next.drafts.some(d=>d.id===draftId&&d.trashedAt))throw Error('รายการนี้อยู่ในถังขยะ กรุณาเปิดใหม่');
       if (!series) { series = { id: newId(), title: d.title, author: d.author, alias: '', category: d.category, edition: d.edition, language: d.language, format: d.format, tags: d.tags, entries: [] }; next.series.push(series); }
       series.entries.push(entry); savedSeriesId=series.id; next.drafts = next.drafts.filter(item => item.id !== draftId);
     })) { $('#modal').close(); render(); if(continueAdding)openAdd(null,savedSeriesId,{prefill:{label:nextLabel([d.label]),status:entry.status,location:d.location},continueAdding:true}); notify('เพิ่มเข้าชั้นแล้ว · รอซิงก์กับบัญชี'); }
@@ -537,6 +562,11 @@ document.addEventListener('click', async event => {
   if(button.id==='apply-shelf-filters'||button.id==='close-shelf-filters'){ $('#shelf-filters').open=false; if(button.id==='apply-shelf-filters'){$('#shelf-result-count').focus({preventScroll:true});$('#shelf-result-count').scrollIntoView({block:'start'});}else $('#shelf-filters summary').focus(); }
   if(button.dataset.removeShelfFilter){const key=button.dataset.removeShelfFilter;if(key==='category')category='all';if(key==='format')bookFormat='all';if(key==='smart')smartFilter='all';if(key==='location')locationFilter='';if(key==='tag')tagFilter='';if(key==='reading')readingFilter='';render();$('#shelf-filters summary').focus({preventScroll:true});}
 
+  if (button.id === 'open-trash') startTrash();
+  if (button.id === 'random-unread') startUnreadPick();
+  if (button.dataset.trashSeries && confirm('ย้ายทั้งฉบับและเล่มที่อยู่ในฉบับนี้ไปถังขยะ? กู้คืนได้ภายหลัง')) {
+    if (await mutate(next => moveToTrash(next,'series',button.dataset.trashSeries))) { $('#modal').close(); render(); notify('ย้ายทั้งฉบับไปถังขยะแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); }
+  }
   if (button.id === 'bulk-edit') startBulkEdit();
   if (button.id === 'manage-categories') startCategoryManager();
   if (button.id === 'import-csv') startCsvImport();
@@ -555,7 +585,9 @@ document.addEventListener('click', async event => {
   if (button.id === 'confirm-reset-server') {
     try { await account.resetFromServer(); $('#modal').close(); render(); } catch (error) { notify(error.message); }
   }
-  if (button.id === 'load-samples') { if (await persist(seedState())) render(); }
+  if (button.id === 'load-samples') {
+    if(await mutate(next=>{for(const sample of seedState().series){const existing=next.series.find(s=>s.id===sample.id);if(!existing)next.series.push(sample);else if(existing.sample&&existing.trashedAt){delete existing.trashedAt;for(const entry of existing.entries)if(sample.entries.some(e=>e.id===entry.id))delete entry.trashedAt;}}}))render();
+  }
   if (button.id === 'import-legacy') { try { previewImport(migrateState(JSON.parse(localStorage.getItem(KEY)))); } catch (error) { notify('อ่านข้อมูลเดิมไม่ได้: ' + error.message); } }
   if (button.id === 'export-legacy') download(localStorage.getItem(KEY) ?? '{}', 'khanwai-legacy-backup.json');
   if (button.dataset.editPhoto) editEntryPhoto(button.dataset.series, button.dataset.editPhoto);
@@ -568,7 +600,7 @@ document.addEventListener('click', async event => {
     button.dataset.saving='true';
     const controls=[...document.querySelectorAll('[data-series-reading]')];controls.forEach(el=>el.disabled=true);
     const id=button.dataset.readingSeries,value=button.dataset.seriesReading;
-    if (await mutate(next=>{const series=next.series.find(s=>s.id===id);if(!series)throw Error('ฉบับนี้ถูกลบแล้ว กรุณาเปิดใหม่');setSeriesReading(series,value);})) {
+    if (await mutate(next=>{const series=next.series.find(s=>s.id===id);if(!series||series.trashedAt)throw Error('ฉบับนี้ถูกลบแล้ว กรุณาเปิดใหม่');setSeriesReading(series,value);})) {
       render();openDetail(id);[...document.querySelectorAll('[data-series-reading]')].find(el=>el.dataset.seriesReading===value)?.focus({preventScroll:true});notify('บันทึกการอ่านทั้งชุดแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
     } else { controls.forEach(el=>el.disabled=false);delete button.dataset.saving; }
   }
@@ -576,8 +608,8 @@ document.addEventListener('click', async event => {
   if (button.hasAttribute('data-close')) $('#modal').close();
   if (button.dataset.filter) { filter = button.dataset.filter; document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b === button); b.setAttribute('aria-pressed', String(b === button)); }); renderResults(); }
   if (button.dataset.review) openAdd(state.drafts.find(d => d.id === button.dataset.review));
-  if (button.dataset.removeDraft && confirm('ลบรายการนี้จากถาดรอตรวจ?')) { if (await mutate(next => { next.drafts = next.drafts.filter(d => d.id !== button.dataset.removeDraft); })) render(); }
-  if (button.dataset.deleteEntry && confirm('ลบรายการนี้ออกจากชั้น?')) { if (await mutate(next => { const s = next.series.find(s => s.id === button.dataset.series); s.entries = s.entries.filter(e => e.id !== button.dataset.deleteEntry); })) { render(); openDetail(button.dataset.series); } }
+  if (button.dataset.removeDraft && confirm('ย้ายรายการนี้ไปถังขยะ? กู้คืนได้ภายหลัง')) { if (await mutate(next => moveToTrash(next,'draft',button.dataset.removeDraft))) { render(); notify('ย้ายไปถังขยะแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); } }
+  if (button.dataset.deleteEntry && confirm('ย้ายรายการนี้ไปถังขยะ? กู้คืนข้อมูลและสถานะเดิมได้')) { if (await mutate(next => moveToTrash(next,'entry',button.dataset.deleteEntry))) { render(); openDetail(button.dataset.series); notify('ย้ายไปถังขยะแล้ว · รอเซิร์ฟเวอร์ยืนยัน'); } }
   if (button.id === 'clear-search') { query = ''; $('#search').value = ''; if (page === 'check') { checkLabel = ''; $('#check-volume').value = ''; } renderResults(); $('#search').focus(); }
   if (button.dataset.scan) {
     scanGeneration++;
@@ -587,12 +619,13 @@ document.addEventListener('click', async event => {
   if (button.id === 'export' || button.id === 'export-conflict') await exportCurrent();
   if (button.id === 'import') $('#import-file').click();
   if (button.id === 'clear-samples' && confirm('ลบเฉพาะรายการตัวอย่าง? รายการที่เพิ่มเองในเรื่องตัวอย่างจะย้ายเป็นเรื่องส่วนตัว')) {
-    if (await mutate(next => { next.series = next.series.flatMap(s => {
-      if (!s.sample) return [s];
-      s.entries = s.entries.filter(e => !/^(sample-|order-|box-|wish-)/.test(e.id));
-      if (!s.entries.length) return [];
-      s.sample = false; s.target = []; return [s];
-    }); })) { render(); notify('ลบข้อมูลตัวอย่างแล้ว'); }
+    if (await mutate(next => {
+      for(const series of next.series) if(series.sample && !series.trashedAt) {
+        for(const entry of series.entries) if(!entry.trashedAt && /^(sample-|order-|box-|wish-)/.test(entry.id)) moveToTrash(next,'entry',entry.id);
+        if(series.entries.every(e=>e.trashedAt)) moveToTrash(next,'series',series.id);
+        else {series.sample=false;series.target=[];}
+      }
+    })) { render(); notify('ย้ายข้อมูลตัวอย่างไปถังขยะแล้ว'); }
   }
   if (button.id === 'install') {
     if (pendingInstall) { pendingInstall.prompt(); pendingInstall = null; }
@@ -625,12 +658,12 @@ document.addEventListener('change', async event => {
   if (target.dataset.entryReading) {
     const id=target.dataset.series, entryId=target.dataset.entryReading, member=target.dataset.readingMember, scroll=$('#modal').scrollTop;
     const expanded=[...document.querySelectorAll('[data-box-reading][open]')].map(el=>el.dataset.boxReading);
-    if (await mutate(next=>{const entry=next.series.find(s=>s.id===id)?.entries.find(e=>e.id===target.dataset.entryReading);if(!entry)throw Error('รายการเปลี่ยนไปแล้ว กรุณาเปิดใหม่');setReading(entry,target.value,target.dataset.readingMember);})) {render();openDetail(id);document.querySelectorAll('[data-box-reading]').forEach(el=>el.open=expanded.includes(el.dataset.boxReading));[...document.querySelectorAll('[data-entry-reading]')].find(el=>el.dataset.entryReading===entryId && el.dataset.readingMember===member)?.focus({preventScroll:true});$('#modal').scrollTop=scroll;notify('บันทึกการอ่านแล้ว · รอเซิร์ฟเวอร์ยืนยัน');}
+    if (await mutate(next=>{const entry=next.series.find(s=>s.id===id&&!s.trashedAt)?.entries.find(e=>e.id===target.dataset.entryReading);if(!entry||entry.trashedAt)throw Error('รายการเปลี่ยนไปแล้ว กรุณาเปิดใหม่');setReading(entry,target.value,target.dataset.readingMember);})) {render();openDetail(id);document.querySelectorAll('[data-box-reading]').forEach(el=>el.open=expanded.includes(el.dataset.boxReading));[...document.querySelectorAll('[data-entry-reading]')].find(el=>el.dataset.entryReading===entryId && el.dataset.readingMember===member)?.focus({preventScroll:true});$('#modal').scrollTop=scroll;notify('บันทึกการอ่านแล้ว · รอเซิร์ฟเวอร์ยืนยัน');}
   }
   if (target.dataset.entryStatus) {
     const id=target.dataset.series,entryId=target.dataset.entryStatus,scroll=$('#modal').scrollTop;
     const expanded=[...document.querySelectorAll('[data-box-reading][open]')].map(el=>el.dataset.boxReading);
-    if (await mutate(next => { const entry=next.series.find(s=>s.id===id)?.entries.find(e=>e.id===entryId);if(!entry)throw Error('รายการเปลี่ยนไปแล้ว กรุณาเปิดใหม่');entry.status=target.value; })) {
+    if (await mutate(next => { const entry=next.series.find(s=>s.id===id&&!s.trashedAt)?.entries.find(e=>e.id===entryId);if(!entry||entry.trashedAt)throw Error('รายการเปลี่ยนไปแล้ว กรุณาเปิดใหม่');entry.status=target.value; })) {
       render();openDetail(id);document.querySelectorAll('[data-box-reading]').forEach(el=>el.open=expanded.includes(el.dataset.boxReading));[...document.querySelectorAll('[data-entry-status]')].find(el=>el.dataset.entryStatus===entryId)?.focus({preventScroll:true});$('#modal').scrollTop=scroll;notify('เปลี่ยนสถานะแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
     }
   }

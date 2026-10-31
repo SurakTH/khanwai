@@ -1,5 +1,12 @@
 # โครงสร้างที่ implementation แล้วใน 0.4.0
 
+## เพิ่มใน 0.10.0
+
+Trash ใช้ optional trashedAt บน record เดิมใน owner-scoped series/entries/drafts ไม่มี SQLite migration เพิ่ม (DB v3, JSON v2) AccountStore/outbox/export/backup เก็บข้อมูลเต็ม แต่ public/app.js แสดง activeLibrary เท่านั้น อ่าน [16-trash-and-picker.md](16-trash-and-picker.md) ก่อนเปลี่ยน persist/import/sample loading เพื่อไม่ทิ้งถังขยะโดยไม่ตั้งใจ
+
+Random unread เป็นการคำนวณ read-only จาก owned/การอ่านสมาชิกบ็อกซ์และสำเนาซ้ำ ไม่สร้าง ID หรือเปลี่ยนสถานะ เมนูอยู่ใน ••• เดิมพร้อมทางเข้าถังขยะ shell-v30 รวม asset ใหม่ทั้งหมด
+
+
 ## เพิ่มใน 0.9.0
 
 หมวดหมู่ส่วนตัวอยู่ใน optional state.categories / sync catalog:categories พร้อม SQLite catalogs แยก owner และ schema DB v3 อัปเกรดจาก v1/v2 โดยเพิ่มตาราง ไม่เขียนข้อมูลหนังสือเดิม ตั้งค่าจัดการเพิ่ม/เปลี่ยนชื่อ/ลบพร้อมย้าย ใช้หมวดเดียวกันทุกแบบฟอร์ม ตัวกรอง และ CSV รวมใน outbox/export/import/backup เดิม ดู [15-categories.md](15-categories.md)

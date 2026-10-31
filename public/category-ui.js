@@ -6,7 +6,7 @@ export function categorySettingsMarkup(state, esc) {
 }
 
 export function openCategoryManager({ getState, openModal, heading, escape: esc, onSave, checkOwner }) {
-  const usageText = name => { const usage = categoryUsage(getState(), name); return `${usage.series} เรื่อง / ฉบับ · ${usage.drafts} รายการรอตรวจ`; };
+  const usageText = name => { const state=getState(),usage = categoryUsage(state, name), archived=[...state.series,...state.drafts].some(item=>item.trashedAt&&categoryKey(item.category)===categoryKey(name)); return `${usage.series} เรื่อง / ฉบับ · ${usage.drafts} รายการรอตรวจ${archived?' · รวมถังขยะ':''}`; };
   const actions = `<div class="form-actions"><button type="button" class="button" data-category-back>กลับ</button><button type="submit" class="button primary">บันทึกหมวดหมู่</button></div>`;
   function bind(command, selector = '#category-form') {
     document.querySelector('[data-category-back]')?.addEventListener('click', list);
