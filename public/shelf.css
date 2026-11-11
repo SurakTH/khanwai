@@ -76,3 +76,20 @@
 @media(prefers-reduced-motion:reduce){.shelf-page .cover,.shelf-page .cover-stage{transition:none}.shelf-page .book-card:hover .cover{transform:none}}
 
 .shelf-views svg,.shelf-filter-icon svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.shelf-result-compact { display: none; }
+@media (max-width: 560px) {
+  #shelf-result-count { line-height: 1.3; }
+  .shelf-result-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .shelf-result-compact { display: inline; }
+}
+@media (max-width: 430px) {
+  .shelf-page .shelf-order select { max-width: 72px; }
+}

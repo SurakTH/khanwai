@@ -78,6 +78,7 @@ export function validateState(data) {
       requireText(seed.label,80);requireText(seed.source,300,true);
     }
     id(s.id);
+    if (s.groupId !== undefined && (typeof s.groupId !== 'string' || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(s.groupId))) throw Error('รหัสกลุ่มฉบับไม่ถูกต้อง');
     requireText(s.title); requireText(s.author, 300, true); requireText(s.alias, 300, true);
     requireText(s.edition); requireText(s.language); requireText(s.category);
     if (!Object.hasOwn(FORMATS, s.format)) throw new Error('รูปแบบหนังสือไม่ถูกต้อง');
@@ -101,6 +102,7 @@ export function validateState(data) {
   for (const d of data.drafts) {
     validateOptionalMedia(d); validateReading(d);
     id(d.id);
+    if (d.groupSourceId !== undefined) requireText(d.groupSourceId, 100);
     if (!Object.hasOwn(FORMATS, d.format)) throw new Error('รูปแบบหนังสือในถาดไม่ถูกต้อง');
     for (const key of ['title', 'author', 'isbn', 'label', 'edition', 'language', 'category', 'source']) requireText(d[key], 300, true);
     if (d.isbn && !normalizeIsbn(d.isbn)) throw new Error('ISBN ในถาดไม่ถูกต้อง');

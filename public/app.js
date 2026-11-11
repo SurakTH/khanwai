@@ -7,7 +7,7 @@ import { categoryList, categoryOptions, categoryKey } from './categories.js';
 import { detailMarkup } from './detail-view.js';
 import { shelfPageMarkup, shelfFilterItems } from './shelf-view.js';
 import { readingOptions, readingItems, readingSummaryText, setReading, setSeriesReading } from './reading.js';
-import { collectionSummary, filterShelf, bulkPatch, parseTags } from './shelf-tools.js';
+import { collectionSummary, filterShelf, bulkPatch, parseTags, targetLabels, shelfVolumeCounts, linkedEditions, changeEditionGroup } from './shelf-tools.js';
 import { openBulkEdit } from './bulk-edit.js';
 import { openCsvImport } from './csv-ui.js';
 import { planCsv, csvFingerprint } from './csv-import.js';
@@ -109,12 +109,29 @@ function cover(s) {
   const symbols = { moon: '☾', garden: '❧', mountain: '△', letter: '✉', cat: '♧', flower: '✿', plain: '❧' };
   return `<div class="cover ${art}" aria-hidden="true"><span class="cover-title">${esc(s.title)}</span><span class="cover-ornament">${symbols[art]}</span><span class="cover-author">${esc(s.author || 'บันทึกเล่มโปรด')}</span></div>`;
 }
-function card(s) {
+function countVolumes(rows) {
+  const counts = { physical: 0, ebook: 0 };
+  let boxes = 0;
+  for (const { series, volumes, unknownBoxes } of rows) {
+    counts[series.format] += volumes;
+    boxes += unknownBoxes;
+  }
+  return { ...counts, total: counts.physical + counts.ebook, boxes };
+}
+
+function volumeCountText({ total, physical, ebook, boxes }) {
+  return `${total} เล่ม (หนังสือเล่ม ${physical} · ebook ${ebook})${boxes ? ` · บ็อกซ์ไม่ระบุเล่ม ${boxes} บ็อกซ์` : ''}`;
+}
+
+function card(s, group = []) {
+  const grouped = Boolean(s.groupId) && !selectionMode;
+  const formats = [...new Set(group.map(row => FORMATS[row.series.format]))].join(' + ');
+  const formatLabel = grouped ? formats : FORMATS[s.format];
   const owned = coverage(s), ordered = coverage(s, 'ordered');
   const summary = collectionSummary(s);
   const short = labels => labels.slice(0,12).map(esc).join(', ') + (labels.length > 12 ? ` และอีก ${labels.length-12} เล่ม` : '');
   const locations = [...new Set(s.entries.map(e => e.location?.trim()).filter(Boolean))];
-  return `<button class="book-card" data-detail="${esc(s.id)}" ${selectionMode?`aria-pressed="${selectedSeries.has(s.id)}"`:''}><div class="cover-stage">${s.sample ? '<span class="sample-flag">เรื่องสมมติ</span>' : ''}${cover(s)}</div><div class="card-meta"><span class="category-label">${esc(FORMATS[s.format])} · ${esc(s.category)} · ${esc(s.language)}</span><h3>${esc(s.title)}</h3><p>${esc(s.author || 'ยังไม่ระบุผู้เขียน')}</p><div class="card-status">${owned.length ? badge('owned', `มีแล้ว ${owned.length}`) : ''}${ordered.length ? badge('ordered', `รอส่ง ${ordered.length}`) : ''}${!owned.length && !ordered.length ? badge('wishlist') : ''}${s.entries.some(e => e.kind === 'box') ? badge('neutral', 'มีบ็อกซ์') : ''}</div><p class="reading-summary ${s.entries.some(e=>readingItems(e).some(item=>item.status!=='unread'))?'':'reading-quiet'}">การอ่าน: ${esc(readingSummaryText(s))}</p><div class="list-summary"><p>มี ${short(summary.owned) || 'ยังไม่มี'}${summary.ordered.length ? ` · รอส่ง ${short(summary.ordered)}` : ''}</p><p>${summary.target.length ? summary.missing.length ? `ยังไม่ได้ซื้อ: ${short(summary.missing)} (ตามเป้าหมายที่ตั้งไว้)` : summary.incomplete ? 'รอรับให้ครบตามเป้าหมาย' : 'ครบตามเป้าหมายที่ตั้งไว้' : 'ยังไม่กำหนดเลขเป้าหมาย'}</p><p>ที่เก็บ / แพลตฟอร์ม: ${locations.slice(0,3).map(esc).join(', ') || 'ยังไม่ระบุ'}</p></div>${s.tags?.length ? `<p class="shelf-tags">${s.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join(' ')}${s.tags.length>4?' …':''}</p>` : ''}</div></button>`;
+  return `<button class="book-card" ${grouped ? `data-open-group="${esc(s.id)}"` : `data-detail="${esc(s.id)}"`} ${selectionMode?`aria-pressed="${selectedSeries.has(s.id)}"`:''}><div class="cover-stage">${s.sample ? '<span class="sample-flag">เรื่องสมมติ</span>' : ''}${cover(s)}</div><div class="card-meta"><span class="category-label">${esc(formatLabel)} · ${esc(s.category)} · ${esc(s.language)}</span><h3>${esc(s.title)}</h3><p>${esc(s.author || 'ยังไม่ระบุผู้เขียน')}</p>${grouped ? `<p class="card-status">${esc(volumeCountText(countVolumes(group)))}</p>` : `<div class="card-status">${owned.length ? badge('owned', `มีแล้ว ${owned.length}`) : ''}${ordered.length ? badge('ordered', `รอส่ง ${ordered.length}`) : ''}${!owned.length && !ordered.length ? badge('wishlist') : ''}${s.entries.some(e => e.kind === 'box') ? badge('neutral', 'มีบ็อกซ์') : ''}</div><p class="reading-summary ${s.entries.some(e=>readingItems(e).some(item=>item.status!=='unread'))?'':'reading-quiet'}">การอ่าน: ${esc(readingSummaryText(s))}</p><div class="list-summary"><p>มี ${short(summary.owned) || 'ยังไม่มี'}${summary.ordered.length ? ` · รอส่ง ${short(summary.ordered)}` : ''}</p><p>${summary.target.length ? summary.missing.length ? `ยังไม่ได้ซื้อ: ${short(summary.missing)} (ตามเป้าหมายที่ตั้งไว้)` : summary.incomplete ? 'รอรับให้ครบตามเป้าหมาย' : 'ครบตามเป้าหมายที่ตั้งไว้' : 'ยังไม่กำหนดเลขเป้าหมาย'}</p><p>ที่เก็บ / แพลตฟอร์ม: ${locations.slice(0,3).map(esc).join(', ') || 'ยังไม่ระบุ'}</p></div>`}${s.tags?.length ? `<p class="shelf-tags">${s.tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join(' ')}${s.tags.length>4?' …':''}</p>` : ''}</div></button>`;
 }
 function updateSelectionBar() {
   if ($('#selection-count')) $('#selection-count').textContent = `เลือก ${selectedSeries.size} เรื่อง / ฉบับ`;
@@ -181,15 +198,33 @@ function updateShelfFilters() {
 function clearShelfFilters() { filter='all';category='all';bookFormat='all';smartFilter='all';locationFilter='';tagFilter='';readingFilter='';selectedSeries.clear(); }
 function renderResults() {
   if (page === 'check') return renderCheckResults();
-  const result = sortShelf(filterShelf(searchLibrary(state.series, query, filter, bookFormat).filter(s => category === 'all' || categoryKey(s.category) === categoryKey(category)), { smart: smartFilter, location: locationFilter, tag: tagFilter, reading: readingFilter }), shelfOrder);
-  for (const id of selectedSeries) if (!result.some(s => s.id === id)) selectedSeries.delete(id);
+  const isbn = normalizeIsbn(query);
+  const countsOptions = { status: filter, location: locationFilter, reading: readingFilter, isbn, smart: smartFilter };
+  const candidates = searchLibrary(state.series, query, 'all', bookFormat)
+    .filter(s => category === 'all' || categoryKey(s.category) === categoryKey(category));
+  const editions = sortShelf(filterShelf(candidates, { smart: smartFilter, tag: tagFilter }), shelfOrder);
+  const rows = editions.map(series => ({ series, ...shelfVolumeCounts(series, countsOptions) }))
+    .filter(row => row.volumes || row.unknownBoxes || filter === 'all' && !locationFilter && !readingFilter && !isbn && smartFilter !== 'no-location');
+  const groups = new Map();
+  for (const row of rows) {
+    const { series } = row;
+    const key = !selectionMode && series.groupId ? `group:${series.groupId}` : `edition:${series.id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+  const result = [...groups.values()];
+  for (const id of selectedSeries) if (!rows.some(row => row.series.id === id)) selectedSeries.delete(id);
   updateSelectionBar();
   const container = $('#results');
   if (!container) return;
-  if ($('#shelf-result-count')) $('#shelf-result-count').textContent = `${query?'พบ ':''}${result.length} เรื่อง / ฉบับ`;
+  const counter = $('#shelf-result-count');
+  if (counter) {
+    const counts = countVolumes(rows);
+    counter.innerHTML = `<span class="shelf-result-full">${query ? 'พบ ' : ''}${result.length} เรื่อง / ฉบับ · ${volumeCountText(counts)}</span><span class="shelf-result-compact" aria-hidden="true">${result.length} ฉบับ · ${counts.total} เล่ม<br>เล่ม ${counts.physical} · ebook ${counts.ebook}${counts.boxes ? `<br>บ็อกซ์ไม่ระบุเล่ม ${counts.boxes}` : ''}</span>`;
+  }
   updateShelfFilters();
   if ($('#clear-search')) $('#clear-search').hidden = !query;
-  container.innerHTML = result.length ? `<div class="shelf-grid ${shelfView === 'list' ? 'shelf-list' : ''}">${result.map(s => `<article class="shelf-tile ${selectedSeries.has(s.id)?'is-selected':''}">${selectionMode ? `<label class="shelf-pick"><input type="checkbox" data-select-series="${esc(s.id)}" ${selectedSeries.has(s.id)?'checked':''}><span class="shelf-visually-hidden">เลือก ${esc(s.title)} · ${esc(FORMATS[s.format])}</span></label>` : ''}${card(s)}</article>`).join('')}</div>` : state.series.length ? `<div class="empty shelf-empty"><span aria-hidden="true">⌕</span><h2>ยังไม่พบในชั้นที่บันทึกไว้</h2><p>ลองเปลี่ยนคำค้นหรือตัวกรอง หนังสือที่ถูกกรองออกยังอยู่บนชั้นเหมือนเดิม</p><button type="button" class="button" id="clear-shelf-all">ล้างคำค้นและตัวกรอง</button></div>` : `<div class="empty shelf-empty"><span aria-hidden="true">▥</span><h2>เริ่มชั้นหนังสือของเรา</h2><p>เพิ่มเรื่องแรกไว้ แล้วให้คั่นไว้ช่วยจำเล่มที่มี</p><button type="button" class="button primary" data-add>เพิ่มหนังสือเล่มแรก</button></div>`;
+  container.innerHTML = result.length ? `<div class="shelf-grid ${shelfView === 'list' ? 'shelf-list' : ''}">${result.map(group => { const { series: s } = group[0]; return `<article class="shelf-tile ${selectedSeries.has(s.id)?'is-selected':''}">${selectionMode ? `<label class="shelf-pick"><input type="checkbox" data-select-series="${esc(s.id)}" ${selectedSeries.has(s.id)?'checked':''}><span class="shelf-visually-hidden">เลือก ${esc(s.title)} · ${esc(FORMATS[s.format])}</span></label>` : ''}${card(s, group)}</article>`; }).join('')}</div>` : state.series.length ? `<div class="empty shelf-empty"><span aria-hidden="true">⌕</span><h2>ยังไม่พบในชั้นที่บันทึกไว้</h2><p>ลองเปลี่ยนคำค้นหรือตัวกรอง หนังสือที่ถูกกรองออกยังอยู่บนชั้นเหมือนเดิม</p><button type="button" class="button" id="clear-shelf-all">ล้างคำค้นและตัวกรอง</button></div>` : `<div class="empty shelf-empty"><span aria-hidden="true">▥</span><h2>เริ่มชั้นหนังสือของเรา</h2><p>เพิ่มเรื่องแรกไว้ แล้วให้คั่นไว้ช่วยจำเล่มที่มี</p><button type="button" class="button primary" data-add>เพิ่มหนังสือเล่มแรก</button></div>`;
 
 }
 
@@ -202,27 +237,29 @@ function checkView() {
     </section><div id="results" class="purchase-results" aria-live="polite"></div>`;
 }
 
-function checkResult(s) {
-  const isbn = normalizeIsbn(query), label = checkLabel.trim();
-  const entries = isbn ? s.entries.filter(e => normalizeIsbn(e.isbn) === isbn) : s.entries;
-  const labelsFor = status => {
-    const labels = coverage({ ...s, entries }, status);
-    return label && !isbn ? labels.filter(value => value === label) : labels;
-  };
+function checkResult(s, relatedLabels = null, related = false) {
+  const isbn = related ? null : normalizeIsbn(query), label = related ? '' : checkLabel.trim();
+  const wanted = relatedLabels ?? (!isbn && label ? new Set([label]) : null);
+  const entries = s.entries.filter(entry => {
+    if (isbn) return normalizeIsbn(entry.isbn) === isbn;
+    if (!wanted) return true;
+    return entry.kind === 'box' ? entry.members.some(member => wanted.has(member)) : wanted.has(entry.label);
+  });
+  const labelsFor = status => coverage({ ...s, entries }, status).filter(value => !wanted || wanted.has(value));
   const owned = labelsFor('owned'), ordered = labelsFor('ordered'), wish = labelsFor('wishlist');
-  const verdict = owned.length ? 'มีแล้วในชั้น' : ordered.length ? 'สั่งแล้ว รอส่ง' : wish.length ? 'อยู่ในลิสต์อยากซื้อ' : 'ยังไม่พบเล่มนี้ในฉบับนี้';
-  const tone = owned.length ? 'owned' : ordered.length ? 'ordered' : 'neutral';
-  const boxes = entries.filter(e => e.kind === 'box' && ['owned', 'ordered'].includes(e.status) && (!label || isbn || e.members.includes(label)));
-  const matchingCovers=isbn?entries:label?entries.filter(e=>e.kind==='box'?e.members.includes(label):e.label===label):[];
-  const picturedEntry=matchingCovers.find(e=>e.coverData);
+  const has = status => entries.some(e => e.status === status);
+  const verdict = has('owned') ? 'มีแล้วในชั้น' : has('ordered') ? 'สั่งแล้ว รอส่ง' : has('wishlist') ? 'อยู่ในลิสต์อยากซื้อ' : 'ยังไม่พบเล่มนี้ในฉบับนี้';
+  const tone = has('owned') ? 'owned' : has('ordered') ? 'ordered' : 'neutral';
+  const boxes = entries.filter(e => e.kind === 'box' && (e.status !== 'wishlist' || !e.members.length));
+  const picturedEntry = isbn || wanted ? entries.find(e => e.coverData) : null;
   const hasRepresentative=s.coverData||s.entries.some(e=>e.coverData);
   const picture=cover(picturedEntry?{...s,coverData:picturedEntry.coverData}:s);
   const pictureCaption=picturedEntry?(picturedEntry.kind==='box'?'ปกบ็อกซ์':`ปกเล่ม ${picturedEntry.label}`):hasRepresentative?'ภาพแทนชุด':'ยังไม่มีรูปปก';
   return `<article class="purchase-result" data-check-result="${esc(s.id)}"><div class="check-result-top"><figure class="check-result-cover">${picture}<figcaption>${esc(pictureCaption)}</figcaption></figure><div class="check-result-meta"><div class="check-result-labels"><span class="badge ${tone}">${verdict}</span><span class="format-marker">${esc(FORMATS[s.format])}</span></div><h3><button type="button" class="check-title-button" data-detail="${esc(s.id)}" aria-label="ดูรายละเอียด ${esc(s.title)} · ${esc(FORMATS[s.format])}">${esc(s.title)}</button></h3><p>${esc(s.author || 'ยังไม่ระบุผู้เขียน')} · ${esc(s.edition)} · ${esc(s.language)}</p></div></div>
     <dl class="check-status-list">${owned.length ? `<div><dt>มีแล้ว</dt><dd>เล่ม ${owned.map(esc).join(', ')}</dd></div>` : ''}${ordered.length ? `<div class="waiting"><dt>รอส่ง</dt><dd>เล่ม ${ordered.map(esc).join(', ')}</dd></div>` : ''}${wish.length ? `<div><dt>อยากซื้อ</dt><dd>เล่ม ${wish.map(esc).join(', ')}</dd></div>` : ''}</dl>
-    ${boxes.length ? `<p class="box-context">${boxes.map(e => `${esc(STATUSES[e.status])}: ${esc(e.label)} (รวมเล่ม ${e.members.map(esc).join(', ')})`).join(' · ')}</p>` : ''}
-    ${!owned.length && !ordered.length ? '<p class="check-caution">ยังไม่ยืนยันว่าไม่มีจริง หากลงข้อมูลในชั้นไม่ครบ</p>' : ''}
-    <div class="check-result-actions"><span>${isbn ? 'ISBN ตรงกับรายการที่บันทึก' : label ? `กำลังเช็กเล่ม ${esc(label)}` : 'เทียบเลขเล่มก่อนซื้ออีกครั้ง'}${s.sample ? ' · ข้อมูลสมมติ' : ''}</span><span class="check-open-hint" aria-hidden="true">แตะการ์ดเพื่อดูรายละเอียด ↗</span></div></article>`;
+    ${boxes.length ? `<p class="box-context">${boxes.map(e => `${esc(STATUSES[e.status])}: ${esc(e.label)} (${e.members.length ? `รวมเล่ม ${e.members.map(esc).join(', ')}` : 'ไม่ระบุเล่มในบ็อกซ์'})`).join(' · ')}</p>` : ''}
+    ${!has('owned') && !has('ordered') ? '<p class="check-caution">ยังไม่ยืนยันว่าไม่มีจริง หากลงข้อมูลในชั้นไม่ครบ</p>' : ''}
+    <div class="check-result-actions"><span>${related ? 'ฉบับที่เชื่อมไว้ · เทียบเลขเล่มและเนื้อหาก่อนซื้อ' : isbn ? 'ISBN ตรงกับรายการที่บันทึก' : label ? `กำลังเช็กเล่ม ${esc(label)}` : 'เทียบเลขเล่มก่อนซื้ออีกครั้ง'}${!related && !isbn && label && s.groupId ? ' · เทียบเลขเล่มและเนื้อหาของแต่ละฉบับ' : ''}${s.sample ? ' · ข้อมูลสมมติ' : ''}</span><span class="check-open-hint" aria-hidden="true">แตะการ์ดเพื่อดูรายละเอียด ↗</span></div></article>`;
 }
 
 function renderCheckResults() {
@@ -232,11 +269,24 @@ function renderCheckResults() {
     return;
   }
   // Never hide owned/ordered or the other format while checking a purchase.
-  const results = searchLibrary(state.series, query);
-  const text = query.trim().toLocaleLowerCase('th');
   const isbn = normalizeIsbn(query);
+  const results = searchLibrary(state.series, query).filter(s => !isbn || s.entries.some(e => normalizeIsbn(e.isbn) === isbn));
+  const resultIds = new Set(results.map(s => s.id));
+  const related = new Map();
+  for (const edition of results) {
+    if (!edition.groupId) continue;
+    const labels = isbn
+      ? edition.entries.filter(e => normalizeIsbn(e.isbn) === isbn).flatMap(e => e.kind === 'box' ? e.members : [e.label])
+      : [checkLabel.trim()].filter(Boolean);
+    for (const sibling of linkedEditions(state.series, edition)) {
+      if (resultIds.has(sibling.id)) continue;
+      if (!related.has(sibling.id)) related.set(sibling.id, { sibling, labels: new Set() });
+      for (const label of labels) related.get(sibling.id).labels.add(label);
+    }
+  }
+  const text = query.trim().toLocaleLowerCase('th');
   const drafts = state.drafts.filter(d => isbn ? normalizeIsbn(d.isbn) === isbn : `${d.title} ${d.author} ${d.isbn}`.toLocaleLowerCase('th').includes(text));
-  container.innerHTML = `${drafts.length ? `<div class="notice warning">มี ${drafts.length} รายการในถาดรอตรวจ ยังไม่นับว่ามีแล้ว <button class="button" data-page="drafts">ไปตรวจข้อมูล</button></div>` : ''}<div class="check-results-heading"><h2>ผลเช็กก่อนซื้อ</h2><span>${results.length} เรื่อง / ฉบับ${checkLabel.trim() && !isbn ? ` · เล่ม ${esc(checkLabel.trim())}` : ''}</span></div>${results.length ? results.map(checkResult).join('') : `<div class="empty"><h2>ยังไม่พบในชั้นที่บันทึกไว้</h2><p>ลองตรวจชื่อหรือ ISBN อีกครั้ง ถ้ายังลงข้อมูลไม่ครบ<br>ผลนี้ยังยืนยันไม่ได้ว่าไม่มีหนังสือเล่มนี้</p><button class="button primary" data-add>เพิ่มข้อมูลหนังสือ</button></div>`}`;
+  container.innerHTML = `${drafts.length ? `<div class="notice warning">มี ${drafts.length} รายการในถาดรอตรวจ ยังไม่นับว่ามีแล้ว <button class="button" data-page="drafts">ไปตรวจข้อมูล</button></div>` : ''}<div class="check-results-heading"><h2>ผลเช็กก่อนซื้อ</h2><span>${results.length + related.size} เรื่อง / ฉบับ${checkLabel.trim() && !isbn ? ` · เล่ม ${esc(checkLabel.trim())}` : ''}</span></div>${results.length ? results.map(s => checkResult(s)).join('') + [...related.values()].map(({ sibling, labels }) => checkResult(sibling, isbn || labels.size ? labels : null, true)).join('') : `<div class="empty"><h2>ยังไม่พบในชั้นที่บันทึกไว้</h2><p>ลองตรวจชื่อหรือ ISBN อีกครั้ง ถ้ายังลงข้อมูลไม่ครบ<br>ผลนี้ยังยืนยันไม่ได้ว่าไม่มีหนังสือเล่มนี้</p><button class="button primary" data-add>เพิ่มข้อมูลหนังสือ</button></div>`}`;
 }
 function render() {
   refreshAfterModal = false;
@@ -304,7 +354,7 @@ function nextLabel(labels) {
 }
 function openBatch(initial={}) {
   draftId=initial.draftId??null;
-  const controller=openBatchForm({state,initial,openModal,heading:modalHeading,escape:esc,notify,intro:addModeMarkup('batch'),lookupMarkup:lookupMarkup(initial.lookupIsbn??initial.seedIsbn),onSave:async data=>{
+  const controller=openBatchForm({state,editions:addEditionChoices(initial.groupSourceId),initial,openModal,heading:modalHeading,escape:esc,notify,intro:addModeMarkup('batch'),lookupMarkup:lookupMarkup(initial.lookupIsbn??initial.seedIsbn),onSave:async data=>{
     let savedId;
     const attachesSeed=data.seed&&data.labels.includes(data.seed.label);
     const duplicates=attachesSeed&&state.series.some(s=>s.entries.some(e=>normalizeIsbn(e.isbn)===data.seed.isbn));
@@ -312,7 +362,9 @@ function openBatch(initial={}) {
     const saved=await mutate(next=>{
       let series=next.series.find(s=>s.id===data.seriesId);
       if(series?.trashedAt || next.drafts.some(d=>d.id===data.draftId&&d.trashedAt))throw Error('รายการนี้อยู่ในถังขยะ กรุณาเปิดใหม่');
-      if(!series){series={id:newId(),title:data.title,author:data.author,alias:'',category:data.category,format:data.format,edition:data.edition,language:data.language,tags:parseTags(data.tags),entries:[]};next.series.push(series);}
+      if(data.seriesId && !series) throw Error('ฉบับที่เลือกเปลี่ยนไปแล้ว กรุณาเปิดใหม่');
+      if(series && data.groupSourceId) requireOtherFormat(next, data.groupSourceId, series, true);
+      if(!series){series={id:newId(),title:data.title,author:data.author,alias:'',category:data.category,format:data.format,edition:data.edition,language:data.language,tags:parseTags(data.tags),entries:[]};next.series.push(series);attachNewEdition(next, data.groupSourceId, series);}
       series.target=[...new Set([...(series.target??[]),...data.target])];
       if(data.seed)series.metadataSeed=data.seed;
       if(data.coverData)series.coverData=data.coverData;
@@ -333,7 +385,7 @@ function openBatch(initial={}) {
   $('#lookup-form').addEventListener('submit',lookup);
   document.querySelectorAll('[data-add-mode]').forEach(button=>button.addEventListener('click',()=>{
     if(button.dataset.addMode!=='single')return;
-    try{const data=controller.getData();openAdd(null,data.seriesId,{prefill:{...data,isbn:data.seedIsbn,label:data.seedLabel},draftId:data.draftId,batchContext:data,continueAdding:data.continueAdding});}catch(error){notify(error.message);}
+    try{const data=controller.getData();openAdd(null,data.seriesId,{prefill:{...data,isbn:data.seedIsbn,label:data.seedLabel},draftId:data.draftId,groupSourceId:data.groupSourceId,batchContext:data,continueAdding:data.continueAdding});}catch(error){notify(error.message);}
   }));
 }
 function editEntryPhoto(seriesId, entryId = null) {
@@ -354,11 +406,15 @@ function openAdd(draft = null, seriesId = '', options = {}) {
   draftId = draft?.id ?? options.draftId ?? null;
   seriesId = seriesId || draft?.seriesId || '';
   const d = draft ?? options.prefill ?? { title: '', author: '', isbn: '', label: '', edition: 'ฉบับธรรมดา', language: 'ไทย', format: 'physical', category: categoryList(state)[0], source: 'กรอกเอง' };
-  const selected = state.series.find(s => s.id === seriesId);
+  const groupSourceId = draft?.groupSourceId ?? options.groupSourceId ?? '';
+  const editions = addEditionChoices(groupSourceId);
+  const selected = editions.find(s => s.id === seriesId);
+  const groupSource = state.series.find(s => s.id === groupSourceId);
   openModal(`${modalHeading(draft ? 'ตรวจข้อมูลก่อนเข้าชั้น' : 'เพิ่มหนังสือ', 'บันทึกเมื่อเธอตรวจแล้วเท่านั้น')}${addModeMarkup('single')}
+    ${groupSource ? `<p class="subtitle">เพิ่มฉบับให้เรื่อง ${esc(groupSource.title)}</p>` : ''}
     ${lookupMarkup(d.lookupIsbn??d.isbn)}
     <form id="review-form"><div class="form-grid">
-    <label class="field full">เพิ่มเข้าเรื่อง / ฉบับ<select id="series-link" name="seriesId"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${state.series.map(s => `<option value="${esc(s.id)}" ${s.id === seriesId ? 'selected' : ''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(s.language)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select><small>ชื่อคล้ายกันจะไม่ถูกรวมเอง เลือกเรื่องเดิมเมื่อเป็นฉบับเดียวกัน</small></label>
+    <label class="field full">เพิ่มเข้าเรื่อง / ฉบับ<select id="series-link" name="seriesId"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${editions.map(s => `<option value="${esc(s.id)}" ${s.id === seriesId ? 'selected' : ''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(s.language)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select><small>ชื่อคล้ายกันจะไม่ถูกรวมเอง เลือกเรื่องเดิมเมื่อเป็นฉบับเดียวกัน</small></label>
     <label class="field full">ชื่อเรื่อง *<input name="title" required maxlength="300" value="${esc(selected?.title ?? d.title)}"></label>
     <label class="field">ผู้เขียน<input name="author" maxlength="300" value="${esc(selected?.author ?? d.author)}"></label>
     <label class="field">ประเภท<select name="category">${categoryOptions(state, selected?.category ?? d.category ?? categoryList(state)[0], esc)}</select></label>
@@ -373,6 +429,7 @@ function openAdd(draft = null, seriesId = '', options = {}) {
     </div>${photoEditorMarkup(esc)}<label class="checkbox-line"><input id="continue-adding" type="checkbox" ${options.continueAdding?'checked':''}>เพิ่มเล่มถัดไปต่อหลังบันทึก</label><p class="subtitle" id="source-label">แหล่งข้อมูล: ${esc(d.source||'กรอกเอง')} · ตรวจเลขเล่ม ภาษา และฉบับก่อนบันทึก</p><div id="duplicate-warning" aria-live="polite"></div>
     <div class="form-actions"><button class="button" id="save-draft" type="button">เก็บไว้ในถาดรอตรวจ</button><button class="button primary" type="submit">ตรวจแล้ว · เพิ่มเข้าชั้น</button></div></form>`);
   $('#review-form').dataset.source = d.source||'กรอกเอง';
+  $('#review-form').dataset.groupSourceId = groupSourceId;
   getReviewPhoto = mountPhotoEditor($('#modal-content'), d.coverData ?? '');
   syncLinkedFields();
   $('#lookup-form').addEventListener('submit', lookup);
@@ -479,7 +536,8 @@ function draftFromForm() {
   if (fields.isbn) { const normalized = normalizeIsbn(fields.isbn); if (!normalized) throw new Error('ISBN ไม่ถูกต้อง ตรวจเลขหรือเว้นว่างก่อนบันทึก'); fields.isbn = normalized; }
   fields.readingStatus = form.elements.readingStatus.value;
   fields.tags = parseTags(form.elements.tags.value);
-  return { ...fields, coverData: getReviewPhoto(), id: draftId ?? newId(), source: form.dataset.source || 'กรอกเอง', seriesId: form.elements.seriesId.value };
+  const groupSourceId = form.dataset.groupSourceId;
+  return { ...fields, ...(groupSourceId ? { groupSourceId } : {}), coverData: getReviewPhoto(), id: draftId ?? newId(), source: form.dataset.source || 'กรอกเอง', seriesId: form.elements.seriesId.value };
 }
 function beginReviewSave(form) {
   if (!form || form.dataset.saving) return null;
@@ -519,14 +577,118 @@ async function commitReview(event) {
     if (await mutate(next => {
       let series = next.series.find(s => s.id === seriesId);
       if(series?.trashedAt || next.drafts.some(d=>d.id===draftId&&d.trashedAt))throw Error('รายการนี้อยู่ในถังขยะ กรุณาเปิดใหม่');
-      if (!series) { series = { id: newId(), title: d.title, author: d.author, alias: '', category: d.category, edition: d.edition, language: d.language, format: d.format, tags: d.tags, entries: [] }; next.series.push(series); }
+      if (seriesId && !series) throw Error('ฉบับที่เลือกเปลี่ยนไปแล้ว กรุณาเปิดใหม่');
+      if (series && d.groupSourceId) requireOtherFormat(next, d.groupSourceId, series, true);
+      if (!series) { series = { id: newId(), title: d.title, author: d.author, alias: '', category: d.category, edition: d.edition, language: d.language, format: d.format, tags: d.tags, entries: [] }; next.series.push(series); attachNewEdition(next, d.groupSourceId, series); }
       series.entries.push(entry); savedSeriesId=series.id; next.drafts = next.drafts.filter(item => item.id !== draftId);
-    })) { $('#modal').close(); render(); if(continueAdding)openAdd(null,savedSeriesId,{prefill:{label:nextLabel([d.label]),status:entry.status,location:d.location},continueAdding:true}); notify('เพิ่มเข้าชั้นแล้ว · รอซิงก์กับบัญชี'); }
+    })) { $('#modal').close(); render(); if(continueAdding)openAdd(null,savedSeriesId,{prefill:{label:nextLabel([d.label]),status:entry.status,location:d.location},continueAdding:true}); else if(d.groupSourceId)openDetail(savedSeriesId); notify('เพิ่มเข้าชั้นแล้ว · รอซิงก์กับบัญชี'); }
   } catch (error) { notify(error.message); } finally { finish(); }
 }
+function editionLabel(series) {
+  return [series.title, series.author, series.edition, series.language, FORMATS[series.format]].filter(Boolean).join(' · ');
+}
+
+function openEditionLink(id) {
+  const source = state.series.find(s => s.id === id);
+  if (!source) return;
+  const members = linkedEditions(account.state.series, source);
+  const candidates = state.series.filter(s => !members.some(member => member.id === s.id));
+  openModal(`${modalHeading('เชื่อมฉบับของเรื่องนี้', editionLabel(source))}
+    <form id="edition-link-form">
+      <label class="field">เลือกฉบับที่จะเชื่อม<select name="edition" required><option value="">เลือกฉบับ</option>${candidates.map(s => `<option value="${esc(s.id)}">${esc(editionLabel(s))}</option>`).join('')}</select></label>
+      <ul id="edition-link-preview"></ul>
+      <div class="form-actions">${source.groupId ? '<button type="button" class="button" id="unlink-edition">แยกฉบับนี้ออก</button>' : ''}<button type="submit" class="button primary" disabled>ยืนยันเชื่อมฉบับ</button></div>
+    </form>`);
+  const form = $('#edition-link-form');
+  let expected = members.map(s => s.id);
+  const refresh = () => {
+    const target = candidates.find(s => s.id === form.elements.edition.value);
+    const preview = [...members, ...(target ? linkedEditions(account.state.series, target) : [])];
+    expected = preview.map(s => s.id);
+    $('#edition-link-preview').innerHTML = preview.map(s => `<li>${esc(editionLabel(s))}${s.trashedAt ? ' · อยู่ในถังขยะ' : ''}</li>`).join('');
+    form.querySelector('[type=submit]').disabled = !target;
+  };
+  const save = async (target, ids) => {
+    const finish = beginReviewSave(form);
+    if (!finish) return;
+    try {
+      if (await mutate(next => changeEditionGroup(next, id, target, ids, newId()))) {
+        render(); openDetail(id); notify('บันทึกการเชื่อมฉบับแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
+      }
+    } finally { finish(); }
+  };
+  refresh();
+  form.elements.edition.addEventListener('change', refresh);
+  form.addEventListener('submit', event => { event.preventDefault(); void save(form.elements.edition.value, expected); });
+  $('#unlink-edition')?.addEventListener('click', () => void save('', members.map(s => s.id)));
+}
+
+function openReleaseTarget(id) {
+  const series = state.series.find(s => s.id === id);
+  if (!series) return;
+  openModal(`${modalHeading('ระบุเล่มที่ออกแล้ว', editionLabel(series))}
+    <form id="release-target-form">
+      <label class="field">เลขเล่มที่ออกแล้ว<input name="target" value="${esc((series.target ?? []).join(', '))}" placeholder="เช่น 1–10, เล่มพิเศษ"><small>ใส่ช่วงหรือคั่นเลขด้วยจุลภาค เว้นว่างได้ถ้ายังไม่ทราบ</small></label>
+      <p role="alert" id="release-target-error"></p>
+      <div class="form-actions"><button type="button" class="button" data-detail="${esc(id)}">ยกเลิก</button><button type="submit" class="button primary">บันทึกเลขเล่ม</button></div>
+    </form>`);
+  const form = $('#release-target-form');
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const finish = beginReviewSave(form);
+    if (!finish) return;
+    try {
+      const target = targetLabels(form.elements.target.value);
+      if (await mutate(next => {
+        const current = next.series.find(s => s.id === id && !s.trashedAt);
+        if (!current) throw Error('ฉบับนี้เปลี่ยนไปแล้ว กรุณาเปิดใหม่');
+        current.target = target;
+      })) { render(); openDetail(id); }
+    } catch (error) { $('#release-target-error').textContent = error.message; }
+    finally { finish(); }
+  });
+}
+
+function addOtherFormat(id) {
+  const source = state.series.find(s => s.id === id);
+  if (!source) return;
+  openAdd(null, '', {
+    groupSourceId: id,
+    prefill: { title: source.title, author: source.author, category: source.category, language: source.language,
+      edition: 'ฉบับธรรมดา', format: source.format === 'ebook' ? 'physical' : 'ebook' }
+  });
+}
+
+function addEditionChoices(groupSourceId) {
+  if (!groupSourceId) return state.series;
+  const source = state.series.find(s => s.id === groupSourceId);
+  if (!source) return [];
+  return linkedEditions(state.series, source).filter(s => s.format !== source.format);
+}
+
+function requireOtherFormat(next, sourceId, edition, mustBeLinked = false) {
+  const source = next.series.find(s => s.id === sourceId && !s.trashedAt);
+  if (!source || (mustBeLinked && (!source.groupId || edition.groupId !== source.groupId))) {
+    throw Error('ฉบับที่เชื่อมไว้เปลี่ยนไปแล้ว กรุณาเปิดใหม่');
+  }
+  if (edition.format === source.format) throw Error('เลือกรูปแบบอื่นเพื่อเพิ่มให้เรื่องนี้');
+}
+
+function attachNewEdition(next, groupSourceId, newEdition) {
+  if (!groupSourceId) return;
+  requireOtherFormat(next, groupSourceId, newEdition);
+  const source = state.series.find(s => s.id === groupSourceId);
+  if (!source) throw Error('ฉบับต้นทางเปลี่ยนไปแล้ว กรุณาเปิดใหม่');
+  const expected = [...linkedEditions(account.state.series, source).map(s => s.id), newEdition.id];
+  changeEditionGroup(next, source.id, newEdition.id, expected, newId());
+}
+
 function openDetail(id) {
   const series = state.series.find(item => item.id === id); if (!series) return;
-  openModal(detailMarkup(series, {esc,cover,heading:modalHeading}), 'detail');
+  const expanded = new Set([...document.querySelectorAll('#modal[open] [data-edition-settings][open]')].map(el => el.dataset.editionSettings));
+  const editions = linkedEditions(state.series, series);
+  openModal(detailMarkup(series, {esc,cover,heading:modalHeading,editions}), 'detail');
+  for (const panel of document.querySelectorAll('[data-edition-settings]')) panel.open = expanded.has(panel.dataset.editionSettings);
 }
 async function scanImage(file, target) {
   if (!file || !target) return;
@@ -594,6 +756,10 @@ document.addEventListener('click', async event => {
   if (button.id === 'export-legacy') download(localStorage.getItem(KEY) ?? '{}', 'khanwai-legacy-backup.json');
   if (button.dataset.editPhoto) editEntryPhoto(button.dataset.series, button.dataset.editPhoto);
   if (button.dataset.editSeriesPhoto) editEntryPhoto(button.dataset.editSeriesPhoto);
+  if (button.dataset.openGroup) openDetail(button.dataset.openGroup);
+  if (button.dataset.linkEdition) openEditionLink(button.dataset.linkEdition);
+  if (button.dataset.releaseTarget) openReleaseTarget(button.dataset.releaseTarget);
+  if (button.dataset.addFormat) addOtherFormat(button.dataset.addFormat);
   if (button.dataset.editSeries) openEdit(button.dataset.editSeries);
   if (button.dataset.editEntry) openEdit(button.dataset.series, button.dataset.editEntry);
   if (button.dataset.addTo) openAdd(null, button.dataset.addTo);
@@ -603,7 +769,7 @@ document.addEventListener('click', async event => {
     const controls=[...document.querySelectorAll('[data-series-reading]')];controls.forEach(el=>el.disabled=true);
     const id=button.dataset.readingSeries,value=button.dataset.seriesReading;
     if (await mutate(next=>{const series=next.series.find(s=>s.id===id);if(!series||series.trashedAt)throw Error('ฉบับนี้ถูกลบแล้ว กรุณาเปิดใหม่');setSeriesReading(series,value);})) {
-      render();openDetail(id);[...document.querySelectorAll('[data-series-reading]')].find(el=>el.dataset.seriesReading===value)?.focus({preventScroll:true});notify('บันทึกการอ่านทั้งชุดแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
+      render();openDetail(id);[...document.querySelectorAll('[data-series-reading]')].find(el=>el.dataset.seriesReading===value && el.dataset.readingSeries===id)?.focus({preventScroll:true});notify('บันทึกการอ่านทั้งชุดแล้ว · รอเซิร์ฟเวอร์ยืนยัน');
     } else { controls.forEach(el=>el.disabled=false);delete button.dataset.saving; }
   }
   if (button.dataset.detail) { if(selectionMode && page==='shelf' && !$('#modal').open){const id=button.dataset.detail;if(selectedSeries.has(id))selectedSeries.delete(id);else selectedSeries.add(id);updateSelectionBar();}else openDetail(button.dataset.detail); }

@@ -31,10 +31,10 @@ export function batchSeed(isbn, label, source='กรอกเอง') {
   if(!String(label ?? '').trim() || String(label).length>80)throw Error('ระบุว่า ISBN ต้นทางเป็นของเล่มไหนก่อน');
   return {isbn:normalized,label:String(label).trim(),source:String(source).slice(0,300)};
 }
-export function openBatchForm({ state, initial={}, intro='', lookupMarkup='', openModal, heading, escape:esc, onSave, notify }) {
+export function openBatchForm({ state, editions = state.series, initial={}, intro='', lookupMarkup='', openModal, heading, escape:esc, onSave, notify }) {
   const options=(values,selected)=>Object.entries(values).map(([key,value])=>`<option value="${esc(key)}" ${key===selected?'selected':''}>${esc(value)}</option>`).join('');
   openModal(`${heading('เพิ่มหนังสือ', 'ใช้ข้อมูลจากเล่มหนึ่ง แล้วเลือกเล่มที่จะเพิ่มก่อนยืนยัน')}${intro}${lookupMarkup}<form id="batch-form"><div class="form-grid">
-    <label class="field full">เพิ่มเข้าฉบับ<select name="seriesId" id="batch-series"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${state.series.map(s=>`<option value="${esc(s.id)}" ${initial.seriesId===s.id?'selected':''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select></label>
+    <label class="field full">เพิ่มเข้าฉบับ<select name="seriesId" id="batch-series"><option value="">สร้างเรื่อง / ฉบับใหม่</option>${editions.map(s=>`<option value="${esc(s.id)}" ${initial.seriesId===s.id?'selected':''}>${esc(s.title)} · ${esc(s.edition)} · ${esc(FORMATS[s.format])}</option>`).join('')}</select></label>
     <label class="field full">ชื่อเรื่อง *<input name="title" required maxlength="300" placeholder="ชื่อชุด ไม่รวมเลขเล่ม"></label>
     <label class="field">ผู้เขียน<input name="author" maxlength="300"></label>
     <label class="field">ประเภท<select name="category">${categoryOptions(state,initial.category??categoryList(state)[0],esc)}</select></label>

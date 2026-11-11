@@ -9,10 +9,47 @@ import { createApp } from '../server.mjs';
 import { LibraryStorage } from '../src/storage.mjs';
 import { restoreBackup } from '../src/cli.mjs';
 import { seedState } from '../public/lib.js';
-import { activeLibrary } from '../public/trash.js';
-import { emptyLibrary, recordDiff, flattenLibrary } from '../public/sync-core.js';
+import { activeLibrary, moveToTrash, restoreFromTrash } from '../public/trash.js';
+import { emptyLibrary, recordDiff, flattenLibrary, mergeImport } from '../public/sync-core.js';
+import { changeEditionGroup, linkedEditions } from '../public/shelf-tools.js';
 
 const PASSWORD = 'test-only-book-password-2026';
+
+test('edition groups use atomic revision checks and survive export, import, and trash recovery', async t => {
+  const { client } = await setup(t);
+  const account = client(), other = client();
+  const email = `${randomUUID()}@example.test`;
+  await signup(account, email);
+  const first = await seed(account);
+  assert.equal((await other.request('/api/auth/login', 'POST', { email, password: PASSWORD })).status, 200);
+  const [a, b, c, d] = first.state.series;
+  const write = (client, before, after) => client.request('/api/sync', 'POST', {
+    id: randomUUID(),
+    changes: recordDiff(before.state, after).map(change => ({ ...change, baseRevision: before.versions[change.key] ?? 0 }))
+  });
+  const grouped = structuredClone(first.state);
+  changeEditionGroup(grouped, a.id, b.id, [a.id, b.id], randomUUID());
+  changeEditionGroup(grouped, c.id, d.id, [c.id, d.id], randomUUID());
+  assert.equal((await write(account, first, grouped)).status, 200);
+  const second = (await account.request('/api/library')).body;
+  const merged = structuredClone(second.state);
+  changeEditionGroup(merged, a.id, c.id, [a.id, b.id, c.id, d.id], randomUUID());
+  const stale = structuredClone(second.state);
+  changeEditionGroup(stale, b.id, '', [a.id, b.id], randomUUID());
+  assert.equal((await write(account, second, merged)).status, 200);
+  assert.equal((await write(other, second, stale)).status, 409);
+  const third = (await other.request('/api/library')).body;
+  assert.equal(new Set(third.state.series.filter(s => [a.id, b.id, c.id, d.id].includes(s.id)).map(s => s.groupId)).size, 1);
+  const trashed = structuredClone(third.state);
+  moveToTrash(trashed, 'series', b.id);
+  assert.equal((await write(other, third, trashed)).status, 200);
+  const portable = (await account.request('/api/export')).body;
+  const restored = mergeImport(emptyLibrary(), portable).state;
+  assert.ok(!activeLibrary(restored).series.some(s => s.id === b.id));
+  restoreFromTrash(restored, 'series', b.id);
+  const restoredEdition = restored.series.find(s => s.id === b.id);
+  assert.equal(linkedEditions(activeLibrary(restored).series, restoredEdition).length, 4);
+});
 function client(base) {
   let cookie = '';
   return { get cookie() { return cookie; }, async request(route, method = 'GET', body, headers = {}) {

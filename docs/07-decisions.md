@@ -323,3 +323,10 @@ Refactor ตัวเตรียมรูปเดิมให้ใช้ร�
 ## เอกสารโครงสร้างปัจจุบัน (31 ตุลาคม 2026)
 
 ผู้ใช้ขอแผนที่เว็บและข้อมูลที่อ่านต่อได้ จัด docs/README.md เป็นสารบัญ และแยก 18-system-overview, 19-data-and-storage, 20-api-and-sync โดยตรวจเทียบซอร์ส 0.10.3 แทนการนำแผน Work/Edition หรือ auth ทางอีเมลมาอ้างว่าใช้งานแล้ว ติดป้าย 03/04 ว่าเป็นข้อเสนอเก่า และให้ 10 เป็นทางเข้าเอกสารปัจจุบัน แยก SQLite v3 / JSON v2 / IndexedDB v1, bytes รูปใน filesystem, ถังขยะกับ SQL tombstone และ preferences กับ catalog outbox ชัดเจน ไม่เปลี่ยน runtime/schema/dependency หรือ deploy เพื่อแก้เอกสาร
+
+
+## ยอดเล่มตามตัวกรองและการเชื่อมฉบับ
+
+ใช้ `series.target` เดิมสำหรับเลขเล่มที่ผู้ใช้ระบุว่าออกแล้ว ยอดกรองคำนวณจากเลขเล่มจริงและสมาชิกบ็อกซ์ของฉบับที่ตรงเงื่อนไข การเชื่อมใช้ `series.groupId` แบบเลือกได้และบันทึกฉบับที่เกี่ยวข้องผ่าน AccountStore ในงานซิงก์เดียว การรวมและแยกกลุ่มออก UUID ใหม่สำหรับสมาชิกที่เกี่ยวข้องเพื่อให้การแก้ไขที่ซ้อนกันชน revision ได้ แม้บางฉบับอยู่ในถังขยะ ใช้ SQLite v3 และ JSON v2 เดิม [กติกาและการใช้งาน](21-shelf-formats-plan.md)
+
+ใช้การบันทึก IndexedDB ผ่าน transaction เดิมสำหรับ state และคิวรอส่งก่อนส่งงานไปเซิร์ฟเวอร์ [IDBTransaction](https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction)

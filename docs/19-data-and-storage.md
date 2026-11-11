@@ -95,6 +95,7 @@ Docker มี volume `book-data` mount ที่ `/data`; รัน Node ตร�
 | root | `schemaVersion`, `series`, `drafts`, optional `categories` | JSON รุ่น 2; series ไม่เกิน 5,000, drafts ไม่เกิน 1,000 |
 | series | `id`, `title`, `author`, `alias`, `edition`, `language`, `category`, `format`, `entries` | title/edition/language/category ไม่ว่าง; format เป็น `physical` หรือ `ebook`; author/alias ว่างได้ |
 | series เพิ่มเติม | `target`, `tags`, `metadataSeed`, `coverData`, `location`, timestamps | target คือเลขเล่มที่ระบุเอง ไม่ใช่จำนวนที่ออกขายจริง; tags อยู่ระดับเรื่อง |
+| การเชื่อมฉบับ | `series.groupId`, `draft.groupSourceId` | เพิ่มในซอร์สหลัง 0.10.3 รหัสกลุ่ม UUID ระบุฉบับที่ผู้ใช้เชื่อมไว้ ส่วน draft เก็บ ID ฉบับต้นทางเมื่อเริ่มเพิ่มอีกรูปแบบ |
 | entry | `id`, `kind`, `label`, `isbn`, `status`, `quantity` | kind `volume`/`box`; quantity จำนวนเต็ม 1–999; ISBN ว่างได้ |
 | box | `members` | array ของ **label เล่ม** เช่น `"2"` ไม่ใช่ ID; ไม่มีตารางสมาชิกแยก |
 | การอ่าน | `readingStatus`, `readingByMember` | ใช้ได้ใน entry/draft ตาม flow; member override ใช้เฉพาะ box และต้องเป็นชื่อสมาชิกที่มีอยู่ |

@@ -126,7 +126,7 @@ test('export/import round-trip requires preview and preserves data', async ({ pa
   expect(exported.series).toHaveLength(7);
   await page.locator('#import-file').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer });
   await expect(page.getByRole('heading', { name: 'ตรวจข้อมูลก่อนนำเข้า' })).toBeVisible();
-  await expect(page.getByText('ข้อมูลปัจจุบันจะถูกแทนที่', { exact: false })).toBeVisible();
+  await expect(page.getByText('ข้อมูลปัจจุบันรวมถังขยะจะถูกแทนที่', { exact: false })).toBeVisible();
   await page.locator('#replace-import').check();
   await page.getByRole('button', { name: 'ยืนยันนำเข้าข้อมูล' }).click();
   await page.reload();
