@@ -42,7 +42,7 @@
 - native details/summary, label ของปุ่มไอคอน, aria-pressed, focus เมื่อปิดเครื่องมือ และ touch target มือถืออย่างน้อย 44px; เคารพ reduced motion
 - การอ่าน ค่าเริ่มต้นยังไม่อ่าน บ็อกซ์ จำนวนสำเนา การแยกฉบับ/ebook และ owner isolation คงตาม docs/11 และ docs/12
 
-หลักฐานทดสอบและการอัปเดต instance อยู่ใน docs/08-prototype.md ไม่ถือว่าการทดสอบ Chromium mobile emulation แทนการลอง iPhone/Android จริงได้
+หลักฐานทดสอบและการอัปเดต instance อยู่ใน docs/development/history/releases.md ไม่ถือว่าการทดสอบ Chromium mobile emulation แทนการลอง iPhone/Android จริงได้
 
 
 ## ปรับขอบรอบปกใน 0.8.2

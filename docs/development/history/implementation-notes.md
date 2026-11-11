@@ -6,11 +6,11 @@
 
 | อยากเข้าใจอะไร | เอกสารปัจจุบัน |
 | --- | --- |
-| เทคโนโลยี แผนภาพระบบ หน้าที่ไฟล์ และขอบเขตที่ยังไม่มี | [18 — ภาพรวมเว็บและโครงสร้างโค้ด](18-system-overview.md) |
-| series/entry/box, fields, ตาราง SQL, รูป, cache และ backup | [19 — ข้อมูลและฐานข้อมูล](19-data-and-storage.md) |
-| endpoints, session, operation/revision, outbox และ conflict | [20 — API และการซิงก์](20-api-and-sync.md) |
-| ติดตั้ง/อัปเดต HTTPS สำรองและกู้คืน | [09 — Docker](09-docker.md) |
-| คู่มือเฉพาะฟังก์ชัน แผน และประวัติ | [สารบัญเอกสาร](README.md) |
+| เทคโนโลยี แผนภาพระบบ หน้าที่ไฟล์ และขอบเขตที่ยังไม่มี | [18 — ภาพรวมเว็บและโครงสร้างโค้ด](../../reference/code-map.md) |
+| series/entry/box, fields, ตาราง SQL, รูป, cache และ backup | [19 — ข้อมูลและฐานข้อมูล](../../reference/data-and-storage.md) |
+| endpoints, session, operation/revision, outbox และ conflict | [20 — API และการซิงก์](../../reference/api-and-sync.md) |
+| ติดตั้ง/อัปเดต HTTPS สำรองและกู้คืน | [09 — Docker](../../deployment.md) |
+| คู่มือเฉพาะฟังก์ชัน แผน และประวัติ | [สารบัญเอกสาร](../../README.md) |
 
 ## ข้อเท็จจริงหลัก
 
@@ -25,6 +25,6 @@
 
 ## เมื่อต้องแก้ต่อ
 
-อ่าน [AGENTS.md](../AGENTS.md) และคู่มือเฉพาะส่วนก่อนแก้ ข้อมูลใน [03](03-data-model.md)/[04](04-architecture.md) เป็นแบบตั้งต้นที่มีข้อเสนออนาคต ไม่ใช่ schema/API ปัจจุบัน
+อ่าน [AGENTS.md](../../../AGENTS.md) และคู่มือเฉพาะส่วนก่อนแก้ ข้อมูลใน [03](data-model-proposal.md)/[04](architecture-proposal.md) เป็นแบบตั้งต้นที่มีข้อเสนออนาคต ไม่ใช่ schema/API ปัจจุบัน
 
-ประวัติและเหตุผลคงอยู่ใน [07](07-decisions.md)/[08](08-prototype.md); หลักฐานตรวจรับอยู่ใน [06](06-delivery-plan.md) รอบจัดเอกสารนี้ไม่เปลี่ยน runtime, schema, image version หรือข้อมูลใน instance ที่ใช้อยู่
+ประวัติและเหตุผลคงอยู่ใน [07](../decisions.md)/[08](releases.md); หลักฐานตรวจรับอยู่ใน [06](../roadmap.md) รอบจัดเอกสารนี้ไม่เปลี่ยน runtime, schema, image version หรือข้อมูลใน instance ที่ใช้อยู่

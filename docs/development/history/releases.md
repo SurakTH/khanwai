@@ -14,14 +14,14 @@ Browser ที่กระทบ 17 ผ่าน/1 skipped และภาพ sc
 
 ## 0.10.1: วางรูปปกที่คัดลอกไว้
 
-ส่วนรูปปกมีปุ่มวางรูปและ textarea สำหรับ ⌘V/Ctrl+V/native paste ใช้ร่วมกับเพิ่มทีละเล่ม รอตรวจ เพิ่มเป็นชุด และเปลี่ยนปกฉบับ/รายเล่ม ผ่านตัวเตรียมรูปและขั้นยืนยันเดิม รูปเก่าคงอยู่เมื่อวางไม่ได้ คำสั่ง async ถูกยกเลิกด้านผลลัพธ์เมื่อเอารูปออกหรือปิด editor ไม่ดัก paste ช่องหนังสืออื่น ไม่โหลดรูปจากลิงก์ clipboard และไม่อ่านคลิปบอร์ดอัตโนมัติ ดู [17-cover-paste.md](17-cover-paste.md)
+ส่วนรูปปกมีปุ่มวางรูปและ textarea สำหรับ ⌘V/Ctrl+V/native paste ใช้ร่วมกับเพิ่มทีละเล่ม รอตรวจ เพิ่มเป็นชุด และเปลี่ยนปกฉบับ/รายเล่ม ผ่านตัวเตรียมรูปและขั้นยืนยันเดิม รูปเก่าคงอยู่เมื่อวางไม่ได้ คำสั่ง async ถูกยกเลิกด้านผลลัพธ์เมื่อเอารูปออกหรือปิด editor ไม่ดัก paste ช่องหนังสืออื่น ไม่โหลดรูปจากลิงก์ clipboard และไม่อ่านคลิปบอร์ดอัตโนมัติ ดู [docs/reference/cover-paste.md](../../reference/cover-paste.md)
 
 ตรวจ unit 66 ผ่าน และ browser ที่เกี่ยวข้อง 20 ผ่าน/2 skipped พร้อม native Chromium clipboard จริง ภาพ scratch UI 320/390/1440px ไม่ล้น ยังต้องลอง Safari/iPhone และ Android จริงสำหรับเมนู paste/permission ของเครื่องนั้น shell-v31 ไม่มี DB/schema/backend change สำรอง /data/backups/pre-0101-cover-paste รวม 2 รูปไว้ก่อนอัปเดต instance khanwai:0.10.1 healthy แล้ว asset photos/workshop/sw ตรง source และ API library ตอบ 401 เมื่อไม่ล็อกอิน
 
 
 ## 0.10.0: สุ่มเรื่องยังไม่อ่านและกู้คืนจากถังขยะ
 
-ชั้น → ••• มีสุ่มเรื่องที่ยังไม่อ่านและถังขยะ ไม่เพิ่มเมนูหลัก/แถว toolbar สุ่ม owned unread ตามตัวกรอง รวมสมาชิกบ็อกซ์และสำเนา ไม่แก้สถานะการอ่าน ถังขยะรองรับ entry/ทั้งฉบับ/draft ตรวจซ้ำก่อนคืนพร้อมข้อมูลและรูปเดิม เก็บจนกู้คืน ไม่มีลบอัตโนมัติ รายละเอียด [16-trash-and-picker.md](16-trash-and-picker.md)
+ชั้น → ••• มีสุ่มเรื่องที่ยังไม่อ่านและถังขยะ ไม่เพิ่มเมนูหลัก/แถว toolbar สุ่ม owned unread ตามตัวกรอง รวมสมาชิกบ็อกซ์และสำเนา ไม่แก้สถานะการอ่าน ถังขยะรองรับ entry/ทั้งฉบับ/draft ตรวจซ้ำก่อนคืนพร้อมข้อมูลและรูปเดิม เก็บจนกู้คืน ไม่มีลบอัตโนมัติ รายละเอียด [docs/reference/trash-and-picker.md](../../reference/trash-and-picker.md)
 
 ใช้ trashedAt บน record เดิมและ activeLibrary เฉพาะการแสดงผล คงข้อมูลเต็มใน AccountStore/export/backup DB v3/JSON v2 ไม่เพิ่มบริการ shell-v30 คง flow อัปเดต PWA เดิม ควรอัปเดตทุกเครื่องก่อนแก้ข้อมูลต่อ เพราะ client เก่าไม่รู้สถานะถังขยะ
 
@@ -30,7 +30,7 @@ Browser ที่กระทบ 17 ผ่าน/1 skipped และภาพ sc
 
 ## 0.9.0: หมวดหมู่ของแต่ละบัญชี
 
-ตั้งค่า → จัดการหมวดหมู่ เพิ่ม เปลี่ยนชื่อ และลบพร้อมย้ายหนังสือ/รายการรอตรวจได้ ค่าเริ่มต้นเดิม ทุกแบบฟอร์ม ตัวกรอง และ CSV ใช้รายการเดียวกัน หมวดว่างซิงก์/ส่งออกได้ ออฟไลน์และ conflict ใช้ outbox/revision เดิม รายละเอียด [15-categories.md](15-categories.md) พร้อมแก้ตัวอักษรช่องกรอกมือถือเป็น 16px โดยไม่ปิด pinch zoom
+ตั้งค่า → จัดการหมวดหมู่ เพิ่ม เปลี่ยนชื่อ และลบพร้อมย้ายหนังสือ/รายการรอตรวจได้ ค่าเริ่มต้นเดิม ทุกแบบฟอร์ม ตัวกรอง และ CSV ใช้รายการเดียวกัน หมวดว่างซิงก์/ส่งออกได้ ออฟไลน์และ conflict ใช้ outbox/revision เดิม รายละเอียด [docs/reference/categories.md](../../reference/categories.md) พร้อมแก้ตัวอักษรช่องกรอกมือถือเป็น 16px โดยไม่ปิด pinch zoom
 
 ตรวจ npm test 61 ผ่าน, browser เต็ม 149 ผ่าน/1 skipped, ทดสอบหมวดรอบสุดท้าย 8 ผ่าน และ Docker อัปเกรด 0.8.6 → 0.9.0/backup/restore/rollback ผ่าน ภาพจัดการหมวดคอม/มือถือจาก scratch DB ตรวจ 320/390/1440px ไม่ล้น ยังไม่อ้าง Safari hardware test หรือการอัปเดตเซิร์ฟเวอร์ของผู้ใช้
 
@@ -83,7 +83,7 @@ Browser เฉพาะส่วนที่กระทบ 46 กรณีผ�
 
 อัปเดต instance เดิมเป็น khanwai:0.8.1 healthy แล้ว สำรอง /data/backups/pre-081-book-details รวม 2 รูปก่อนเปลี่ยน container ตรวจ LAN healthz, /api/library ตอบ 401 เมื่อไม่ล็อกอิน, หน้า login ไม่มี page error และ index/app/detail.css/detail-view.js/sw.js ที่ให้บริการตรง source ปัจจุบันทุก byte ไม่สร้างหรือแก้บัญชีทดสอบใน volume จริง ใช้ app image และ volume เดิม ไม่มี migration หรือบริการเพิ่ม
 
-ปรับตามภาพและคำขอผู้ใช้ให้รายเล่มเป็นการ์ด มีเลขเล่ม/รูป ข้อมูลสำเนา/ที่เก็บ/ISBN และช่องการครอบครอง/การอ่านที่มี label ชัดเจน ปุ่มแก้ข้อมูล/รูปปก/ลบอยู่เมนู ••• ของแต่ละ entry ลบยังยืนยันตามเดิม เพิ่มเล่มใกล้หัวข้อ ย่อภาพรวมเลขเล่มและการอ่านทั้งชุด ชื่อ dialog กับปุ่มปิดติดด้านบนเมื่อเลื่อน เปลี่ยนสถานะแล้วคงตำแหน่ง/focus และ box expansion ไม่มี schema/API/dependency เพิ่ม ดู 14-book-details.md
+ปรับตามภาพและคำขอผู้ใช้ให้รายเล่มเป็นการ์ด มีเลขเล่ม/รูป ข้อมูลสำเนา/ที่เก็บ/ISBN และช่องการครอบครอง/การอ่านที่มี label ชัดเจน ปุ่มแก้ข้อมูล/รูปปก/ลบอยู่เมนู ••• ของแต่ละ entry ลบยังยืนยันตามเดิม เพิ่มเล่มใกล้หัวข้อ ย่อภาพรวมเลขเล่มและการอ่านทั้งชุด ชื่อ dialog กับปุ่มปิดติดด้านบนเมื่อเลื่อน เปลี่ยนสถานะแล้วคงตำแหน่ง/focus และ box expansion ไม่มี schema/API/dependency เพิ่ม ดู docs/reference/book-details.md
 
 ผลตรวจสุดท้าย unit/API 58 ผ่าน และ browser ทั้งชุด 142 ผ่านสะอาดบน source สุดท้าย (desktop Chromium 71 + mobile viewport 71) รวมการ์ด/menu keyboard/Escape/ลบเฉพาะ entry/scroll-focus/box expansion/close-search focus/ข้อมูลอีกเครื่องระหว่างเปิด modal และ regression บัญชี รูป ISBN CSV/offline/retry/conflict/PWA เดิม รอบก่อนพบ mobile cover test กรอกคำค้นต่อทันทีหลังปิด dialog แล้ว input ถูก render ทับ แก้ให้ refresh หลังปิดเฉพาะเมื่อมี content update รออยู่ พร้อม regression แล้วจึงรันทั้งชุดใหม่ผ่าน 142 ไม่ได้แก้ด้วยการเพิ่ม timeout
 
@@ -95,7 +95,7 @@ Browser เฉพาะส่วนที่กระทบ 46 กรณีผ�
 
 Docker smoke แยก project ผ่านการ upgrade 0.7.1 → 0.8.0, recreate คงข้อมูล, SQLite+รูป backup/restore, login/export/settings และ rollback ไป 0.7.1 พร้อมหนังสือและรูปเดิม ลบเฉพาะ scratch project/volume ที่สคริปต์สร้าง ไม่เพิ่ม reverse proxy หรือบริการถาวร
 
-จัดหน้าชั้นใหม่ตามคำขอให้ลดความรกและสวยขึ้น ยุบสถิติเป็นบรรทัดเดียว รวมตัวกรองไว้ในปุ่มกรอง แสดงตัวกรองที่ใช้อยู่เป็นป้ายเอาออกได้ ย้ายเลือกหลายรายการไว้ ••• การ์ดเน้นปก ชื่อ และสถานะ ส่วนรายละเอียดการอ่าน/ที่เก็บ/แท็กอยู่ในรายการย่อและรายละเอียดฉบับ ฟังก์ชันเดิมยังอยู่ ไม่มี schema/API หรือบริการ Docker ใหม่ ดู 13-shelf-redesign.md
+จัดหน้าชั้นใหม่ตามคำขอให้ลดความรกและสวยขึ้น ยุบสถิติเป็นบรรทัดเดียว รวมตัวกรองไว้ในปุ่มกรอง แสดงตัวกรองที่ใช้อยู่เป็นป้ายเอาออกได้ ย้ายเลือกหลายรายการไว้ ••• การ์ดเน้นปก ชื่อ และสถานะ ส่วนรายละเอียดการอ่าน/ที่เก็บ/แท็กอยู่ในรายการย่อและรายละเอียดฉบับ ฟังก์ชันเดิมยังอยู่ ไม่มี schema/API หรือบริการ Docker ใหม่ ดู docs/development/history/shelf-redesign.md
 
 หลักฐานภาพจากบัญชีทดสอบแยกข้อมูล: screenshots/shelf-before-mobile.png, shelf-after-mobile.png, shelf-before-desktop.png, shelf-after-desktop.png, shelf-after-filters-mobile.png และ shelf-after-list-mobile.png ปกแรกบนจอ 390px ขึ้นจาก y=644 เป็น y=359 เห็นปกและชื่อสองเรื่องในจอแรก ตรวจไม่ล้นแนวนอนที่ 320/390/1440px
 
@@ -117,7 +117,7 @@ Docker smoke แยก project ผ่านการ upgrade 0.7.1 → 0.8.0, re
 
 อัปเดต instance หลักเป็น khanwai:0.7.0 healthy แล้ว สำรองก่อนอัปเดต /data/backups/pre-070-reading-status รวม 2 รูป ตรวจ healthz หน้า login และ reading.js ผ่าน LAN ไม่มี page error ไม่สร้างบัญชีทดสอบใน instance จริง Docker 0.6.0 → 0.7.0 upgrade/recreate/backup/restore/rollback ผ่าน รวม readingStatus และ readingByMember ของ box พร้อมรูปและ settings
 
-เพิ่มยังไม่อ่าน / ตั้งใจจะอ่าน / กำลังอ่าน / อ่านแล้ว และยังไม่ระบุสำหรับข้อมูลเดิม เก็บแยกจาก owned/ordered/wishlist รองรับรายสมาชิกใน box ไม่สร้างเล่มเดี่ยวซ้ำ ช่องภาพรวมบ็อกซ์ที่อ่านต่างกันแสดง “ต่างกันแต่ละเล่ม” แก้ metadata ไม่เปลี่ยนฐานการอ่านหรือทำให้สมาชิกที่เพิ่งเพิ่มกลายเป็นอ่านแล้ว เพิ่ม/ถาด/โหมดหลายเล่ม/แก้/quick edit/bulk/filter/CSV ใช้ metadata เดิมต่อ owner ไม่มี migration SQLite รายละเอียด docs/12-reading-status.md
+เพิ่มยังไม่อ่าน / ตั้งใจจะอ่าน / กำลังอ่าน / อ่านแล้ว และยังไม่ระบุสำหรับข้อมูลเดิม เก็บแยกจาก owned/ordered/wishlist รองรับรายสมาชิกใน box ไม่สร้างเล่มเดี่ยวซ้ำ ช่องภาพรวมบ็อกซ์ที่อ่านต่างกันแสดง “ต่างกันแต่ละเล่ม” แก้ metadata ไม่เปลี่ยนฐานการอ่านหรือทำให้สมาชิกที่เพิ่งเพิ่มกลายเป็นอ่านแล้ว เพิ่ม/ถาด/โหมดหลายเล่ม/แก้/quick edit/bulk/filter/CSV ใช้ metadata เดิมต่อ owner ไม่มี migration SQLite รายละเอียด docs/reference/reading-status.md
 
 ผลตรวจ: unit/API 56 ผ่าน รวม reading enum, box members, copies, unknown legacy, ownership independence, filter+location, CSV, server validation, owner isolation และ SQLite backup/restore; browser รอบเต็ม 120 กรณี: 118 ผ่าน สองกรณีใหม่ล้มเพราะ fixture ไม่เปลี่ยนจากหน้าชั้นไปถาดและกลับชั้น แก้ navigation ใน fixture แล้วตรวจซ้ำ 16 กรณีผ่านทั้ง desktop/mobile รวมสองกรณีเดิม การแก้ box metadata/เพิ่มสมาชิกเมื่อเล่มเดิมอ่านครบ การค้นและแก้ entry เดิม ไม่อ้างว่ารอบเต็มผ่านสะอาดในครั้งเดียว รวม coverage 122 browser scenarios เมื่อเพิ่ม regression สมาชิกใหม่
 
@@ -127,7 +127,7 @@ Browser ใช้ Chromium desktop และ Pixel 7 emulation มี offline re
 
 เผยแพร่ใน instance เดิมของผู้ใช้เป็น khanwai:0.6.0 healthy แล้ว (self-host LAN เดิม ไม่ใช่ public hosting) สำรองก่อนอัปเดต /data/backups/pre-060-shelf-management รวม 2 รูป ตรวจ healthz, หน้า login และ ES modules ใหม่ทั้ง 4 ผ่าน LAN ด้วย Chromium ไม่มี page error และไม่สร้าง/แก้บัญชีทดสอบใน instance จริง ลบเฉพาะ scratch project/volume ทดสอบแล้ว
 
-ทำรายการย่อและจำมุมมองแยกบัญชี ตัวกรองชุดไม่ครบ/ไม่มีปก/ไม่มีที่เก็บ พร้อมกรองที่เก็บและแท็ก แก้หลาย entry พร้อม before/after review และ CSV UTF-8 พร้อม column mapping, row edit/exclusion, duplicate/error checks และ explicit commit ใช้ account/outbox/conflict เดิม ไม่มี schema migration หรือบริการ Docker เพิ่ม คู่มือ 11-shelf-management.md
+ทำรายการย่อและจำมุมมองแยกบัญชี ตัวกรองชุดไม่ครบ/ไม่มีปก/ไม่มีที่เก็บ พร้อมกรองที่เก็บและแท็ก แก้หลาย entry พร้อม before/after review และ CSV UTF-8 พร้อม column mapping, row edit/exclusion, duplicate/error checks และ explicit commit ใช้ account/outbox/conflict เดิม ไม่มี schema migration หรือบริการ Docker เพิ่ม คู่มือ docs/reference/shelf-management.md
 
 หลักฐานปัจจุบัน: unit/API 49 ผ่าน (รวม server validation ของแท็ก/owner isolation/export/SQLite backup และกฎ CSV/box/target); Docker 0.5.4 → 0.6.0 → rollback smoke ผ่าน พร้อม recreate/SQLite+รูป/แท็ก/settings/export หลัง restore
 
@@ -193,7 +193,7 @@ SQLite user_version=2 เพิ่ม preferences พร้อม owner/revision
 เพิ่ม Open Library fallback, exact ISBN check, public-metadata cache/dedup/throttling และ Google API key แบบ optional ฝั่งเซิร์ฟเวอร์ UI แสดงแหล่งข้อมูลจริงและแยก quota หมดจากแหล่งสำรองที่ไม่มีรายการ ไม่เดาภาษา/ฉบับ/เลขเล่ม ผล unit/API รอบแก้นี้ 28 ผ่าน browser เฉพาะ lookup 6 cases ผ่านบน Docker 0.3.1 (desktop/mobile) รวม fallback source/unknown fields และข้อมูลกรอกไม่หายเมื่อ quota หมด ส่วนด้านล่างเป็นหลักฐานรอบบัญชี 0.3.0
 
 
-อัปเดต 30 ตุลาคม 2026: จากต้นแบบ localStorage 0.2.0 เป็นระบบบัญชีจริง 0.3.0 แล้ว รายละเอียดโครงสร้างใน [10-implementation.md](10-implementation.md) และวิธีรัน/สำรองใน [09-docker.md](09-docker.md)
+อัปเดต 30 ตุลาคม 2026: จากต้นแบบ localStorage 0.2.0 เป็นระบบบัญชีจริง 0.3.0 แล้ว รายละเอียดโครงสร้างใน [docs/development/history/implementation-notes.md](implementation-notes.md) และวิธีรัน/สำรองใน [docs/deployment.md](../../deployment.md)
 
 ## ทำได้จริง
 

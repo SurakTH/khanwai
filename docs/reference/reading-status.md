@@ -26,4 +26,4 @@
 
 ตรวจ enum และสมาชิก box ที่ server ผ่าน validateState ใช้ JSON record/schemaVersion 2 เดิม ไม่เพิ่ม SQLite schema migration สถานะการอ่านตาม owner ผ่าน IndexedDB/outbox/revisions/conflict และ portable JSON/SQLite+photos backup เดิม ไม่มี API/AI หรือ public sharing เพิ่ม
 
-รายละเอียดการตรวจรับล่าสุดอยู่ใน 08-prototype.md; browser automation เป็น Chromium desktop/mobile emulation ไม่ใช่การลอง iPhone/Safari จริง
+รายละเอียดการตรวจรับล่าสุดอยู่ใน docs/development/history/releases.md; browser automation เป็น Chromium desktop/mobile emulation ไม่ใช่การลอง iPhone/Safari จริง

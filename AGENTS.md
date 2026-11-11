@@ -2,25 +2,25 @@
 
 ## บริบท
 
-ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.10.3 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/08-prototype.md` และ `docs/10-implementation.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
+ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.10.3 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/development/history/releases.md` และ `docs/development/history/implementation-notes.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
 
-0.7.1 มีรายการย่อ ตัวกรอง target/ที่เก็บ/แท็ก แก้หลาย entry และ CSV import พร้อม mapping/review แล้ว อ่าน docs/11-shelf-management.md กติกา target unknown/ordered/box และ CSV duplicate/edition matching ต้องรักษา แท็กเป็นระดับ series ไม่ใช่ per-volume ใช้ validateState ฝั่ง server และ mutation/outbox เดิม
+0.7.1 มีรายการย่อ ตัวกรอง target/ที่เก็บ/แท็ก แก้หลาย entry และ CSV import พร้อม mapping/review แล้ว อ่าน docs/reference/shelf-management.md กติกา target unknown/ordered/box และ CSV duplicate/edition matching ต้องรักษา แท็กเป็นระดับ series ไม่ใช่ per-volume ใช้ validateState ฝั่ง server และ mutation/outbox เดิม
 
-0.7.1 เพิ่ม entry.readingStatus และ readingByMember สำหรับ box แล้ว อ่าน docs/12-reading-status.md ต้องแยกจาก ownership และตามคำขอล่าสุด 0.7.1 ค่าเริ่มต้นของข้อมูลการอ่านที่ว่าง/ไม่มีคือ unread โดยคำนวณตอนแสดงผล ไม่เขียนทับสถานะที่เลือกไว้แล้ว ห้ามสร้าง owned เล่มเดี่ยวเพื่อเก็บ reading ของสมาชิก box
+0.7.1 เพิ่ม entry.readingStatus และ readingByMember สำหรับ box แล้ว อ่าน docs/reference/reading-status.md ต้องแยกจาก ownership และตามคำขอล่าสุด 0.7.1 ค่าเริ่มต้นของข้อมูลการอ่านที่ว่าง/ไม่มีคือ unread โดยคำนวณตอนแสดงผล ไม่เขียนทับสถานะที่เลือกไว้แล้ว ห้ามสร้าง owned เล่มเดี่ยวเพื่อเก็บ reading ของสมาชิก box
 
-0.8.0 จัดหน้าชั้นใหม่ผ่าน public/shelf-view.js และ public/shelf.css อ่าน docs/13-shelf-redesign.md ก่อนแก้ UI คงตัวกรอง/รายการย่อ/เลือกหลายรายการในเมนู ••• และ mutation เดิม
+0.8.0 จัดหน้าชั้นใหม่ผ่าน public/shelf-view.js และ public/shelf.css อ่าน docs/development/history/shelf-redesign.md ก่อนแก้ UI คงตัวกรอง/รายการย่อ/เลือกหลายรายการในเมนู ••• และ mutation เดิม
 
-0.8.1 จัดรายละเอียดฉบับ/การ์ดรายเล่มใหม่ผ่าน public/detail-view.js และ public/detail.css อ่าน docs/14-book-details.md เมนู ••• ต่อ entry เก็บแก้ไข/รูปปก/ลบ สถานะการครอบครองและการอ่านยังแก้ตรงการ์ดได้ ห้ามนำสถานะสองชนิดมารวมกัน
+0.8.1 จัดรายละเอียดฉบับ/การ์ดรายเล่มใหม่ผ่าน public/detail-view.js และ public/detail.css อ่าน docs/reference/book-details.md เมนู ••• ต่อ entry เก็บแก้ไข/รูปปก/ลบ สถานะการครอบครองและการอ่านยังแก้ตรงการ์ดได้ ห้ามนำสถานะสองชนิดมารวมกัน
 
 0.8.3 ผู้ใช้ยืนยันให้กรอบปก gallery กว้างเต็มคอลัมน์เท่าเดิมและตรงแนวข้อความ ขยายเฉพาะรูปในกรอบ ห้ามย่อกรอบเป็น max-width แคบแล้วจัดกลางเหมือน 0.8.2
 
 0.8.6 ผู้ใช้ขอคืนหน้าชั้นแบบก่อนเพิ่มช่องการอ่าน: ใช้ shelf.css/shelf-view.js จาก 0.8.3 โดยตรง ตัวกรองการอ่านอยู่ในปุ่มกรอง ไม่เพิ่มแถว quick filter หรือคู่ช่องอ่าน/เรียงด้านนอกแบบ 0.8.4–0.8.5 สถานะการอ่านและข้อมูลเดิมคงครบ
 
-0.9.0 จัดการหมวดหมู่ต่อบัญชีในตั้งค่า ผ่าน public/categories.js และ catalog:categories ใน outbox เดิม SQLite v3/JSON v2 อ่าน docs/15-categories.md ก่อนแก้ หมวดเริ่มต้นเดิม ใช้ categoryList/categoryOptions ทุกช่อง ไม่ hardcode CATEGORIES สำหรับบัญชี เปลี่ยนชื่อ/ลบต้องย้าย series และ drafts ใน mutation เดียว ไม่เปลี่ยน entries; referenced names จากเครื่องเก่าต้องยังเห็นได้ mobile-inputs.css คงฟอนต์ช่องกรอกมือถือ 16px และ pinch zoom
+0.9.0 จัดการหมวดหมู่ต่อบัญชีในตั้งค่า ผ่าน public/categories.js และ catalog:categories ใน outbox เดิม SQLite v3/JSON v2 อ่าน docs/reference/categories.md ก่อนแก้ หมวดเริ่มต้นเดิม ใช้ categoryList/categoryOptions ทุกช่อง ไม่ hardcode CATEGORIES สำหรับบัญชี เปลี่ยนชื่อ/ลบต้องย้าย series และ drafts ใน mutation เดียว ไม่เปลี่ยน entries; referenced names จากเครื่องเก่าต้องยังเห็นได้ mobile-inputs.css คงฟอนต์ช่องกรอกมือถือ 16px และ pinch zoom
 
-0.10.0 เพิ่มสุ่ม owned unread และถังขยะ อ่าน docs/16-trash-and-picker.md ใช้ trashedAt บน record เดิม AccountStore/JSON/backup เก็บข้อมูลเต็ม หน้าชั้นใช้ activeLibrary ห้ามนำ projection ไป persist จนถังขยะหาย ฟังก์ชัน bulk/อ่านทั้งชุด/CSV ต้องไม่นับหรือแก้เล่มที่อยู่ในถังขยะ กู้คืน ID เดิมและตรวจซ้ำก่อนคืน ไม่มีลบอัตโนมัติ/ถาวร UI; อย่าใช้ Math.random สร้าง ID
+0.10.0 เพิ่มสุ่ม owned unread และถังขยะ อ่าน docs/reference/trash-and-picker.md ใช้ trashedAt บน record เดิม AccountStore/JSON/backup เก็บข้อมูลเต็ม หน้าชั้นใช้ activeLibrary ห้ามนำ projection ไป persist จนถังขยะหาย ฟังก์ชัน bulk/อ่านทั้งชุด/CSV ต้องไม่นับหรือแก้เล่มที่อยู่ในถังขยะ กู้คืน ID เดิมและตรวจซ้ำก่อนคืน ไม่มีลบอัตโนมัติ/ถาวร UI; อย่าใช้ Math.random สร้าง ID
 
-0.10.1 วางรูปปกผ่าน public/photos.js ได้ทุก flow อ่าน docs/17-cover-paste.md ใช้ processor/validation เดียวกับ file/camera ไม่ดัก paste ช่องข้อมูล ไม่โหลดภาพจาก URL clipboard ไม่อ่านคลิปบอร์ดอัตโนมัติ ใช้ native paste fallback เมื่อ async Clipboard API ไม่พร้อม และคง generation/editor lifecycle guard
+0.10.1 วางรูปปกผ่าน public/photos.js ได้ทุก flow อ่าน docs/reference/cover-paste.md ใช้ processor/validation เดียวกับ file/camera ไม่ดัก paste ช่องข้อมูล ไม่โหลดภาพจาก URL clipboard ไม่อ่านคลิปบอร์ดอัตโนมัติ ใช้ native paste fallback เมื่อ async Clipboard API ไม่พร้อม และคง generation/editor lifecycle guard
 
 0.10.2 ผู้ใช้ขอรูปปกไม่กินพื้นที่ก่อนข้อมูล ISBN: single/draft วาง photo editor หลัง form-grid, ช่อง keyboard/native paste เริ่มพับ ปุ่มวางตรงยังใช้ได้ และมี inline lookup status หลังเลือก candidate ห้ามนำกล่องรูปปกใหญ่กลับไปคั่นผล ISBN กับชื่อเรื่อง
 
@@ -28,8 +28,8 @@
 
 ## ก่อนทำงาน
 
-- สารบัญเอกสารอยู่ใน `docs/README.md` โครงสร้างที่ใช้จริงแยกเป็น `docs/18-system-overview.md` (เว็บ/ไฟล์), `docs/19-data-and-storage.md` (ข้อมูล/SQLite/รูป/cache), `docs/20-api-and-sync.md` (API/session/outbox/conflict) ตรวจเทียบซอร์ส 0.10.3; `03`/`04` เป็นแบบตั้งต้น ไม่ใช้แทน schema/API ปัจจุบัน เมื่อเปลี่ยนโครงสร้างให้อัปเดตส่วนที่เกี่ยวข้องด้วย
-- อ่าน `README.md`, `docs/01-product.md`, `docs/06-delivery-plan.md` และ `docs/07-decisions.md` ก่อนเริ่มพัฒนา อ่านเอกสารเฉพาะส่วนเพิ่มเติมตามงาน
+- เริ่มจาก `docs/architecture.md` และ `docs/reference/README.md` สำหรับระบบปัจจุบัน ใช้ `docs/deployment.md` สำหรับงานเซิร์ฟเวอร์ และ `docs/development/` สำหรับแผน การตัดสินใจ และประวัติ เมื่อโครงสร้างเปลี่ยนให้อัปเดตเอกสารอ้างอิงส่วนที่เกี่ยวข้อง
+- อ่าน `README.md`, `docs/development/history/product-brief.md`, `docs/development/roadmap.md` และ `docs/development/decisions.md` ก่อนเริ่มพัฒนา อ่านเอกสารเฉพาะส่วนเพิ่มเติมตามงาน
 - แยกข้อกำหนดที่ผู้ใช้ยืนยันออกจากข้อเสนอ อย่าอ้างว่าการตัดสินใจที่ยังเปิดอยู่ได้รับอนุมัติแล้ว
 - ทำงานต่อจากไฟล์และสถานะจริง ไม่เริ่มใหม่จากบทสนทนาอย่างเดียว
 - สื่อสารกับผู้ใช้เป็นภาษาไทยที่เข้าใจง่าย อธิบายข้อแลกเปลี่ยนที่มีผลต่อการใช้งาน
@@ -41,7 +41,7 @@
 
 - เมนูหลักให้เรียบง่าย: ชั้นหนังสือ เช็กก่อนซื้อ ถาดรอตรวจ และตั้งค่า ไม่เพิ่มแท็บโชว์ฟีเจอร์ทดลอง ตัวเลขข้างเมนูมีเฉพาะชั้นหนังสือ ไม่แสดง badge ของถาดรอตรวจ
 
-- Docker เป็นทางหลัก: มุ่งหนึ่ง app image และ Compose ที่อ่านง่าย ไม่เพิ่ม reverse proxy หรือหลายบริการโดยไม่จำเป็น ดู `docs/09-docker.md`
+- Docker เป็นทางหลัก: มุ่งหนึ่ง app image และ Compose ที่อ่านง่าย ไม่เพิ่ม reverse proxy หรือหลายบริการโดยไม่จำเป็น ดู `docs/deployment.md`
 - รองรับหนังสือเล่มและ ebook แยกตามฉบับ ไม่ใช้รูปแบบแทนสถานะ owned/ordered/wishlist และไม่ถือว่า ebook มี ISBN เสมอ
 
 - หัวใจของผลิตภัณฑ์คือการเช็กซ้ำและลงข้อมูลได้ง่าย ไม่ใช่ social network หรือระบบรีวิว
@@ -56,7 +56,7 @@
 
 ## เมื่อเริ่ม implementation
 
-- ตรวจเอกสารทางการล่าสุดของเทคโนโลยีที่เลือก และบันทึกการตัดสินใจลง `docs/07-decisions.md`
-- อัปเดตแผนเมื่อขอบเขตเปลี่ยน ระบุสิ่งที่เสร็จจริงพร้อมหลักฐานตรวจรับใน `docs/06-delivery-plan.md`
+- ตรวจเอกสารทางการล่าสุดของเทคโนโลยีที่เลือก และบันทึกการตัดสินใจลง `docs/development/decisions.md`
+- อัปเดตแผนเมื่อขอบเขตเปลี่ยน ระบุสิ่งที่เสร็จจริงพร้อมหลักฐานตรวจรับใน `docs/development/roadmap.md`
 - ทดสอบพฤติกรรมสำคัญตาม acceptance criteria โดยเฉพาะสิทธิ์บัญชี การซิงก์ การเพิ่มซ้ำ และการกู้ข้อมูล
 - ไม่เพิ่มการแชร์ชั้นเป็นสาธารณะ การเผยแพร่ขึ้น production หรือบริการที่มีค่าใช้จ่ายโดยถือว่าเป็นส่วนหนึ่งของการวางแผนโดยอัตโนมัติ ให้ยึดคำสั่งผู้ใช้ในงานนั้น

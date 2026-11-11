@@ -21,7 +21,7 @@
 
 แยก interface `lookupByIsbn` ออกจาก UI เพื่อเปลี่ยนแหล่งได้ คืนสถานะแบบ found/not_found/rate_limited/unavailable/invalid_response พร้อม candidates และ provenance
 
-- ปัจจุบัน 0.3.1 ใช้ Google Books เป็นแหล่งแรกและ Open Library Books API สำรองเมื่อไม่พบ/ล่ม/จำกัดคำขอ; ยังไม่รับรองความครอบคลุมหนังสือไทย ดู cache/rate policy ใน 07-decisions.md
+- ปัจจุบัน 0.3.1 ใช้ Google Books เป็นแหล่งแรกและ Open Library Books API สำรองเมื่อไม่พบ/ล่ม/จำกัดคำขอ; ยังไม่รับรองความครอบคลุมหนังสือไทย ดู cache/rate policy ใน docs/development/decisions.md
 - ลองแหล่งสำรองได้เมื่อมี API/สิทธิ์ใช้งานชัดเจน ห้ามถือว่าเว็บที่ค้นเจอ scrape ได้โดยอัตโนมัติ
 - ตั้ง timeout, bounded retries, deduplicate คำขอ และ cache ตามเงื่อนไขบริการ
 - cache “ไม่พบ” ชั่วคราว แยกจากระบบล่ม ไม่ cache ถาวรจนหนังสือใหม่ค้นไม่เจอ

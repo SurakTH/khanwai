@@ -31,7 +31,7 @@ test('server serves app shell, denies non-public paths and rejects mutations', a
   assert.match(response.headers.get('content-security-policy'), /default-src 'self'/);
   assert.deepEqual(await (await fetch(base + '/healthz')).json(), { status: 'ok', database: 'sqlite' });
   for (const target of ['/styles.css', '/app.js', '/lib.js', '/sw.js', '/manifest.webmanifest', '/icon.svg']) assert.equal((await fetch(base + target)).status, 200);
-  for (const target of ['/README.md', '/package.json', '/.env', '/docs/01-product.md']) assert.equal((await fetch(base + target)).status, 404);
+  for (const target of ['/README.md', '/package.json', '/.env', '/docs/architecture.md']) assert.equal((await fetch(base + target)).status, 404);
   assert.equal((await fetch(base + '/api/isbn?isbn=bad')).status, 401);
   assert.equal((await fetch(base, { method: 'POST', headers: { 'X-Book-Request': '1', 'Content-Type': 'application/json' }, body: '{}' })).status, 405);
 });

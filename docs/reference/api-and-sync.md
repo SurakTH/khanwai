@@ -1,8 +1,8 @@
 # API บัญชี และการซิงก์
 
-ตรวจเทียบกับซอร์ส **0.10.3** — 31 ตุลาคม 2026 · [สารบัญ](README.md) · [โครงสร้างข้อมูล](19-data-and-storage.md)
+รายละเอียดจากซอร์ส · [สารบัญ](../README.md) · [โครงสร้างข้อมูล](data-and-storage.md)
 
-เอกสารนี้อธิบาย API ภายในที่เว็บใช้อยู่ ไม่ใช่ API key service สำหรับแอพภายนอก แหล่งอ้างอิงหลักคือ [server.mjs](../server.mjs), [storage.mjs](../src/storage.mjs), [account-store.js](../public/account-store.js) และ [sync-core.js](../public/sync-core.js)
+เอกสารนี้อธิบาย API ภายในที่เว็บใช้อยู่ ไม่ใช่ API key service สำหรับแอพภายนอก แหล่งอ้างอิงหลักคือ [server.mjs](../../server.mjs), [storage.mjs](../../src/storage.mjs), [account-store.js](../../public/account-store.js) และ [sync-core.js](../../public/sync-core.js)
 
 ## Request และบัญชี
 
@@ -10,7 +10,7 @@
 
 คำขอที่เปลี่ยนข้อมูลต้องมี `X-Book-Request: 1` และ `Content-Type: application/json` ตรวจ Origin ถ้ามี และปฏิเสธ cross-site Header นี้ไม่แทนการ login เจ้าของข้อมูลมาจาก session ฝั่ง server ไม่เชื่อ owner ที่ browser ส่งมา ใน settings จะตรวจ owner ใน body ซ้ำเพื่อจับกรณีสลับบัญชี
 
-`APP_ORIGIN` ต้องตรง URL ที่เปิดใช้จริงเมื่ออยู่หลัง HTTPS proxy ดู [.env.example](../.env.example) และ [09](09-docker.md) ไม่จำเป็นต้องเพิ่ม proxy อีกตัวใน Compose
+`APP_ORIGIN` ต้องตรง URL ที่เปิดใช้จริงเมื่ออยู่หลัง HTTPS proxy ดู [.env.example](../../.env.example) และ [คู่มือเซิร์ฟเวอร์](../deployment.md) ไม่จำเป็นต้องเพิ่ม proxy อีกตัวใน Compose
 
 ## เส้นทางที่มีอยู่จริง
 
@@ -39,7 +39,7 @@
 
 ## Snapshot กับ sync records
 
-`state` เป็น nested library ตาม [19](19-data-and-storage.md) ส่วน `versions` เป็น object จาก record key ไป revision และ cursor เป็นลำดับล่าสุดของบัญชี การแปลงใช้ flattenLibrary/expandLibrary:
+`state` เป็น nested library ตาม [ข้อมูลและที่เก็บ](data-and-storage.md) ส่วน `versions` เป็น object จาก record key ไป revision และ cursor เป็นลำดับล่าสุดของบัญชี การแปลงใช้ flattenLibrary/expandLibrary:
 
 | Key | value |
 | --- | --- |
@@ -52,7 +52,7 @@ snapshot.state ไม่รวม SQL tombstone แต่ versions ยังร�
 
 ## ตัวอย่างเพิ่มเล่มผ่าน operation
 
-ตัวอย่างนี้ต่อจาก series ใน [19](19-data-and-storage.md) เลข ID เป็นตัวอย่างเท่านั้น ในเว็บสร้างใหม่ผ่าน [ids.js](../public/ids.js) เสมอ ไม่ใช้ ISBN เป็น ID
+ตัวอย่างนี้ต่อจาก series ใน [ข้อมูลและที่เก็บ](data-and-storage.md) เลข ID เป็นตัวอย่างเท่านั้น ในเว็บสร้างใหม่ผ่าน [ids.js](../../public/ids.js) เสมอ ไม่ใช้ ISBN เป็น ID
 
 ```json
 {
@@ -142,13 +142,13 @@ AccountStore ทำ mutation เป็นลำดับและตรวจ ge
 
 ## PWA และรูปออฟไลน์
 
-[sw.js](../public/sw.js) precache ไฟล์แอพและใช้ network-first สำหรับ shell พร้อม cache fallback ไม่ cache JSON ของทุก API รูปส่วนตัว cache ได้เมื่อ X-Book-Owner จาก server ตรงกับ owner ที่ AccountStore แจ้งให้ client นั้น รูปที่ไม่เคยโหลดไม่ได้รับประกันว่าจะเปิดออฟไลน์ได้ logout สั่งล้าง private cache ของบัญชี
+[sw.js](../../public/sw.js) precache ไฟล์แอพและใช้ network-first สำหรับ shell พร้อม cache fallback ไม่ cache JSON ของทุก API รูปส่วนตัว cache ได้เมื่อ X-Book-Owner จาก server ตรงกับ owner ที่ AccountStore แจ้งให้ client นั้น รูปที่ไม่เคยโหลดไม่ได้รับประกันว่าจะเปิดออฟไลน์ได้ logout สั่งล้าง private cache ของบัญชี
 
 การติดตั้ง PWA กับการซิงก์เป็นคนละเรื่อง HTTPS/config origin สำคัญสำหรับกล้องและ Clipboard API; ยังมีเลือกไฟล์/พิมพ์ ISBN/native paste fallback ตาม capability ไม่ปิด pinch zoom
 
 ## ISBN และผลที่ไม่ใช่ข้อผิดพลาด HTTP
 
-provider IDs คือ `google`, `openlibrary`, `nlt`; ค่าเริ่มต้น Google Books/Open Library ส่วน NLT ทดลองและ default-off การค้นมี timeout, fallback, memory cache และพัก provider ที่ติด limit ดู [isbn.mjs](../src/isbn.mjs) ข้อมูลสาธารณะจาก ISBN ไม่รวมรูป/บันทึกส่วนตัวของผู้ใช้ใน cache ร่วม
+provider IDs คือ `google`, `openlibrary`, `nlt`; ค่าเริ่มต้น Google Books/Open Library ส่วน NLT ทดลองและ default-off การค้นมี timeout, fallback, memory cache และพัก provider ที่ติด limit ดู [isbn.mjs](../../src/isbn.mjs) ข้อมูลสาธารณะจาก ISBN ไม่รวมรูป/บันทึกส่วนตัวของผู้ใช้ใน cache ร่วม
 
 HTTP 200 อาจมี domain status `found`, `not_found`, `rate_limited`, `unavailable` หรือ `disabled` ไม่ได้แปลว่าพบหนังสือทุกครั้ง และไม่เหมือน HTTP 429 ของ app เอง ทุก candidate เป็นข้อเสนอ ต้อง review ก่อนเข้าชั้น ไม่มี AI provider/OCR ในระบบจริง API key ถ้ามีตั้ง `GOOGLE_BOOKS_API_KEY` ฝั่ง server ไม่ส่งกลับ browser
 
@@ -166,4 +166,4 @@ HTTP 200 อาจมี domain status `found`, `not_found`, `rate_limited`, `un
 | 429 | app rate_limited | พักแล้วลองใหม่ตาม flow |
 | 503 | maintenance | server กำลังสำรอง ให้ outbox รอซิงก์ |
 
-ดูข้อความ/code จริงจาก source ก่อนเพิ่ม client ภายนอก และดูหลักฐานทดสอบใน [06](06-delivery-plan.md), [tests](../tests/) เอกสารนี้เป็นแผนที่การทำงานปัจจุบัน ไม่ใช่คำสัญญาว่า API ภายในจะคงเดิมทุกเวอร์ชัน
+ดูข้อความ/code จริงจาก source ก่อนเพิ่ม client ภายนอก และดูหลักฐานทดสอบใน [แผนและเกณฑ์ตรวจรับ](../development/roadmap.md), [tests](../../tests) เอกสารนี้เป็นแผนที่การทำงานปัจจุบัน ไม่ใช่คำสัญญาว่า API ภายในจะคงเดิมทุกเวอร์ชัน

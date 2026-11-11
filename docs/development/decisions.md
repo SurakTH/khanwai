@@ -8,7 +8,7 @@
 
 เลือก IndexedDB ต่อบัญชี + outbox + generation CAS, delta sync และ UI resolve conflict; ไม่ส่ง cookie/token ลง localStorage รูป private เก็บบน volume และ cache แยกบัญชี ไม่ใช้ shared object storage/service เพิ่ม เลือก JSON รวมรูปและ CLI SQLite backup เป็นการสำรองรอบนี้
 
-เอกสารทางการที่ตรวจ: [SQLite Node v24](https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html), [scrypt](https://nodejs.org/docs/latest-v24.x/api/crypto.html#cryptoscryptpassword-salt-keylen-options-callback), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) รายละเอียด/retention และขอบเขตที่ยังไม่ทำอยู่ใน [10-implementation.md](10-implementation.md)
+เอกสารทางการที่ตรวจ: [SQLite Node v24](https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html), [scrypt](https://nodejs.org/docs/latest-v24.x/api/crypto.html#cryptoscryptpassword-salt-keylen-options-callback), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) รายละเอียด/retention และขอบเขตที่ยังไม่ทำอยู่ใน [docs/development/history/implementation-notes.md](history/implementation-notes.md)
 
 รายการ P01 magic link ด้านล่างเป็นข้อเสนอเก่าที่ยังไม่ได้เลือก ใช้ email/password ในเวอร์ชันปัจจุบันแทน คำถาม stack/database ปิดสำหรับรอบนี้แล้ว hosting/AI ยังเปิดอยู่ iPhone หลักและ Android ยืนยันแล้ว รอทดสอบอุปกรณ์จริง
 
@@ -88,7 +88,7 @@
 - 30 ตุลาคม 2026: ผู้ใช้สั่งเริ่มทำต้นแบบตามคำแนะนำ เลือก buildless HTML/CSS/ES modules และ Node.js 24 HTTP server สำหรับ local prototype เพื่อทดลอง UI โดยไม่ต้องเลือก production stack ไม่มี runtime dependencies ใช้ Playwright เป็น dev dependency ทดสอบ desktop/mobile
 - การเก็บต้นแบบใช้ localStorage schema v1 เป็นการทดลองเฉพาะ origin ไม่ใช่ระบบบัญชีหรือ sync ตามแผนจริง; ระบบจริงต้องใช้ฐานข้อมูล สิทธิ์เจ้าของและ migration ที่เหมาะสม
 - เตรียม PWA shell/offline read, PNG icons และ Noto Sans Thai แบบ self-host พร้อม OFL; ต้องทดสอบการติดตั้งบนอุปกรณ์จริงต่อ
-- ลอง Google Books live ด้วย ISBN สาธารณะสองเล่ม ได้ rate limit ทั้งคู่ จึงยังไม่เลือกเป็นแหล่ง production และไม่สรุป coverage หนังสือไทย รายละเอียดใน `08-prototype.md`
+- ลอง Google Books live ด้วย ISBN สาธารณะสองเล่ม ได้ rate limit ทั้งคู่ จึงยังไม่เลือกเป็นแหล่ง production และไม่สรุป coverage หนังสือไทย รายละเอียดใน `docs/development/history/releases.md`
 - เอกสารทางการที่ตรวจสำหรับ implementation: [Node HTTP v24](https://nodejs.org/docs/latest-v24.x/api/http.html), [Node test runner v24](https://nodejs.org/docs/latest-v24.x/api/test.html), [Google Books ISBN query](https://developers.google.com/books/docs/v1/using), [MDN Barcode Detection](https://developer.mozilla.org/en-US/docs/Web/API/Barcode_Detection_API), [MDN Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 
 - 30 ตุลาคม 2026: จัดทำแผนตั้งต้นและคำแนะนำสำหรับผู้ช่วย ยังไม่ได้ทดสอบ provider หรือเลือก stack ยังไม่มี implementation
@@ -163,7 +163,7 @@ Batch ระบุ seed ISBN และ seed label ว่า ISBN นี้เป
 
 ## 0.6.0 — จัดชั้นและ CSV ครบ 5 ข้อที่ผู้ใช้อนุมัติ
 
-ผู้ใช้สั่ง “ทำทั้งหมด” หลังเสนอรายการย่อ ชุดยังเก็บไม่ครบ แก้หลายรายการ ที่เก็บ/แท็ก และ CSV จึงทำทั้งหมดในเว็บเดิม ดูสัญญาพฤติกรรมและข้อจำกัดใน [11-shelf-management.md](11-shelf-management.md) ยังคง 4 nav / หนึ่ง app image / SQLite schema v2 / private photos เดิม ไม่มี AI/provider ใหม่หรือ public deployment
+ผู้ใช้สั่ง “ทำทั้งหมด” หลังเสนอรายการย่อ ชุดยังเก็บไม่ครบ แก้หลายรายการ ที่เก็บ/แท็ก และ CSV จึงทำทั้งหมดในเว็บเดิม ดูสัญญาพฤติกรรมและข้อจำกัดใน [docs/reference/shelf-management.md](../reference/shelf-management.md) ยังคง 4 nav / หนึ่ง app image / SQLite schema v2 / private photos เดิม ไม่มี AI/provider ใหม่หรือ public deployment
 
 แท็กเป็น optional series.tags และอาจอยู่ใน draft ก่อนสร้างฉบับ ตรวจจำนวน/ความยาวที่ server ใช้ JSON record เดิมเพื่อให้ outbox/owner checks/export/backup เดิมครอบคลุม มุมมองเป็น local preference ต่อ owner ส่วนแท็กเป็นข้อมูลบัญชีที่ซิงก์ ไม่ย้าย metadata ส่วนตัวเข้าฐานข้อมูลร่วม
 
@@ -179,7 +179,7 @@ Bulk แสดง checkbox ราย entry และ before/after preview ใช
 
 ผู้ใช้ขออ่านแล้ว/ยังไม่อ่าน/คิดจะอ่าน จึงเพิ่ม unread/planned/reading/read เป็น optional entry.readingStatus และ readingByMember สำหรับสมาชิก box ใช้ unknown เมื่อข้อมูลเดิมไม่ระบุ ไม่เดาย้อนหลัง ไม่เปลี่ยน owned/ordered/wishlist/ISBN/quantity หรือความครบชุดเพราะสถานะอ่าน รองรับเพิ่ม/ถาด/แก้/quick edit/bulk/filter/CSV/export/offline โดยใช้ mutation และ owner checks เดิม ไม่มี schema SQLite ใหม่
 
-Box รองรับรายเล่มโดยไม่สร้างเล่ม owned ซ้ำ การตั้งสถานะทั้งบ็อกซ์ล้างรายเล่มแบบชัดเจนใน label/preview อัปเดต metadata ทั่วไปเก็บ reading map ไว้ ดู 12-reading-status.md ใช้ native labelled select ตาม [MDN select](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select) เพื่อใช้งาน keyboard/touch ตามแพลตฟอร์ม ไม่เพิ่ม dependency หรือบริการ Docker
+Box รองรับรายเล่มโดยไม่สร้างเล่ม owned ซ้ำ การตั้งสถานะทั้งบ็อกซ์ล้างรายเล่มแบบชัดเจนใน label/preview อัปเดต metadata ทั่วไปเก็บ reading map ไว้ ดู docs/reference/reading-status.md ใช้ native labelled select ตาม [MDN select](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select) เพื่อใช้งาน keyboard/touch ตามแพลตฟอร์ม ไม่เพิ่ม dependency หรือบริการ Docker
 
 
 ## 0.7.1 — ปุ่มการอ่านทั้งชุดและ default ยังไม่อ่าน (31 ตุลาคม 2026)
@@ -193,14 +193,14 @@ Box รองรับรายเล่มโดยไม่สร้างเ�
 
 ผู้ใช้ต้องการหน้าชั้นที่สวยและลดความรก จึงจัดลำดับใหม่ให้หนังสือเด่น: ยุบสถิติเป็นบรรทัดเดียว รวมตัวกรองใน disclosure เดียว แยกสถานะที่ใช้บ่อยไว้ และย้ายเลือกหลายรายการไปเมนู ••• การ์ดลดข้อความซ้ำแต่คงข้อมูลเต็มในรายการย่อ/รายละเอียด ไม่ลบความสามารถกรอง/เรียง/แก้หลายรายการหรือเปลี่ยนข้อมูลส่วนตัว
 
-ใช้ native [details/summary](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details) พร้อม Escape/focus handling ของแอพ และ [aspect-ratio](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/aspect-ratio) จัดพื้นที่ปกตามเอกสารที่ตรวจรอบนี้ ไม่มี dependency หรือบริการใหม่ แยก shelf-view.js/shelf.css เพื่อลดการสะสม template/style ในหน้าอื่น ดูขอบเขตและภาพก่อนหลังใน 13-shelf-redesign.md
+ใช้ native [details/summary](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details) พร้อม Escape/focus handling ของแอพ และ [aspect-ratio](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/aspect-ratio) จัดพื้นที่ปกตามเอกสารที่ตรวจรอบนี้ ไม่มี dependency หรือบริการใหม่ แยก shelf-view.js/shelf.css เพื่อลดการสะสม template/style ในหน้าอื่น ดูขอบเขตและภาพก่อนหลังใน docs/development/history/shelf-redesign.md
 
 
 ## 0.8.1 — การ์ดรายเล่มในรายละเอียดฉบับ (31 ตุลาคม 2026)
 
 ผู้ใช้ขอปรับหน้ารายละเอียดโดยเน้นแถวรายเล่มที่แน่นและไม่สวย จัดเป็นการ์ดที่แยกข้อมูลเล่ม การครอบครอง การอ่าน และเมนูการจัดการ; คงการอ่านเป็นตัวเลือกตรงการ์ดเพื่อไม่เพิ่มขั้นตอนในงานประจำ ปุ่มรองแก้/รูป/ลบย้ายเข้าเมนูต่อ entry ลบยังยืนยันตามเดิม ย่อ overview และวางเพิ่มเล่มใกล้หัวข้อ ชื่อ dialog/ปิดติดบนเมื่อเลื่อน และเปลี่ยน ownership แล้วไม่กระโดดกลับต้นชุด
 
-ใช้ [details/summary](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details) ตามเอกสารทางการที่ตรวจในรอบนี้ โดยไม่ใส่ role=menu ที่จะต้องทำ keyboard interaction อีกชุด ช่องสถานะยังเป็น [labelled select](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select) ของแพลตฟอร์ม ไม่รวมการอ่านกับ ownership ไม่เพิ่ม dependency หรือเปลี่ยน schema แยก presentation ใน detail-view.js/detail.css รายละเอียดสัญญาและภาพอยู่ใน 14-book-details.md
+ใช้ [details/summary](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details) ตามเอกสารทางการที่ตรวจในรอบนี้ โดยไม่ใส่ role=menu ที่จะต้องทำ keyboard interaction อีกชุด ช่องสถานะยังเป็น [labelled select](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select) ของแพลตฟอร์ม ไม่รวมการอ่านกับ ownership ไม่เพิ่ม dependency หรือเปลี่ยน schema แยก presentation ใน detail-view.js/detail.css รายละเอียดสัญญาและภาพอยู่ใน docs/reference/book-details.md
 
 การปิด dialog เดิมเรียก render ทั้งหน้าทุกครั้ง พบ race ใน mobile test ที่การกรอกคำค้นต่อทันทีใช้ input ที่ถูกถอดออก จึงติดตาม content update ที่รอแสดงระหว่างเปิด modal และ refresh หลังปิดเฉพาะเมื่อจำเป็น ใช้ renderPreservingFocus เมื่อต้อง refresh การแก้ข้อมูลเดิมที่ render ไว้แล้วไม่วาดซ้ำ ไม่เปลี่ยน outbox หรือ conflict policy เพิ่ม regression การคืน focus และการรับข้อมูลข้ามเครื่องระหว่างเปิดรายละเอียด
 
@@ -230,7 +230,7 @@ Box รองรับรายเล่มโดยไม่สร้างเ�
 
 ผู้ใช้ระบุว่า UI มือถือรับไม่ได้และคอมก็ไม่สวย ต้องปรับด้านความงามและความกลมกลืน ไม่ใช่เพียงวาง control ให้ครบ จึงจัดการอ่านและเรียงเป็นกลุ่มเดียวกัน โดยเลือกแบบสองช่องเท่ากันบนมือถือที่ตรงแนวหนังสือ แล้วค่อยแสดงผลลัพธ์/มุมมอง/จัดการ บนคอมเป็นหนึ่งบรรทัดแบบเรียบไม่มีกรอบสีขาวโดด ยกเลิกการจัดวาง 0.8.4 แต่คงความสามารถเลือกอ่านโดยตรงและ 4 reading states/ทั้งหมด
 
-ใช้ [CSS grid-template-areas](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-areas) ตามเอกสารทางการที่ตรวจในรอบนี้ ปรับเฉพาะ presentation ใน shelf-view.js/shelf.css หนึ่ง native select กับ listener เดิม ไม่มีตัวกรองสำเนา/resize handler, dependency, schema หรือ API ใหม่ ตรวจภาพจริงหลายความกว้าง ทั้งก่อนเลือกและหลังกรอง/เรียง ปุ่มและตัวอักษร native มือถือยัง 44px/16px ไม่ลดขนาดให้พอดีด้วยการทำให้กดยาก รายละเอียดภาพและเกณฑ์อยู่ใน 13-shelf-redesign.md shell-v25 คง flow แจ้งอัปเดตเดิม
+ใช้ [CSS grid-template-areas](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-areas) ตามเอกสารทางการที่ตรวจในรอบนี้ ปรับเฉพาะ presentation ใน shelf-view.js/shelf.css หนึ่ง native select กับ listener เดิม ไม่มีตัวกรองสำเนา/resize handler, dependency, schema หรือ API ใหม่ ตรวจภาพจริงหลายความกว้าง ทั้งก่อนเลือกและหลังกรอง/เรียง ปุ่มและตัวอักษร native มือถือยัง 44px/16px ไม่ลดขนาดให้พอดีด้วยการทำให้กดยาก รายละเอียดภาพและเกณฑ์อยู่ใน docs/development/history/shelf-redesign.md shell-v25 คง flow แจ้งอัปเดตเดิม
 
 
 ## 0.8.6 — คืนหน้าชั้นก่อนเพิ่มช่องการอ่าน ตามคำขอผู้ใช้ (31 ตุลาคม 2026)
@@ -262,7 +262,7 @@ README และคู่มือ Docker เริ่มด้วย `test -e .
 
 ตรวจ [SQLite user_version](https://www.sqlite.org/pragma.html#pragma_user_version) และ [service worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers) แล้ว ใช้ migration เพิ่ม catalogs owner-scoped ที่ DB v3 (JSON ยังคง v2), รับ restore DB v1/v2/v3, guard รุ่นใหม่กว่าเดิม และ shell-v27 รวม asset ใหม่ คง flow อัปเดต PWA เดิมไม่บังคับ reload กลางฟอร์ม
 
-ชื่อหมวดบน series/draft ยังเป็น string เพื่อคงข้อมูลเดิม รายการแสดงรวม configured + referenced names จึงไม่ซ่อนหนังสือจาก late offline write/การเลือก conflict ที่นำชื่อเก่ากลับมา การเปลี่ยนชื่อ/ลบปกติย้ายทั้ง series/draft ใน operation เดียว ไม่เปลี่ยน entry/photo/reading/ownership ชื่อเก่าที่กลับมาจะแสดงให้จัดการอีกครั้ง รายละเอียดและเกณฑ์อยู่ใน 15-categories.md
+ชื่อหมวดบน series/draft ยังเป็น string เพื่อคงข้อมูลเดิม รายการแสดงรวม configured + referenced names จึงไม่ซ่อนหนังสือจาก late offline write/การเลือก conflict ที่นำชื่อเก่ากลับมา การเปลี่ยนชื่อ/ลบปกติย้ายทั้ง series/draft ใน operation เดียว ไม่เปลี่ยน entry/photo/reading/ownership ชื่อเก่าที่กลับมาจะแสดงให้จัดการอีกครั้ง รายละเอียดและเกณฑ์อยู่ใน docs/reference/categories.md
 
 
 ## ช่องถึงเล่มเริ่มว่าง (31 ตุลาคม 2026)
@@ -287,7 +287,7 @@ README และคู่มือ Docker เริ่มด้วย `test -e .
 
 ถังขยะใช้ optional trashedAt บน record เดิมแทนเก็บ snapshot ซ้ำ รักษา IDs/photo URLs/ข้อมูล box และ revisions เดิม หน้าชั้นใช้ activeLibrary แต่ AccountStore/export/backup ใช้ข้อมูลเต็ม การย้าย/คืนเป็น mutation ใน [SQLite transaction](https://www.sqlite.org/lang_transaction.html) เดิมต่อ owner จึงไม่เพิ่ม schema หรืองานล้างรูปที่เสี่ยงทำรูปในถังขยะหาย DB v3/JSON v2 คงเดิม shell-v30 รวม module ใหม่
 
-ไม่มีการลบอัตโนมัติหรือลบถาวรใน UI รุ่นนี้ ยืนยันก่อนย้ายและตรวจซ้ำก่อนคืน คืนทั้งฉบับไม่คืนเล่มที่เคยลบแยกก่อนหน้า การนำเข้าแทนที่และลบบัญชียังมีความหมายเดิม ต้องอัปเดต PWA ทุกเครื่องก่อนแก้ข้อมูล เพราะ client เก่าไม่รู้สถานะถังขยะ รายละเอียดใน 16-trash-and-picker.md
+ไม่มีการลบอัตโนมัติหรือลบถาวรใน UI รุ่นนี้ ยืนยันก่อนย้ายและตรวจซ้ำก่อนคืน คืนทั้งฉบับไม่คืนเล่มที่เคยลบแยกก่อนหน้า การนำเข้าแทนที่และลบบัญชียังมีความหมายเดิม ต้องอัปเดต PWA ทุกเครื่องก่อนแก้ข้อมูล เพราะ client เก่าไม่รู้สถานะถังขยะ รายละเอียดใน docs/reference/trash-and-picker.md
 
 
 ## README พร้อมภาพแนะนำแอพ (31 ตุลาคม 2026)
@@ -305,7 +305,7 @@ README ใช้ภาพ relative path, alt text, ตารางฟังก�
 
 ตรวจ [ClipboardEvent.clipboardData](https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData), [Clipboard.read](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read) และ [WebKit async clipboard](https://webkit.org/blog/10855/async-clipboard-api/) แล้ว ปุ่ม read เรียกจาก user gesture เท่านั้นบน secure context; Safari อาจต้องยืนยัน paste เลือกอ่าน MIME ภาพที่รองรับและคงทาง native paste/file picker เมื่อ capability หรือ permission ไม่พร้อม ไม่ขยาย CSP หรืออ่าน text/HTML จาก clipboard ไปโหลด URL ภายนอก
 
-Refactor ตัวเตรียมรูปเดิมให้ใช้ร่วมกันทั้งไฟล์/กล้อง/paste พร้อม generation/editor visibility guard: รูปเก่าคงอยู่หากแปลงไม่ได้ และผล async เก่าไม่กลับมาหลังลบหรือปิดฟอร์ม ตัวจำกัดขนาด/ชนิด การย่อ JPEG รีวิวยืนยัน owner photos และ outbox เดิมทั้งหมด ไม่มี backend/schema/dependency ใหม่ shell-v31 รายละเอียดและขอบเขตทดสอบใน 17-cover-paste.md
+Refactor ตัวเตรียมรูปเดิมให้ใช้ร่วมกันทั้งไฟล์/กล้อง/paste พร้อม generation/editor visibility guard: รูปเก่าคงอยู่หากแปลงไม่ได้ และผล async เก่าไม่กลับมาหลังลบหรือปิดฟอร์ม ตัวจำกัดขนาด/ชนิด การย่อ JPEG รีวิวยืนยัน owner photos และ outbox เดิมทั้งหมด ไม่มี backend/schema/dependency ใหม่ shell-v31 รายละเอียดและขอบเขตทดสอบใน docs/reference/cover-paste.md
 
 
 ## 0.10.2 — รูปปกกระชับ ไม่บังผล ISBN (31 ตุลาคม 2026)
@@ -327,6 +327,11 @@ Refactor ตัวเตรียมรูปเดิมให้ใช้ร�
 
 ## ยอดเล่มตามตัวกรองและการเชื่อมฉบับ
 
-ใช้ `series.target` เดิมสำหรับเลขเล่มที่ผู้ใช้ระบุว่าออกแล้ว ยอดกรองคำนวณจากเลขเล่มจริงและสมาชิกบ็อกซ์ของฉบับที่ตรงเงื่อนไข การเชื่อมใช้ `series.groupId` แบบเลือกได้และบันทึกฉบับที่เกี่ยวข้องผ่าน AccountStore ในงานซิงก์เดียว การรวมและแยกกลุ่มออก UUID ใหม่สำหรับสมาชิกที่เกี่ยวข้องเพื่อให้การแก้ไขที่ซ้อนกันชน revision ได้ แม้บางฉบับอยู่ในถังขยะ ใช้ SQLite v3 และ JSON v2 เดิม [กติกาและการใช้งาน](21-shelf-formats-plan.md)
+ใช้ `series.target` เดิมสำหรับเลขเล่มที่ผู้ใช้ระบุว่าออกแล้ว ยอดกรองคำนวณจากเลขเล่มจริงและสมาชิกบ็อกซ์ของฉบับที่ตรงเงื่อนไข การเชื่อมใช้ `series.groupId` แบบเลือกได้และบันทึกฉบับที่เกี่ยวข้องผ่าน AccountStore ในงานซิงก์เดียว การรวมและแยกกลุ่มออก UUID ใหม่สำหรับสมาชิกที่เกี่ยวข้องเพื่อให้การแก้ไขที่ซ้อนกันชน revision ได้ แม้บางฉบับอยู่ในถังขยะ ใช้ SQLite v3 และ JSON v2 เดิม [กติกาและการใช้งาน](../reference/linked-editions.md)
 
 ใช้การบันทึก IndexedDB ผ่าน transaction เดิมสำหรับ state และคิวรอส่งก่อนส่งงานไปเซิร์ฟเวอร์ [IDBTransaction](https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction)
+
+
+## โครงสร้างเอกสารตามหน้าที่
+
+ใช้ docs/ ชั้นบนเป็นทางเข้าของระบบปัจจุบัน รายละเอียดที่ใช้อ้างอิงอยู่ใน reference ส่วนแผน เกณฑ์ตรวจรับ เหตุผล และคำสั่งของรุ่นเก่าอยู่ใน development เพื่อให้หาคู่มือที่ตรงกับงานได้จากชื่อไฟล์

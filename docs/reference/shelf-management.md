@@ -50,7 +50,7 @@ CSV เป็นช่องนำเข้าข้อมูล ไม่ใช
 
 ## หลักฐานและข้อจำกัด
 
-ผลตรวจรับฉบับสุดท้ายอยู่ใน 08-prototype.md ยังต้องลอง Safari/iPhone และ Android จริง ไม่อ้างว่าทดสอบ hardware แล้ว UI ไม่เพิ่ม main nav หรือบริการ Docker และไม่ใช้ผู้ให้บริการมีค่าใช้จ่าย
+ผลตรวจรับฉบับสุดท้ายอยู่ใน docs/development/history/releases.md ยังต้องลอง Safari/iPhone และ Android จริง ไม่อ้างว่าทดสอบ hardware แล้ว UI ไม่เพิ่ม main nav หรือบริการ Docker และไม่ใช้ผู้ให้บริการมีค่าใช้จ่าย
 
 
 ## ตรวจปิดงานตามคำสั่ง “ทำทั้งหมด”
@@ -63,4 +63,4 @@ CSV เป็นช่องนำเข้าข้อมูล ไม่ใช
 | ที่เก็บ/แท็ก | สร้างเดี่ยว/ชุด/draft, แก้ฉบับ/bulk, filter/search, server validation และ export/restore ต่อ owner | new edition tags / tags and targets browser; private tags backend; Docker tag backup restore |
 | CSV | UTF-8 template, delimiter/mapping/defaults, review/edit/exclude, errors block commit, duplicate/box/format checks, recheck current shelf, offline | CSV unit + 4 CSV browser scenarios ทั้ง desktop/mobile |
 
-ผลรอบสุดท้าย unit/API 49 ผ่าน + browser 110 ผ่านทั้งหมด และ Docker upgrade/rollback/backup/restore ผ่าน รายละเอียดการอัปเดต instance เดิมอยู่ใน 08-prototype.md ไม่มีรายการที่อนุมัติทั้ง 5 ข้อค้างไว้ใน mockup
+ผลรอบสุดท้าย unit/API 49 ผ่าน + browser 110 ผ่านทั้งหมด และ Docker upgrade/rollback/backup/restore ผ่าน รายละเอียดการอัปเดต instance เดิมอยู่ใน docs/development/history/releases.md ไม่มีรายการที่อนุมัติทั้ง 5 ข้อค้างไว้ใน mockup

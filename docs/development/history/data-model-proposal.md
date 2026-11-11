@@ -1,6 +1,6 @@
 # โครงสร้างข้อมูลและกฎธุรกิจ
 
-> **สถานะเอกสาร:** แบบจำลองเชิงแนวคิดช่วงวางแผน ไม่ใช่ schema ที่ใช้อยู่จริง ปัจจุบันรวมเรื่อง/ฉบับไว้ใน series และใช้ SQLite ดู [19 — ข้อมูลและฐานข้อมูล](19-data-and-storage.md) สำหรับ fields ตาราง และตัวอย่าง JSON ที่ตรงกับโค้ด
+> **สถานะเอกสาร:** แบบจำลองเชิงแนวคิดช่วงวางแผน ไม่ใช่ schema ที่ใช้อยู่จริง ปัจจุบันรวมเรื่อง/ฉบับไว้ใน series และใช้ SQLite ดู [19 — ข้อมูลและฐานข้อมูล](../../reference/data-and-storage.md) สำหรับ fields ตาราง และตัวอย่าง JSON ที่ตรงกับโค้ด
 
 นี่คือแบบจำลองเชิงแนวคิด ยังไม่ใช่ schema migration ชื่อและตารางเปลี่ยนได้ แต่ต้องคงกฎธุรกิจและตรวจรับได้
 
@@ -71,10 +71,10 @@ Work/Edition/Volume/BoxSet ที่ผู้ใช้สร้างหรื�
 
 ## ส่วนที่เพิ่มจริงใน 0.6.0
 
-series.tags?: string[] ไม่เกิน 30 แท็ก แท็กละ 50 ตัวอักษร เก็บใน JSON เดิมต่อ owner และมี draft.tags ก่อนยืนยันสร้างฉบับ การกรองชุดไม่ครบใช้ series.target เดิม ไม่อนุมานลำดับวางขายจากจำนวน entries ส่วน location ยังอยู่ per-entry UI bulk ไม่เปลี่ยน ISBN/quantity/members และ CSV จับคู่เฉพาะ title+author+edition+language+format ดูข้อกำหนดจริงใน 11-shelf-management.md
+series.tags?: string[] ไม่เกิน 30 แท็ก แท็กละ 50 ตัวอักษร เก็บใน JSON เดิมต่อ owner และมี draft.tags ก่อนยืนยันสร้างฉบับ การกรองชุดไม่ครบใช้ series.target เดิม ไม่อนุมานลำดับวางขายจากจำนวน entries ส่วน location ยังอยู่ per-entry UI bulk ไม่เปลี่ยน ISBN/quantity/members และ CSV จับคู่เฉพาะ title+author+edition+language+format ดูข้อกำหนดจริงใน docs/reference/shelf-management.md
 
 
-0.7.0 เพิ่ม optional entry.readingStatus (unread/planned/reading/read หรือว่าง) และ box.readingByMember เก็บการอ่านรายสมาชิก มิติแยกจาก ownership ไม่เพิ่ม entries หรือแก้ coverage JSON/schema SQLite เดิม รองรับ export/import/restore ดู 12-reading-status.md
+0.7.0 เพิ่ม optional entry.readingStatus (unread/planned/reading/read หรือว่าง) และ box.readingByMember เก็บการอ่านรายสมาชิก มิติแยกจาก ownership ไม่เพิ่ม entries หรือแก้ coverage JSON/schema SQLite เดิม รองรับ export/import/restore ดู docs/reference/reading-status.md
 
 
 0.7.1 ค่าเริ่มต้นการอ่านที่ว่าง/ไม่มี ใช้ unread ขณะอ่านค่า ไม่ใช่การสร้าง ownership หรือ migration เขียนทับ reading เดิมทั้งชั้น ปุ่มทั้งชุดอัปเดตเฉพาะ entries ใน series ที่เปิด รวม box members ไม่สร้าง entry ตาม target

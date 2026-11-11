@@ -9,8 +9,8 @@
   Self-hosted · Docker · SQLite · PWA<br>
   <a href="#เริ่มใช้ด้วย-docker">เริ่มใช้งาน</a> ·
   <a href="#ภาพหน้าจอ">ภาพหน้าจอ</a> ·
-  <a href="docs/09-docker.md">คู่มือติดตั้งเซิร์ฟเวอร์</a> ·
-  <a href="docs/README.md">สารบัญเอกสาร / โครงสร้างระบบ</a>
+  <a href="docs/deployment.md">คู่มือติดตั้งเซิร์ฟเวอร์</a> ·
+  <a href="docs/architecture.md">โครงสร้างระบบ</a>
 </p>
 
 ![คั่นไว้ — หน้าชั้นหนังสือบนคอมและมือถือ แสดงปก ชื่อเรื่อง และสถานะจากข้อมูลตัวอย่าง](docs/images/readme/overview.png)
@@ -64,14 +64,14 @@ docker compose up -d
 เปิด **http://localhost:4173** แล้วสมัครบัญชีของตัวเอง บัญชีใหม่เริ่มด้วยชั้นว่าง ไม่มีรหัสผ่านตั้งต้น โหลดข้อมูลตัวอย่างมาลองจากหน้าตั้งค่าได้
 
 - เข้าผ่าน IP เซิร์ฟเวอร์จากมือถือหรือเครื่องอื่น: ตั้ง `BIND_ADDRESS=0.0.0.0` ใน `.env` ก่อนเปิดแอพ
-- ใช้โดเมน HTTPS หรือ reverse proxy: ตั้ง `APP_ORIGIN` เป็น URL ของแอพ และ `COOKIE_SECURE=true` ตาม [คู่มือเซิร์ฟเวอร์](docs/09-docker.md)
+- ใช้โดเมน HTTPS หรือ reverse proxy: ตั้ง `APP_ORIGIN` เป็น URL ของแอพ และ `COOKIE_SECURE=true` ตาม [คู่มือเซิร์ฟเวอร์](docs/deployment.md)
 - ใช้ HTTPS สำหรับติดตั้ง PWA จากมือถือหรือเครื่องอื่น ส่วน `.env` จริงเก็บเฉพาะเครื่องของตัวเอง
 
 ตอนนี้ต้อง build image จาก source เอง ยังไม่ได้เผยแพร่ image บน registry ใช้ reverse proxy ที่มีอยู่ได้ Compose ไม่เพิ่ม proxy หรือบริการอื่นให้เอง
 
 ### ข้อมูลอยู่ไหน
 
-บัญชี หนังสือ ถังขยะ และรูปเก็บใน named volume `book-data` ที่ `/data` เปลี่ยน container แล้วข้อมูลยังอยู่ ควรสำรองไว้ก่อนอัปเกรดตาม [คู่มือ backup/restore](docs/09-docker.md#สำรองข้อมูล)
+บัญชี หนังสือ ถังขยะ และรูปเก็บใน named volume `book-data` ที่ `/data` เปลี่ยน container แล้วข้อมูลยังอยู่ ควรสำรองไว้ก่อนอัปเกรดตาม [คู่มือ backup/restore](docs/deployment.md#สำรองข้อมูล)
 
 ```sh
 docker compose logs -f
@@ -84,12 +84,12 @@ docker compose down
 
 | เรื่อง | อ่านต่อ |
 | --- | --- |
-| ติดตั้ง อัปเดต HTTPS ย้ายเครื่อง และกู้ข้อมูล | [Docker และเซิร์ฟเวอร์](docs/09-docker.md) |
-| จัดชั้น เลือกหลายรายการ และนำเข้า CSV | [การจัดการชั้นหนังสือ](docs/11-shelf-management.md) |
-| สถานะการอ่านและเล่มในบ็อกซ์ | [การอ่าน](docs/12-reading-status.md) |
-| รายละเอียดฉบับ แก้ข้อมูล และเปลี่ยนปก | [รายละเอียดหนังสือ](docs/14-book-details.md) · [วางรูปปก](docs/17-cover-paste.md) |
-| หมวดหมู่ส่วนตัวและหมวดเริ่มต้น | [จัดการหมวดหมู่](docs/15-categories.md) |
-| สุ่มเรื่องที่ยังไม่อ่าน และถังขยะ | [สุ่มและกู้คืน](docs/16-trash-and-picker.md) |
+| ติดตั้ง อัปเดต HTTPS ย้ายเครื่อง และกู้ข้อมูล | [Docker และเซิร์ฟเวอร์](docs/deployment.md) |
+| จัดชั้น เลือกหลายรายการ และนำเข้า CSV | [การจัดการชั้นหนังสือ](docs/reference/shelf-management.md) |
+| สถานะการอ่านและเล่มในบ็อกซ์ | [การอ่าน](docs/reference/reading-status.md) |
+| รายละเอียดฉบับ แก้ข้อมูล และเปลี่ยนปก | [รายละเอียดหนังสือ](docs/reference/book-details.md) · [วางรูปปก](docs/reference/cover-paste.md) |
+| หมวดหมู่ส่วนตัวและหมวดเริ่มต้น | [จัดการหมวดหมู่](docs/reference/categories.md) |
+| สุ่มเรื่องที่ยังไม่อ่าน และถังขยะ | [สุ่มและกู้คืน](docs/reference/trash-and-picker.md) |
 
 ### เรื่องที่ควรรู้ก่อนใช้
 
@@ -134,6 +134,4 @@ Docker smoke ใช้ scratch Compose project/volume ของตัวเอ�
 
 </details>
 
-สถานะและหลักฐานตรวจรับ: [สถานะระบบ](docs/08-prototype.md) · [โครงสร้าง implementation](docs/10-implementation.md) · [แผนตรวจรับ](docs/06-delivery-plan.md)
-
-เอกสารออกแบบ: [ขอบเขตผลิตภัณฑ์](docs/01-product.md) · [User flows](docs/02-user-flows.md) · [แบบข้อมูล](docs/03-data-model.md) · [สถาปัตยกรรม](docs/04-architecture.md) · [ISBN / AI](docs/05-book-ingestion.md) · [Decision log](docs/07-decisions.md) · [หน้าชั้นหนังสือ](docs/13-shelf-redesign.md)
+อ่านต่อที่ [สารบัญเอกสาร](docs/README.md) หรือ [เอกสารการพัฒนา](docs/development/README.md) สำหรับแผน เหตุผลในการออกแบบ และประวัติแต่ละรุ่น

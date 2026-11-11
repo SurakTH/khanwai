@@ -26,4 +26,4 @@ public/detail-view.js แยกการสร้าง markup รายละ�
 
 หลักฐานภาพจากบัญชีและฐานข้อมูลชั่วคราว: screenshots/detail-after-desktop.png, detail-after-mobile.png, detail-volumes-desktop.png และ detail-volumes-mobile.png สร้างใหม่ด้วย `node tests/preview-detail.mjs` ไม่ใช้ข้อมูลหรือภาพส่วนตัวจากบัญชีจริง
 
-ตรวจ layout ที่ 320/390/1440px, touch targets ของ select/เมนู/ปิดบนมือถือ, menu keyboard/Escape, เลือกแก้/ยกเลิกลบ/ยืนยันลบเฉพาะ entry, scroll/focus หลังเปลี่ยนสถานะของเล่มท้ายชุด และ box expansion พร้อม regression เพิ่ม/รูป/ISBN/อ่าน/ซิงก์/CSV เดิม ผลตรวจจริงอยู่ใน docs/08-prototype.md เป็น Chromium emulation ไม่แทนการลอง iPhone/Android จริง
+ตรวจ layout ที่ 320/390/1440px, touch targets ของ select/เมนู/ปิดบนมือถือ, menu keyboard/Escape, เลือกแก้/ยกเลิกลบ/ยืนยันลบเฉพาะ entry, scroll/focus หลังเปลี่ยนสถานะของเล่มท้ายชุด และ box expansion พร้อม regression เพิ่ม/รูป/ISBN/อ่าน/ซิงก์/CSV เดิม ผลตรวจจริงอยู่ใน docs/development/history/releases.md เป็น Chromium emulation ไม่แทนการลอง iPhone/Android จริง

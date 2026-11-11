@@ -1,6 +1,6 @@
 # ข้อมูลและฐานข้อมูลที่ใช้จริง
 
-ตรวจเทียบกับซอร์ส **0.10.3** — 31 ตุลาคม 2026 · [สารบัญ](README.md) · [ภาพรวมเว็บ](18-system-overview.md)
+รายละเอียดจากซอร์ส · [สารบัญ](../README.md) · [ภาพรวมเว็บ](code-map.md)
 
 ## ข้อมูลอยู่ที่ไหน
 
@@ -12,7 +12,7 @@
 | Cache Storage ในแต่ละ browser | ไฟล์แอพ และรูปส่วนตัวที่เคยโหลด แยกตามบัญชี | ใช้งาน PWA ออฟไลน์ ไม่ใช่ backup |
 | localStorage | บัญชีที่ใช้ล่าสุดและค่ามุมมอง/การเรียงต่อบัญชี | ไม่มีรหัสผ่านหรือ session token |
 
-Docker มี volume `book-data` mount ที่ `/data`; รัน Node ตรงใช้ `DATA_DIR` หรือ `./data` ค่าเริ่มต้น ไฟล์ SQLite WAL/SHM อาจเกิดข้างฐานข้อมูลขณะเปิดใช้งาน อย่าคัดลอกเฉพาะไฟล์หลักขณะรันเพื่อถือว่าเป็น backup ที่สมบูรณ์ ใช้คำสั่งสำรองตาม [คู่มือ Docker](09-docker.md)
+Docker มี volume `book-data` mount ที่ `/data`; รัน Node ตรงใช้ `DATA_DIR` หรือ `./data` ค่าเริ่มต้น ไฟล์ SQLite WAL/SHM อาจเกิดข้างฐานข้อมูลขณะเปิดใช้งาน อย่าคัดลอกเฉพาะไฟล์หลักขณะรันเพื่อถือว่าเป็น backup ที่สมบูรณ์ ใช้คำสั่งสำรองตาม [คู่มือ Docker](../deployment.md)
 
 ## โมเดลที่แอพใช้
 
@@ -102,7 +102,7 @@ Docker มี volume `book-data` mount ที่ `/data`; รัน Node ตร�
 | ข้อมูลเสริม | `coverData`, `location`, `createdAt`, `updatedAt`, `trashedAt` | fields ที่เกี่ยวข้องอาจไม่มีในข้อมูลเก่า; location ไม่เกิน 150 ตัวอักษร |
 | draft | `id`, `title`, `author`, `isbn`, `label`, `edition`, `language`, `category`, `format`, `source` | fields ข้อความหลักเป็น string และว่างได้ เพื่อให้รอตรวจต่อได้ |
 
-ข้อจำกัดละเอียดดู [validateState](../public/lib.js) ซึ่งใช้ทั้ง server/client: ID ไม่เกิน 100 ตัวและไม่ซ้ำข้าม series/entries/drafts ภายใน state; ข้อความหลัก series ไม่เกิน 300 ตัว, entry label ไม่เกิน 80, entries ต่อเรื่องไม่เกิน 5,000; target/members ไม่เกิน 1,000 labels และ tags ไม่เกิน 30 ค่า ค่าที่ไม่อยู่ในตารางนี้ไม่ได้แปลว่าถูกปฏิเสธทั้งหมด validator ไม่ใช่ strict unknown-field schema สำหรับทุก entity
+ข้อจำกัดละเอียดดู [validateState](../../public/lib.js) ซึ่งใช้ทั้ง server/client: ID ไม่เกิน 100 ตัวและไม่ซ้ำข้าม series/entries/drafts ภายใน state; ข้อความหลัก series ไม่เกิน 300 ตัว, entry label ไม่เกิน 80, entries ต่อเรื่องไม่เกิน 5,000; target/members ไม่เกิน 1,000 labels และ tags ไม่เกิน 30 ค่า ค่าที่ไม่อยู่ในตารางนี้ไม่ได้แปลว่าถูกปฏิเสธทั้งหมด validator ไม่ใช่ strict unknown-field schema สำหรับทุก entity
 
 ### สถานะ 3 เรื่องต้องแยกกัน
 
@@ -112,17 +112,17 @@ Docker มี volume `book-data` mount ที่ `/data`; รัน Node ตร�
 | การครอบครอง | `owned`, `ordered`, `wishlist` | มีแล้ว / รอส่ง / อยากซื้อ |
 | การอ่าน | `unread`, `planned`, `reading`, `read` | ยังไม่อ่าน / อยากอ่าน / กำลังอ่าน / อ่านแล้ว |
 
-ไม่มี readingStatus หรือเป็นค่าว่าง ให้ **คำนวณว่า unread ตอนแสดงผล** ไม่เขียนทับข้อมูลเก่าและไม่เปลี่ยน ownership สมาชิก box ใช้ readingByMember override; ห้ามสร้าง owned entry เดี่ยวเพิ่มเพื่อเก็บสถานะสมาชิก เพราะจะนับซ้ำ ดู [12](12-reading-status.md)
+ไม่มี readingStatus หรือเป็นค่าว่าง ให้ **คำนวณว่า unread ตอนแสดงผล** ไม่เขียนทับข้อมูลเก่าและไม่เปลี่ยน ownership สมาชิก box ใช้ readingByMember override; ห้ามสร้าง owned entry เดี่ยวเพิ่มเพื่อเก็บสถานะสมาชิก เพราะจะนับซ้ำ ดู [สถานะการอ่าน](reading-status.md)
 
 บ็อกซ์ครอบคลุมเลขเล่มตาม members; การเช็กซ้ำรวม coverage ของ box กับเล่มเดี่ยวและไม่ถือว่ามีเล่ม 1–10 เพียงเพราะพบ label 10 เลข ISBN ตรวจ checksum/normalize ก่อนจับคู่ แต่เป็นรหัสสิ่งพิมพ์ ไม่ใช่ ID สำเนาของผู้ใช้ และไม่รับประกันว่าจะค้น metadata ได้ `metadataSeed.isbn` ผูกกับ label ที่ใช้เป็นต้นข้อมูลชุด ไม่ถือว่าเป็นเจ้าของและไม่กระจายไปทุก entry
 
 ### หมวดและค่าเริ่มต้น
 
-`categories` เป็น optional array 1–100 ชื่อ; ถ้าไม่เคยตั้งใช้หมวดเริ่มต้นเดิม การแสดงตัวเลือกใช้ `categoryList/categoryOptions` รวมชื่อที่ยังถูกอ้างจาก series/drafts เก่า ลำดับแรกของ catalog ที่ตั้งเป็นหมวดเริ่มต้น การเปลี่ยนชื่อ/ลบหมวดต้องย้าย series และ drafts ที่เกี่ยวข้องใน mutation เดียว ไม่แก้ entries และไม่ทิ้งรายการในถังขยะ ดู [15](15-categories.md)
+`categories` เป็น optional array 1–100 ชื่อ; ถ้าไม่เคยตั้งใช้หมวดเริ่มต้นเดิม การแสดงตัวเลือกใช้ `categoryList/categoryOptions` รวมชื่อที่ยังถูกอ้างจาก series/drafts เก่า ลำดับแรกของ catalog ที่ตั้งเป็นหมวดเริ่มต้น การเปลี่ยนชื่อ/ลบหมวดต้องย้าย series และ drafts ที่เกี่ยวข้องใน mutation เดียว ไม่แก้ entries และไม่ทิ้งรายการในถังขยะ ดู [หมวดหมู่](categories.md)
 
 ## ตาราง SQLite ทั้งหมด
 
-ฐานข้อมูลใช้ `STRICT` tables, WAL, foreign keys และ transaction `BEGIN IMMEDIATE` โครงสร้างอยู่ใน [src/storage.mjs](../src/storage.mjs) ไม่มี ORM
+ฐานข้อมูลใช้ `STRICT` tables, WAL, foreign keys และ transaction `BEGIN IMMEDIATE` โครงสร้างอยู่ใน [src/storage.mjs](../../src/storage.mjs) ไม่มี ORM
 
 | ตาราง | คอลัมน์ | Key / หน้าที่ |
 | --- | --- | --- |
@@ -165,7 +165,7 @@ ERD นี้ย่อความสัมพันธ์จริง ไม่
 | ถังขยะที่ผู้ใช้กด | ใส่ `trashedAt` ISO ใน JSON ของ series/entry/draft; SQL deleted ยังเป็น 0 | ยังอยู่ใน raw state/export/backup กู้คืน ID เดิมได้ |
 | sync tombstone | change `value: null`; SQL deleted = 1 และเก็บ revision/ข้อมูลเดิม | ไม่รวม record ใน snapshot.state แต่เก็บเวอร์ชันไว้กันการส่งเก่าทับ |
 
-หน้าชั้นใช้ `activeLibrary` ที่ซ่อนรายการถังขยะเท่านั้น **ห้ามนำ projection นี้ไป persist ทับ raw state** เพราะจะทำถังขยะหาย ลบทั้งเรื่องแล้วคืนเรื่องจะไม่คืน child ที่เคยลบแยกมาก่อนโดยอัตโนมัติ ไม่มีล้างถังขยะอัตโนมัติหรือปุ่มลบถาวร ดู [16](16-trash-and-picker.md)
+หน้าชั้นใช้ `activeLibrary` ที่ซ่อนรายการถังขยะเท่านั้น **ห้ามนำ projection นี้ไป persist ทับ raw state** เพราะจะทำถังขยะหาย ลบทั้งเรื่องแล้วคืนเรื่องจะไม่คืน child ที่เคยลบแยกมาก่อนโดยอัตโนมัติ ไม่มีล้างถังขยะอัตโนมัติหรือปุ่มลบถาวร ดู [สุ่มและถังขยะ](trash-and-picker.md)
 
 ## วงจรรูปปก
 
@@ -175,7 +175,7 @@ ERD นี้ย่อความสัมพันธ์จริง ไม่
 4. ข้อมูลที่ server ยืนยันใช้ `coverData: "/api/photos/HASH"` การอ่านรูปต้องมี session และ owner ตรงกัน ไม่มี static public photo directory
 5. portable JSON export แปลง reference กลับเป็น data URI เพื่อย้ายไปบัญชี/เครื่องอื่นได้
 
-ไฟล์เก่าที่ลงทะเบียนแล้วไม่ได้ถูกล้างทันทีเมื่อเปลี่ยนปก และ backup เก็บ registered photos ทั้งหมด การลบบัญชีลบข้อมูลและโฟลเดอร์รูปเจ้าของนั้น ภาพบาร์โค้ดอ่านในเครื่อง ไม่กลายเป็นรูปปกหรืออัปโหลดโดยอัตโนมัติ ดู [17](17-cover-paste.md)
+ไฟล์เก่าที่ลงทะเบียนแล้วไม่ได้ถูกล้างทันทีเมื่อเปลี่ยนปก และ backup เก็บ registered photos ทั้งหมด การลบบัญชีลบข้อมูลและโฟลเดอร์รูปเจ้าของนั้น ภาพบาร์โค้ดอ่านในเครื่อง ไม่กลายเป็นรูปปกหรืออัปโหลดโดยอัตโนมัติ ดู [วางรูปปก](cover-paste.md)
 
 ## สำเนาในเบราว์เซอร์และการสำรอง
 
@@ -185,7 +185,7 @@ ERD นี้ย่อความสัมพันธ์จริง ไม่
 - **portable JSON** เป็นข้อมูลชั้น หมวด ถังขยะ และรูป ไม่รวมบัญชี รหัสผ่าน session หรือ preferences แหล่ง ISBN; export ในเว็บรองรับข้อมูล local ส่วน `/api/export` ส่งข้อมูลที่ server มี
 - **server backup** เป็น SQLite + registered photos + manifest/checksums รวมข้อมูลทุกบัญชี/settings ใช้ CLI เมื่อย้ายเซิร์ฟเวอร์; restore ลง directory ว่างและยกเลิก sessions เดิม ต้อง login ใหม่
 
-สำเนาใน browser ไม่เข้ารหัสแยกจาก profile ของผู้ใช้เครื่อง และไม่แทน backup เมื่อล้างข้อมูลเว็บไซต์สำเนา/outbox อาจหาย ดูลำดับ ACK/conflict ใน [20](20-api-and-sync.md) และขั้นตอน backup/restore ใน [09](09-docker.md)
+สำเนาใน browser ไม่เข้ารหัสแยกจาก profile ของผู้ใช้เครื่อง และไม่แทน backup เมื่อล้างข้อมูลเว็บไซต์สำเนา/outbox อาจหาย ดูลำดับ ACK/conflict ใน [API และการซิงก์](api-and-sync.md) และขั้นตอน backup/restore ใน [คู่มือเซิร์ฟเวอร์](../deployment.md)
 
 ## เลขเวอร์ชันที่ไม่ใช่สิ่งเดียวกัน
 
