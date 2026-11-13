@@ -256,3 +256,7 @@ Barcode fixtures สร้างอิสระใน tests/fixtures ใช้ I
 เปิด `book-app-1` ด้วย khanwai:0.3.0 แล้ว: healthy, user=node, mount /data, หน้า login render ไม่มี JavaScript error และ /api/library คืน 401 เมื่อไม่ล็อกอิน สำรองก่อนอัปเดตไว้ /data/backups/pre-030-final ไม่สร้างบัญชีตัวอย่างใน volume จริง ปิดและลบเฉพาะ Compose projects/volumes ที่ใช้ทดสอบแล้ว ข้อมูล localStorage ต้นแบบไม่ถูกลบ
 
 สิ่งที่ยังเปิดในแผนรวม (AI, CSV, UI สร้างบ็อกซ์, hardware camera/install และ public hosting) ไม่ได้อ้างว่าเสร็จในรอบบัญชีนี้ ดูข้อจำกัดด้านบนก่อนนำไปใช้เป็น production
+
+## 0.11.0 — ปรับหน้าตาแอพ
+
+ปรับหน้าชั้น เมนู ฟอร์มเพิ่มหนังสือ หน้ารายละเอียด และหน้าตั้งค่าให้ใช้รูปแบบเดียวกันทั้งคอมและมือถือ ภาพใน README แสดงหน้าตารุ่นนี้ ดูขั้นตอนอัปเกรดใน [คู่มือเซิร์ฟเวอร์](../../deployment.md)

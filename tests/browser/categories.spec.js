@@ -42,6 +42,7 @@ test('chosen default survives reload and offline sync, starts new single and bat
   await page.getByRole('button', { name: 'บันทึกค่าเริ่มต้น', exact: true }).click();
   await expect(page.locator('[name=defaultCategory]')).toHaveValue('นิยายแปลจีน');
   await expect(page.locator('[name=defaultCategory] option').first()).toHaveValue('นิยายแปลจีน');
+  await expect(page.locator('#connection')).toContainText('รอซิงก์');
   await page.reload(); await page.locator('.page-heading [data-add]').click();
   await expect(page.locator('[name=category]')).toHaveValue('นิยายแปลจีน');
   await context.setOffline(false); await page.getByRole('button', { name: 'ปิดหน้าต่าง' }).click();

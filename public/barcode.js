@@ -2,7 +2,7 @@ import { decodePixels } from './vendor/barcode-decoder.js';
 import { normalizeIsbn } from './lib.js';
 
 export function scanControls() {
-  return '<div class="barcode-actions"><button type="button" class="button" data-scan="camera">ถ่ายบาร์โค้ด</button><button type="button" class="button" data-scan="file">เลือกรูปบาร์โค้ด</button></div>';
+  return '<div class="barcode-actions"><button type="button" class="button" data-scan="camera"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h2.5l1.4-2h4.2l1.4 2H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>ถ่ายบาร์โค้ด</button><button type="button" class="button" data-scan="file"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m20 15-4.5-4.5L7 19"/></svg>เลือกรูปบาร์โค้ด</button></div>';
 }
 
 export async function decodeBarcodeFile(file) {

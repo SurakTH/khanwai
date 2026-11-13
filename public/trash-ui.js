@@ -40,7 +40,7 @@ export function openTrash({getState,openModal,heading,escape:esc,checkOwner,onRe
       document.querySelector('#trash-count').textContent=`${items.length} รายการ`;
       document.querySelector('#trash-list').innerHTML=items.map(item=>{
         const image=item.record.coverData||item.series?.coverData||item.series?.entries.find(e=>e.coverData)?.coverData;
-        return `<article class="trash-row">${image?`<img src="${esc(image)}" alt="ปก ${esc(titleOf(item))}" loading="lazy">`:'<span class="trash-cover" aria-hidden="true">▥</span>'}<div><h3>${esc(titleOf(item))}</h3><p>${esc(detailsOf(item))}</p><small>ย้ายเมื่อ ${esc(new Intl.DateTimeFormat('th-TH',{dateStyle:'medium'}).format(new Date(item.date)))}</small></div><button class="button" data-restore-kind="${item.kind}" data-restore-id="${esc(item.id)}">ตรวจและกู้คืน</button></article>`;
+        return `<article class="trash-row">${image?`<img src="${esc(image)}" alt="ปก ${esc(titleOf(item))}" loading="lazy">`:'<span class="trash-cover" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 4v16"/></svg></span>'}<div><h3>${esc(titleOf(item))}</h3><p>${esc(detailsOf(item))}</p><small>ย้ายเมื่อ ${esc(new Intl.DateTimeFormat('th-TH',{dateStyle:'medium'}).format(new Date(item.date)))}</small></div><button class="button" data-restore-kind="${item.kind}" data-restore-id="${esc(item.id)}">ตรวจและกู้คืน</button></article>`;
       }).join('')||'<p class="notice">ยังไม่มีรายการในถังขยะที่ตรงกับคำค้น</p>';
       for(const button of document.querySelectorAll('[data-restore-id]'))button.onclick=()=>review(button.dataset.restoreKind,button.dataset.restoreId);
     }

@@ -4,7 +4,7 @@
 
 ```sh
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.10.3 .
+docker build -t khanwai:0.11.0 .
 docker compose up -d --wait
 ```
 
@@ -19,10 +19,10 @@ docker compose up -d --wait
 ยังไม่มี registry ที่เผยแพร่จริง ผู้สร้างส่ง image กับ compose.yaml ได้:
 
 ```sh
-docker image save -o khanwai-0.10.0.tar khanwai:0.10.3
+docker image save -o khanwai-0.11.0.tar khanwai:0.11.0
 ```
 
-ผู้รับใช้ `docker image load -i khanwai-0.10.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
+ผู้รับใช้ `docker image load -i khanwai-0.11.0.tar` แล้ว `docker compose up -d --wait` ไม่ต้องมี source หรือ Node การย้าย image ไม่ได้ย้าย volume; ใช้ backup/restore เพื่อย้ายข้อมูล ทดสอบ image บน Linux amd64 ยังไม่ยืนยัน ARM64
 
 ## ตั้งค่า
 
@@ -32,7 +32,7 @@ docker image save -o khanwai-0.10.0.tar khanwai:0.10.3
 | --- | --- | --- |
 | PORT | 4173 | พอร์ต host |
 | BIND_ADDRESS | 127.0.0.1 | interface host |
-| KHANWAI_IMAGE | khanwai:0.10.3 | image/tag |
+| KHANWAI_IMAGE | khanwai:0.11.0 | image/tag |
 | DATA_DIR | /data | โฟลเดอร์ฐานข้อมูลใน volume ใช้เปลี่ยนหลัง restore |
 | ALLOW_REGISTRATION | true | ตั้ง false หลังสมัครบัญชีที่ต้องการแล้ว |
 | APP_ORIGIN | ว่าง | URL เว็บภายนอก เช่น https://books.example.com สำหรับ origin check |
@@ -80,6 +80,8 @@ docker compose exec app node src/cli.mjs reset-password reader@example.com
 พิมพ์รหัสใหม่อย่างน้อย 10 ตัวอักษรแล้วจบ stdin (Ctrl-D) คำสั่งนี้ไม่ใช่ช่องทางลับ: อย่าแชร์ terminal/session ที่ใช้กรอกรหัส ทุกอุปกรณ์ต้องล็อกอินใหม่หลัง reset เปลี่ยนรหัสเองได้จากหน้า settings เช่นกัน
 
 ## อัปเกรดและย้อนกลับ
+
+สำหรับรุ่น **0.11.0** สำรองข้อมูลก่อน ตั้ง `KHANWAI_IMAGE=khanwai:0.11.0` ใน `.env` เดิม แล้ว build และเปิด Compose ด้วยคำสั่งด้านบน รุ่นนี้ใช้ฐาน SQLite v3 และ volume เดิม หลังอัปเดตให้เปิดเว็บใหม่เพื่อรับไฟล์ PWA รุ่นล่าสุด
 
 หลังดึงซอร์สแล้ว ให้ build image ด้วย tag ที่ตรงกับ `KHANWAI_IMAGE` ใน `.env` หรือค่าเริ่มต้นใน [compose.yaml](../compose.yaml) จากนั้นรัน `docker compose up -d` และตรวจว่าเปิดชั้นกับรูปปกได้ตามเดิม
 

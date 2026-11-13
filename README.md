@@ -49,13 +49,13 @@
 
 ## เริ่มใช้ด้วย Docker
 
-ใช้ Docker และ Docker Compose เพื่อรันแอพและเก็บข้อมูลใน volume เดียว คำสั่งนี้ build จากซอร์สด้วย tag เริ่มต้นของ Compose
+รุ่น **0.11.0** ปรับหน้าชั้น เมนู รายละเอียดหนังสือ และฟอร์มให้ใช้หน้าตาชุดเดียวกัน ใช้ Docker และ Docker Compose เพื่อรันแอพและเก็บข้อมูลใน volume เดียว คำสั่งนี้ build จากซอร์สด้วย tag เริ่มต้นของ Compose
 
 ```sh
 git clone https://github.com/SurakTH/khanwai.git
 cd khanwai
 test -e .env || cp .env.example .env
-docker build -t khanwai:0.10.3 .
+docker build -t khanwai:0.11.0 .
 docker compose up -d
 ```
 

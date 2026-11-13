@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f5ee">
+  <meta name="theme-color" content="#f5f3ec">
   <meta name="description" content="คั่นไว้ — ชั้นหนังสือส่วนตัว เช็กให้ชัวร์ก่อนซื้อเล่มถัดไป">
   <title>คั่นไว้ — ชั้นหนังสือของเรา</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -22,21 +22,71 @@
 <body>
   <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
   <aside class="sidebar">
-    <a class="brand" href="#shelf"><span class="brand-mark">ค</span><span>คั่นไว้<small>ที่ของหนังสือเล่มโปรด</small></span></a>
+    <a class="brand" href="#shelf">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 36 40" fill="none">
+          <rect x="2" y="2" width="32" height="36" rx="5" fill="#244a3d"/>
+          <path d="M9 6v28" stroke="#85a894" stroke-width="2" stroke-linecap="round"/>
+          <path d="M19 6v14l4.5-3.4L28 20V6z" fill="#c97954"/>
+          <path d="M14 26h13M14 31h9" stroke="#f5f3ec" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+        </svg>
+      </span>
+      <span class="brand-copy">คั่นไว้<small>ชั้นหนังสือส่วนตัว</small></span>
+    </a>
     <p class="nav-label">มุมหนังสือของเรา</p>
     <nav aria-label="เมนูหลัก">
-      <button data-page="shelf" class="nav-item active"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h18v16H3zM7 4v16M11 4v16M15 4v16M18 4v16"/></svg></span><span class="nav-text">ชั้นหนังสือ</span><span class="nav-count" id="series-count">0</span></button>
-      <button data-page="check" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></span><span class="nav-text">เช็กก่อนซื้อ</span></button>
-      <button data-page="drafts" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h18v16H3zM3 9h18M3 14h18M7 6.5h10M7 11.5h10M7 16.5h10"/></svg></span><span class="nav-text">ถาดรอตรวจ</span></button>
-      <button data-page="settings" class="nav-item"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span><span class="nav-text">ข้อมูลและการตั้งค่า</span></button>
+      <button type="button" data-page="shelf" class="nav-item active">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8.5 5v14M13 5v14M16.5 5l1.5 14"/></svg>
+        </span>
+        <span class="nav-text">ชั้นหนังสือ</span>
+        <span class="nav-count" id="series-count">0</span>
+      </button>
+      <button type="button" data-page="check" class="nav-item">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/><path d="m8 10.5 1.7 1.7 3.3-3.4"/></svg>
+        </span>
+        <span class="nav-text">เช็กก่อนซื้อ</span>
+      </button>
+      <button type="button" data-page="drafts" class="nav-item">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 13h4.5l1.5 2h4l1.5-2H20"/><path d="M8.5 8.5h7"/></svg>
+        </span>
+        <span class="nav-text">ถาดรอตรวจ</span>
+      </button>
+      <button type="button" data-page="settings" class="nav-item">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        <span class="nav-text">ข้อมูลและการตั้งค่า</span>
+      </button>
     </nav>
-    <div class="sidebar-note"><span class="tiny-book" aria-hidden="true">▥</span><p>เรื่องเยอะก็จำไม่หมด<br><strong>ให้คั่นไว้ช่วยจำนะ</strong></p></div>
-    <div class="local-profile"><span class="avatar">☺</span><div><strong id="profile-name">บัญชีของเรา</strong><small id="profile-email"></small></div></div>
+    <div class="sidebar-note">
+      <span class="tiny-book" aria-hidden="true">
+        <svg viewBox="0 0 28 24" fill="none"><path d="M2 5.5C2 4.4 2.9 3.5 4 3.5h7c1.6 0 3 1.1 3 2.7v14.3c0-1.1-1-2-2.2-2H4c-1.1 0-2-.9-2-2V5.5zM26 5.5c0-1.1-.9-2-2-2h-7c-1.6 0-3 1.1-3 2.7v14.3c0-1.1 1-2 2.2-2H24c1.1 0 2-.9 2-2V5.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M19 3.5v7l2-1.5 2 1.5v-7" fill="#c97954"/></svg>
+      </span>
+      <p>เรื่องเยอะก็จำไม่หมด<br><strong>ให้คั่นไว้ช่วยจำนะ</strong></p>
+    </div>
+    <div class="local-profile">
+      <span class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg>
+      </span>
+      <div class="local-profile-info">
+        <strong id="profile-name">บัญชีของเรา</strong>
+        <small id="profile-email"></small>
+      </div>
+    </div>
   </aside>
   <div class="workspace">
-    <header class="topbar"><span>ห้องสมุดเล็ก ๆ ของเรา <span aria-hidden="true">/</span> <strong id="breadcrumb">ชั้นหนังสือ</strong></span><span class="local-indicator" id="connection">● เก็บในเครื่องนี้</span></header>
+    <header class="topbar">
+      <span class="topbar-crumb">ห้องสมุดเล็ก ๆ ของเรา <span aria-hidden="true">/</span> <strong id="breadcrumb">ชั้นหนังสือ</strong></span>
+      <button type="button" class="local-indicator" id="connection" title="สถานะการซิงก์ข้อมูล">● เก็บในเครื่องนี้</button>
+    </header>
     <main id="main" tabindex="-1"></main>
-    <footer>คั่นไว้ · เก็บเรื่องราวไว้ แล้วไปพบเล่มใหม่กัน <span id="footer-status">ชั้นหนังสือส่วนตัว</span></footer>
+    <footer>
+      <span>คั่นไว้ · เก็บเรื่องราวไว้ แล้วไปพบเล่มใหม่กัน</span>
+      <span id="footer-status">ชั้นหนังสือส่วนตัว</span>
+    </footer>
   </div>
   <dialog id="modal" aria-labelledby="modal-title"><div id="modal-content"></div></dialog>
   <dialog id="auth-modal" aria-label="เข้าสู่ระบบอีกครั้ง"><div id="auth-modal-content"></div></dialog>

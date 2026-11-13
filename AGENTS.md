@@ -2,7 +2,7 @@
 
 ## บริบท
 
-ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.10.3 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/development/history/releases.md` และ `docs/development/history/implementation-notes.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
+ผู้ใช้ต้องการเว็บเช็กหนังสือก่อนซื้อ สำหรับการ์ตูนและนิยายประมาณ 200+ เล่ม มีบัญชี ข้อมูลข้ามเครื่อง และ PWA เอกสารอยู่ใน `docs/` มีระบบ 0.11.0 แบบ vanilla HTML/CSS/JS + Node.js 24.22.2 + SQLite พร้อมบัญชี email/password ในแอพ, owner-scoped photos, IndexedDB outbox และ conflict UI แล้ว อ่าน `docs/development/history/releases.md` และ `docs/development/history/implementation-notes.md` เพื่อดูสถานะจริง มี settings แหล่ง ISBN ต่อบัญชีและ NLT adapter แบบทดลอง default-off แล้ว ยังไม่มี public hosting หรือ AI provider
 
 0.7.1 มีรายการย่อ ตัวกรอง target/ที่เก็บ/แท็ก แก้หลาย entry และ CSV import พร้อม mapping/review แล้ว อ่าน docs/reference/shelf-management.md กติกา target unknown/ordered/box และ CSV duplicate/edition matching ต้องรักษา แท็กเป็นระดับ series ไม่ใช่ per-volume ใช้ validateState ฝั่ง server และ mutation/outbox เดิม
 

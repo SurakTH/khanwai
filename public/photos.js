@@ -1,6 +1,8 @@
 // Shared cover editor: prepare locally; the caller saves only after review.
+const placeholderSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 3v18M12 8h4M12 12h4"/></svg>';
+
 export function photoEditorMarkup(escape) {
-  return `<section class="photo-editor" aria-label="แนบรูปปก"><div id="photo-preview" class="photo-preview"><span aria-hidden="true">▧</span></div><div><strong>รูปปก</strong><p class="subtitle">JPG, PNG, WebP · บันทึกเมื่อกดยืนยัน</p><div class="photo-actions"><label class="button">เลือกรูป<input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" class="visually-hidden"></label><label class="button">ถ่ายรูป<input id="photo-camera" type="file" accept="image/*" capture="environment" class="visually-hidden"></label><button type="button" class="button" id="photo-paste-button" aria-label="วางรูปจากคลิปบอร์ด">วางรูป</button><button type="button" class="button ghost" id="photo-remove">ลบรูป</button></div><details class="photo-paste-options"><summary>วางด้วยคีย์บอร์ด / แตะค้าง</summary><label class="photo-paste-label" for="photo-paste">วางรูปตรงนี้</label><textarea id="photo-paste" rows="2" aria-label="วางรูปปกที่นี่" aria-describedby="photo-paste-help" placeholder="⌘V / Ctrl+V หรือแตะค้าง"></textarea><p id="photo-paste-help" class="subtitle">ใช้ “คัดลอกรูปภาพ” แทนคัดลอกลิงก์รูป</p></details><p id="photo-status" class="subtitle" role="status">${escape('ไม่จำเป็นต้องมีรูปก็เพิ่มหนังสือได้')}</p></div></section>`;
+  return `<section class="photo-editor" aria-label="แนบรูปปก"><div id="photo-preview" class="photo-preview"><span>${placeholderSvg}</span></div><div><strong>รูปปก</strong><p class="subtitle">JPG, PNG, WebP · บันทึกเมื่อกดยืนยัน</p><div class="photo-actions"><label class="button">เลือกรูป<input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" class="visually-hidden"></label><label class="button">ถ่ายรูป<input id="photo-camera" type="file" accept="image/*" capture="environment" class="visually-hidden"></label><button type="button" class="button" id="photo-paste-button" aria-label="วางรูปจากคลิปบอร์ด">วางรูป</button><button type="button" class="button ghost" id="photo-remove">ลบรูป</button></div><details class="photo-paste-options"><summary>วางด้วยคีย์บอร์ด / แตะค้าง</summary><label class="photo-paste-label" for="photo-paste">วางรูปตรงนี้</label><textarea id="photo-paste" rows="2" aria-label="วางรูปปกที่นี่" aria-describedby="photo-paste-help" placeholder="⌘V / Ctrl+V หรือแตะค้าง"></textarea><p id="photo-paste-help" class="subtitle">ใช้ “คัดลอกรูปภาพ” แทนคัดลอกลิงก์รูป</p></details><p id="photo-status" class="subtitle" role="status">${escape('ไม่จำเป็นต้องมีรูปก็เพิ่มหนังสือได้')}</p></div></section>`;
 }
 
 export function mountPhotoEditor(root, initial = '') {
@@ -10,11 +12,19 @@ export function mountPhotoEditor(root, initial = '') {
   const editor = root.querySelector('.photo-editor'), pasteArea = root.querySelector('#photo-paste'), pasteButton = root.querySelector('#photo-paste-button');
   const supported = ['image/png', 'image/jpeg', 'image/webp'];
   const current = version => version === generation && editor.isConnected && (!editor.closest('dialog') || editor.closest('dialog').open);
-  const setBusy = value => { busy=value; pasteButton.disabled=value; editor.setAttribute('aria-busy',String(value)); };
+  const setBusy = value => { busy = value; pasteButton.disabled = value; editor.setAttribute('aria-busy', String(value)); };
   const render = () => {
     preview.replaceChildren();
-    if (image) { const img = document.createElement('img'); img.src = image; img.alt = 'พรีวิวรูปปก'; preview.append(img); }
-    else { const label = document.createElement('span'); label.textContent = '▧'; preview.append(label); }
+    if (image) {
+      const img = document.createElement('img');
+      img.src = image;
+      img.alt = 'พรีวิวรูปปก';
+      preview.append(img);
+    } else {
+      const label = document.createElement('span');
+      label.innerHTML = placeholderSvg;
+      preview.append(label);
+    }
   };
   const prepare = async read => {
     const version = ++generation; setBusy(true); message.textContent = 'กำลังเตรียมรูป…';
@@ -41,27 +51,27 @@ export function mountPhotoEditor(root, initial = '') {
   };
   editor.addEventListener('paste', event => {
     const files = [...(event.clipboardData?.files ?? [])];
-    if (!files.length) for (const item of event.clipboardData?.items ?? []) if (item.kind === 'file') { const file=item.getAsFile();if(file)files.push(file); }
+    if (!files.length) for (const item of event.clipboardData?.items ?? []) if (item.kind === 'file') { const file = item.getAsFile(); if (file) files.push(file); }
     const file = files.find(file => supported.includes(file.type)) ?? files.find(file => file.type.startsWith('image/'));
-    if (file) { event.preventDefault();pasteArea.value='';prepare(() => file); }
-    else if (event.target === pasteArea) { event.preventDefault();pasteArea.value='';message.textContent='ยังไม่มีไฟล์รูปให้วาง ใช้ “คัดลอกรูปภาพ” แล้วลองใหม่ หรือกดเลือกรูป'; }
+    if (file) { event.preventDefault(); pasteArea.value = ''; prepare(() => file); }
+    else if (event.target === pasteArea) { event.preventDefault(); pasteArea.value = ''; message.textContent = 'ยังไม่มีไฟล์รูปให้วาง ใช้ “คัดลอกรูปภาพ” แล้วลองใหม่ หรือกดเลือกรูป'; }
   });
-  pasteArea.addEventListener('input', () => { pasteArea.value='';message.textContent='ช่องนี้สำหรับวางรูปที่คัดลอกไว้ ใช้ ⌘V / Ctrl+V หรือแตะค้างแล้วเลือกวาง'; });
+  pasteArea.addEventListener('input', () => { pasteArea.value = ''; message.textContent = 'ช่องนี้สำหรับวางรูปที่คัดลอกไว้ ใช้ ⌘V / Ctrl+V หรือแตะค้างแล้วเลือกวาง'; });
   pasteButton.addEventListener('click', () => {
-    if (!window.isSecureContext || !navigator.clipboard?.read) { root.querySelector('.photo-paste-options').open=true;pasteArea.focus();message.textContent='แตะช่องวางรูป แล้วใช้ ⌘V / Ctrl+V หรือแตะค้างเลือกวาง หากใช้ปุ่มวางรูปให้เปิดเว็บผ่าน HTTPS';return; }
+    if (!window.isSecureContext || !navigator.clipboard?.read) { root.querySelector('.photo-paste-options').open = true; pasteArea.focus(); message.textContent = 'แตะช่องวางรูป แล้วใช้ ⌘V / Ctrl+V หรือแตะค้างเลือกวาง หากใช้ปุ่มวางรูปให้เปิดเว็บผ่าน HTTPS'; return; }
     prepare(async () => {
       let items;
-      try { items=await navigator.clipboard.read(); }
+      try { items = await navigator.clipboard.read(); }
       catch { throw Error('ยังวางรูปไม่ได้ ลองอนุญาตให้เบราว์เซอร์วางรูป หรือใช้ช่องวางรูป / ปุ่มเลือกรูป'); }
-      for(const item of items) {
-        const type=supported.find(type=>item.types.includes(type)) ?? item.types.find(type=>type.startsWith('image/'));
-        if(type)return item.getType(type);
+      for (const item of items) {
+        const type = supported.find(type => item.types.includes(type)) ?? item.types.find(type => type.startsWith('image/'));
+        if (type) return item.getType(type);
       }
       throw Error('ยังไม่มีไฟล์รูปให้วาง ใช้ “คัดลอกรูปภาพ” แล้วลองใหม่ หรือกดเลือกรูป');
     });
   });
   root.querySelectorAll('#photo-file, #photo-camera').forEach(input => input.addEventListener('change', choose));
-  root.querySelector('#photo-remove').addEventListener('click', () => { generation++; setBusy(false); pasteArea.value=''; image = ''; render(); message.textContent = 'ลบรูปจากพรีวิวแล้ว กดยืนยันเพื่อบันทึก'; });
+  root.querySelector('#photo-remove').addEventListener('click', () => { generation++; setBusy(false); pasteArea.value = ''; image = ''; render(); message.textContent = 'ลบรูปจากพรีวิวแล้ว กดยืนยันเพื่อบันทึก'; });
   render();
   return () => { if (busy) throw Error('รอเตรียมรูปให้เสร็จก่อนนะ'); return image; };
 }
